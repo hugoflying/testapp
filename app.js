@@ -1953,12 +1953,14 @@ function renderTabs(){
 
   // Un seul bouton : clic = liste Airport Keeper,
   // double-clic ou appui long = creation d'un vol hors AK.
-  tabBar.innerHTML = `
+  // Bouton Vols : placé avant la bande défilante des onglets (jamais recouvert)
+  document.getElementById('volsBtn')?.remove();
+  tabBar.innerHTML = '';
+  tabBar.insertAdjacentHTML('beforebegin', `
     <button class="vols-btn" type="button" id="volsBtn"
             title="Clic : liste des vols — Double-clic ou appui long : vol hors Keeper">
       <svg class="ico"><use href="#i-plus"/></svg>Vols
-    </button>
-  `;
+    </button>`);
   wireVolsButton();
 
   let tabs = JSON.parse(localStorage.getItem('flightTabs') || '[]');
