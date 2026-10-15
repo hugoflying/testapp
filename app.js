@@ -2504,7 +2504,7 @@ function generateTimingFields(){
         <div class="control">
           <div class="time-wrap" data-id="${id}">
             <input type="time" id="${id}" class="tw-hidden-input" onchange="updateAllCalculations(); twSync('${id}')">
-            <div class="input tw-display" id="tw-disp-${id}">--:--</div>
+            <div class="tw-display" id="tw-disp-${id}">--:--</div>
             <div class="tw-zone tw-zone-left"  data-action="minus">−1</div>
             <div class="tw-zone tw-zone-center" data-action="now"></div>
             <div class="tw-zone tw-zone-right" data-action="plus">+1</div>
@@ -6524,7 +6524,7 @@ function checkAndDeleteIfEmpty(){
 /* ===== Service Worker — enregistrement ===== */
 if ('serviceWorker' in navigator) {
   const swCode = `
-const CACHE = 'suivi-perf-v1';
+const CACHE = 'suivi-perf-v2';
 const PRECACHE = [];   // fichiers à précacher (vide = online-only)
 
 self.addEventListener('install', e => {

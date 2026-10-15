@@ -71,7 +71,7 @@
     if(m) new MutationObserver(syncTabbar).observe(m, { attributes:true, attributeFilter:['style'] });
 
     // Cases Load vides : un tiret montre où saisir
-    document.querySelectorAll('#ldmModal .ld-stat input:not([readonly])').forEach(i=>{ if(!i.placeholder) i.placeholder = '–'; });
+    document.querySelectorAll('#ldmModal .ld-stat input:not([readonly]), #ldmModal .ld-tob input').forEach(i=>{ if(!i.placeholder) i.placeholder = '–'; });
 
     // Codes retard : l'erreur de validation se met à jour pendant la saisie
     const dl = document.querySelector('.dl-wrap');
