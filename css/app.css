@@ -166,10 +166,9 @@ body.has-tab .tabbar{display:grid}
 body.no-tab .fixed-header,body.no-tab .tabbar{display:none!important}
 
 /* Onglets de vols (rendus par renderTabs) */
-.flights{flex:1;display:flex;align-items:center;gap:6px;overflow-x:auto;scrollbar-width:none;min-width:0;padding-right:28px;scroll-snap-type:x proximity;
-  -webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 28px),transparent);mask-image:linear-gradient(90deg,#000 calc(100% - 28px),transparent)}
+.flights{flex:1;display:flex;align-items:center;gap:6px;overflow-x:auto;scrollbar-width:none;min-width:0;scroll-snap-type:x proximity;border-radius:10px}
 .flights::-webkit-scrollbar{display:none}
-.vols-btn{flex:none;position:sticky;left:0;z-index:1;height:36px;border-radius:10px;border:1px solid var(--accent);background:color-mix(in srgb,var(--accent) 12%,var(--surface));box-shadow:6px 0 8px -4px var(--surface);color:var(--accent);padding:0 10px;display:inline-flex;align-items:center;gap:6px;font-weight:700;font-size:14px;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+.vols-btn{flex:none;height:36px;border-radius:10px;border:1px solid var(--accent);background:color-mix(in srgb,var(--accent) 12%,var(--surface));color:var(--accent);padding:0 10px;display:inline-flex;align-items:center;gap:6px;font-weight:700;font-size:14px;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
 .vols-btn .ico{width:16px;height:16px}
 .flt{flex:none;display:inline-flex;align-items:stretch;height:36px;border-radius:10px;border:1px solid var(--line);background:var(--surface-2);overflow:hidden;scroll-snap-align:start}
 .flt.is-on{background:var(--accent-soft);border-color:var(--accent)}
@@ -505,3 +504,37 @@ body.pv-locked .home-actions{display:none}
 @media (min-width:700px){
   .iv-edit{grid-template-columns:repeat(4,1fr)}
 }
+
+/* ---------- v1.1 : corrections après test sur téléphone ---------- */
+/* Champ horaire généré (.input.tw-display) : pas de cadre ni d'arrondi propres */
+.time-wrap .tw-display{height:auto;min-height:0;border-radius:0;border-top:0;border-bottom:0;padding:0;box-shadow:none!important;-webkit-appearance:none;appearance:none}
+.time-wrap:not(.tw-empty) .tw-display{background:transparent}
+/* Libellés des jalons : texte continu (évite "Envoi   eLID") */
+#timing-grid .field .label{display:block}
+#timing-grid .field .label .tw-dot{margin-right:9px;vertical-align:1px}
+/* Cases Load : zone de saisie visible même vide */
+.ld-stat input{height:30px;line-height:30px}
+.ld-stat input:placeholder-shown{color:var(--faint)}
+/* TOB : valeur centrée sur toute la largeur de la case */
+.ld-tob{position:relative;display:flex;justify-content:center}
+.ld-tob-label{position:absolute;left:14px;top:50%;transform:translateY(-50%)}
+.ld-tob input{width:60%}
+.ld-tob #lidGuideBtn{position:absolute;right:8px;top:50%;transform:translateY(-50%)}
+/* Bouton Vols séparé de la bande des onglets */
+.fh-top > .vols-btn{margin-right:2px}
+
+/* ---------- v1.2 ---------- */
+/* Bande des onglets : bord net, le menu ⋯ séparé par un filet */
+#moreBtn{border-left:1px solid var(--line);border-radius:0 10px 10px 0;margin-left:2px}
+/* Load PREVI : espacement régulier entre les blocs */
+#previFRRK,#previOTHER{display:flex;flex-direction:column;gap:12px}
+.ld-tob{min-height:52px;padding:8px 12px}
+.ld-tob input::placeholder{color:var(--faint);font-weight:500}
+
+/* ---- v1.3 : textes grisés plus petits, TOB toujours espacé ---- */
+.ld-stat input::placeholder,.ld-tob input::placeholder{font-family:var(--f-ui);font-size:13px;font-weight:500;letter-spacing:0;color:var(--faint)}
+.ld-stat input:placeholder-shown{text-overflow:ellipsis}
+#previFRRK,#previOTHER{display:flex;flex-direction:column;gap:0}
+.ldm-card .ld-tob{margin:12px 0}
+#ldmFinal .ld-tob{margin:12px 0 4px}
+.ld-row-4 .ld-stat input::placeholder{font-size:11px;letter-spacing:-.01em}
