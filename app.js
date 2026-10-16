@@ -2690,18 +2690,6 @@ function generateTimingFields(){
         <div class="grid-auto">
           ${fieldHTML('RechercheBagDebut','Début de recherche',false,false,'is-pink')}
           ${fieldHTML('RechercheBagFin','Fin de recherche',false,false,'is-pink')}
-          <div class="span-6">
-            <div class="field">
-              <label class="label"><span class="tw-dot" style="background:#ec4899;"></span>Nombre de bags</label>
-              <div class="control">
-                <div class="bag-step">
-                  <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="3" id="RechercheBagNombre" placeholder="0" oninput="digitsOnly(this); twSync('RechercheBagNombre')">
-                  <button type="button" class="bs-btn" onclick="bagStep('RechercheBagNombre',-1)" aria-label="Retirer un bag">−1</button>
-                  <button type="button" class="bs-btn" onclick="bagStep('RechercheBagNombre',1)" aria-label="Ajouter un bag">+1</button>
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
     </div>
@@ -6249,7 +6237,7 @@ function confirmClearFields(){
     'ArrPNT','ArrPNC','ArriveeFuel','DepartFuel','ArriveeLiftArr','DepartLiftArr',
     'ArriveeLift','DepartLift','AvionPremierEmbarque','AvionDernierEmbarque',
     'FermeturePorteAvion','RemiseLID','ConnexionAgentCasque','ArriveeINAD',
-    'ArrPNT','ArrPNC','AnnonceINAD','AppelNayak','ArriveeNayak','DepartNayak','RechercheBagNombre','RechercheBagDebut','RechercheBagFin',
+    'ArrPNT','ArrPNC','AnnonceINAD','AppelNayak','ArriveeNayak','DepartNayak','RechercheBagDebut','RechercheBagFin',
     'MiseEnPlaceTapis','DebutDechargementBagages','FinDechargementBagages','DebutRepositionnement','FinRepositionnement','DebutChargementBagages','FinChargementBagages',
     'ConnexionPush','ChangementPush','FermetureSouteAV','FermetureSouteAR','RetraitEchelleAV','RetraitEchelleAR','ReouverturePorteAvion','DebutComptageBagages','FinComptageBagages',
     'CommChiffresPorte', 'CommChargementPiste',
@@ -6619,16 +6607,6 @@ function twSync(id){
 }
 // Sync all tw displays on load and after calculations
 const _origUpdateAll = typeof updateAllCalculations === 'function' ? updateAllCalculations : null;
-/* Compteur −1 / +1 (Recherche bag : nombre de bags) */
-function bagStep(id, d){
-  const el = document.getElementById(id);
-  if(!el) return;
-  const n = Math.max(0, (parseInt(el.value, 10) || 0) + d);
-  el.value = n ? String(n) : '';
-  el.dispatchEvent(new Event('input',  { bubbles:true }));
-  el.dispatchEvent(new Event('change', { bubbles:true }));
-}
-
 function twSyncAll(){
   document.querySelectorAll('.time-wrap').forEach(w => {
     const id = w.dataset.id;
@@ -6705,7 +6683,7 @@ function checkAndDeleteIfEmpty(){
 /* ===== Service Worker — enregistrement ===== */
 if ('serviceWorker' in navigator) {
   const swCode = `
-const CACHE = 'suivi-perf-v33';
+const CACHE = 'suivi-perf-v34';
 const PRECACHE = [];   // fichiers à précacher (vide = online-only)
 
 self.addEventListener('install', e => {
