@@ -902,3 +902,10 @@ html.dark .rc-blk.blk-in{color:#8FA6FF!important}
 /* v2.20 : Récap — SOBT / EOBT / CTOT en pied de carte */
 .rc-meta{gap:10px;flex-wrap:wrap;row-gap:4px}
 .rc-meta .rc-ctot b{color:var(--fg);background:var(--warn-soft);padding:0 4px;border-radius:4px}
+
+/* v2.21 : bouton d'ajout = rond « + » ; bandeau du vol masqué sur le Récap */
+.fixed-header .vols-btn{width:36px;height:36px;padding:0;border-radius:50%;justify-content:center;gap:0;box-shadow:0 2px 6px rgba(11,30,79,.25)}
+.fixed-header .vols-btn .ico{width:18px;height:18px}
+.fixed-header .vols-btn .vb-t{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.fixed-header .vols-btn:active{transform:scale(.94)}
+body[data-panel="vols"] .fh-band{display:none}

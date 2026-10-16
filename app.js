@@ -1960,9 +1960,9 @@ function renderTabs(){
   document.getElementById('volsBtn')?.remove();
   tabBar.innerHTML = '';
   tabBar.insertAdjacentHTML('beforebegin', `
-    <button class="vols-btn" type="button" id="volsBtn"
+    <button class="vols-btn" type="button" id="volsBtn" aria-label="Ajouter un vol"
             title="Clic : liste des vols — Double-clic ou appui long : vol hors Keeper">
-      <svg class="ico"><use href="#i-plus"/></svg>Vols
+      <svg class="ico"><use href="#i-plus"/></svg><span class="vb-t">Vols</span>
     </button>`);
   wireVolsButton();
 
@@ -6642,7 +6642,7 @@ function checkAndDeleteIfEmpty(){
 /* ===== Service Worker — enregistrement ===== */
 if ('serviceWorker' in navigator) {
   const swCode = `
-const CACHE = 'suivi-perf-v25';
+const CACHE = 'suivi-perf-v26';
 const PRECACHE = [];   // fichiers à précacher (vide = online-only)
 
 self.addEventListener('install', e => {

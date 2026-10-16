@@ -32,6 +32,8 @@
       if(tl && tl.style.display !== 'none') requestAnimationFrame(()=>{ try{ renderTimeline(); }catch(e){} });
     }
     if(name === 'vols') renderRecap();
+    // Le bandeau du vol courant est masqué sur le Récap : recalcule la hauteur d'en-tête
+    try{ updateHeaderOffset(); }catch(e){}
     if(name === 'notes'){
       // Mode Stylet / Clavier : rétablit le dernier mode si aucun n'est actif
       if(!document.querySelector('#bnPenLi.is-active, #bnTextLi.is-active') && typeof bnSwitchMode === 'function'){
@@ -305,7 +307,7 @@
     const view = recapView();
     document.querySelectorAll('.rc-seg button').forEach(b => b.classList.toggle('is-on', b.dataset.view === view));
     document.getElementById('rcSub').textContent = F.length ? F.length + ' vol' + (F.length > 1 ? 's' : '') + ' · ' + fmtHM(nowMin()) + (lateN ? ' · ' + lateN + ' en retard' : '') : '';
-    if(!F.length){ list.innerHTML = '<div class="rc-empty">Aucun vol ouvert. Touche « + Vols » en haut pour en ajouter un.</div>'; return; }
+    if(!F.length){ list.innerHTML = '<div class="rc-empty">Aucun vol ouvert. Touche le « + » en haut pour en ajouter un.</div>'; return; }
     const key = f => f.done ? 1e6 : (f.left == null ? 1e5 : f.left);
     const sorted = F.slice().sort((a,b) => key(a) - key(b));
     if(view === 'cmp'){
