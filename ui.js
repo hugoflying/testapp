@@ -438,7 +438,16 @@
       if(!zSum && isNaN(main)) zs.innerHTML = '';
       else { const ok = !isNaN(main) && zSum === main; zs.innerHTML = '<b class="' + (ok ? 'ok' : 'ko') + '">' + zSum + '</b> / ' + (isNaN(main) ? '–' : main) + ' pax'; }
     }
-    zIds.forEach(id => { const t = document.getElementById(id).closest('.ld-stat'); t.style.setProperty('--zw', (zSum ? (ldInt(id) || 0) / zSum * 100 : 0).toFixed(1) + '%'); });
+    // Total des zones ≠ TOB → zones en rouge ; jauge = remplissage vs capacité (placeholder « 27 (1-5) »)
+    const zKo = !isNaN(main) && zSum !== main;
+    ['FinalOA','FinalOB','FinalOC','FinalOD'].forEach(id => {
+      const inp = document.getElementById(id), t = inp?.closest('.ld-stat'); if(!t) return;
+      t.classList.toggle('ld-ko', zKo && zIds.includes(id));
+      const cap = parseInt((/^(\d+)/.exec(inp.placeholder || '') || [])[1], 10);
+      const v = ldInt(id) || 0;
+      t.style.setProperty('--zw', (cap > 0 ? Math.min(100, v / cap * 100) : 0).toFixed(1) + '%');
+      t.classList.toggle('ld-over', cap > 0 && v > cap);
+    });
     // Soutes : barre proportionnelle + total pièces / kg
     const bar = document.getElementById('ldHoldBar');
     if(bar){

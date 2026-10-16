@@ -980,3 +980,7 @@ html.dark #ldmModal .ld-tob.ld-hero{background:#16265E}
 .ld-holdbar div span{font-weight:600;opacity:.8}
 .ld-holdbar div i{font-style:normal;opacity:.6}
 .ld-holdbar div b{font-weight:800}
+/* v2.27 : zones en rouge si total ≠ TOB ; jauge = remplissage de la zone */
+#ldmModal .ld-box .ld-stat.ld-ko{background:var(--crit-soft);border-color:var(--crit)}
+#ldmModal .ld-stat.ld-ko .ld-stat-label,#ldmModal .ld-stat.ld-ko input{color:var(--crit)}
+#ldmModal #finalZonesRow .ld-stat.ld-over::after{background:var(--crit)}
