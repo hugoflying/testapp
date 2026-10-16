@@ -2538,8 +2538,8 @@ function generateTimingFields(){
     <div class="card mb-4">
       <div class="card-content">
         <div class="grid-auto">
-          <div class="span-6">${fieldHTML('PremierDebarque','1er débarqué (L1)')}</div>
-          <div class="span-6">${fieldHTML('PremierDebarqueL2','1er débarqué (L2)')}</div>
+          <div class="span-6">${fieldHTML('PremierDebarque','1er débarqué (AV)')}</div>
+          <div class="span-6">${fieldHTML('PremierDebarqueL2','1er débarqué (AR)')}</div>
           <div class="span-6">${fieldHTML('ArriveeFuel','Arrivée Avitair',true,false,'is-warning')}</div>
           <div class="span-6">${fieldHTML('DernierDebarque','Dernier débarqué')}</div>
           <div class="span-6">${fieldHTML('ArriveeLiftArr','Arrivée lift',false,false,'is-success')}</div>
@@ -5718,8 +5718,8 @@ function doValidate() {
   if(t('ArrPNC'))            { body += r('ARRIVEE PNC', t('ArrPNC')); }
 
   body += br();
-  if(t('PremierDebarque'))   { body += r('PREMIER DEBARQUE (L1)', t('PremierDebarque')); }
-  if(t('PremierDebarqueL2')) { body += r('PREMIER DEBARQUE (L2)', t('PremierDebarqueL2')); }
+  if(t('PremierDebarque'))   { body += r('PREMIER DEBARQUE (AV)', t('PremierDebarque')); }
+  if(t('PremierDebarqueL2')) { body += r('PREMIER DEBARQUE (AR)', t('PremierDebarqueL2')); }
   if(t('DernierDebarque'))   { body += r('DERNIER DEBARQUE',      t('DernierDebarque')); }
 
   body += br();
@@ -6691,7 +6691,7 @@ function checkAndDeleteIfEmpty(){
 /* ===== Service Worker — enregistrement ===== */
 if ('serviceWorker' in navigator) {
   const swCode = `
-const CACHE = 'suivi-perf-v28';
+const CACHE = 'suivi-perf-v29';
 const PRECACHE = [];   // fichiers à précacher (vide = online-only)
 
 self.addEventListener('install', e => {
