@@ -203,9 +203,34 @@
     try{ renderTimeline(); }catch(e){}
   }
 
+  /* ===== Onglets de vol : anneau d'avancement autour du code compagnie ===== */
+  function ringRatio(a, d){
+    if(a == null || d == null) return null;
+    if(d <= a) d += 1440;
+    const n = new Date(); let now = n.getHours()*60 + n.getMinutes() + n.getSeconds()/60;
+    if(now < a - 720) now += 1440;
+    return (now - a) / (d - a);
+  }
+  function syncTabRings(){
+    document.querySelectorAll('#tab-bar .flt[data-tab]').forEach(t => {
+      const ring = t.querySelector('.flt-cie'); if(!ring) return;
+      let r = null;
+      if(t.classList.contains('is-on')){
+        r = ringRatio(toMin(val('AIBT')), toMin(txt('timer-eobt')) ?? toMin(val('SOBT')));
+      } else {
+        let d = {}; try{ d = JSON.parse(localStorage.getItem('tab-' + t.dataset.tab) || '{}'); }catch(e){}
+        r = ringRatio(toMin(d.AIBT || ''), toMin(d.SOBT || ''));
+      }
+      const p = r == null ? 0 : Math.max(0, Math.min(1, r)) * 100;
+      ring.style.setProperty('--p', p.toFixed(1) + '%');
+      ring.classList.toggle('over', r != null && r > 1);
+    });
+  }
+
   function init(){
-    syncHero(); setInterval(()=>{ syncHero(); syncEvents(); }, 1000);
-    initSwipe(); syncFollowBtn(); setInterval(tlTick, 15000);
+    syncHero(); setInterval(()=>{ syncHero(); syncEvents(); syncTabRings(); }, 1000);
+    initSwipe(); syncFollowBtn(); syncTabRings();
+    const tb = document.getElementById('tab-bar'); if(tb) new MutationObserver(()=>requestAnimationFrame(syncTabRings)).observe(tb, { childList:true }); setInterval(tlTick, 15000);
     document.addEventListener('click', e => { if(e.target.closest('.ev-x, .tw-zone')) setTimeout(syncEvents, 0); });
     let start = 'vol';
     try{ start = localStorage.getItem('uiPanel') || 'vol'; }catch(e){}

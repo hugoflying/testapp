@@ -784,3 +784,19 @@ body[data-panel="timing"] #appWrap{touch-action:pan-y pinch-zoom}
 html.dark .tl-follow[aria-pressed="true"]{border-color:#8FA6FF;color:#8FA6FF}
 .ev-item.is-on em{color:var(--ok)}
 .tl-follow{order:-1}
+
+/* ---- v2.8 : onglets de vol en pastilles + anneau d'avancement (choix B3) ---- */
+.fixed-header .flt{height:38px;border:1px solid var(--line);border-radius:999px;background:var(--surface);box-shadow:none;align-items:center;padding:0 2px 0 3px}
+.fixed-header .flt.is-on{border:1.5px solid var(--navy);box-shadow:none;background:var(--surface)}
+html.dark .fixed-header .flt.is-on{border-color:#8FA6FF}
+.fixed-header .flt-go{display:inline-flex;align-items:center;gap:5px;height:100%;padding:0 8px 0 0;font-family:var(--f-ui);font-size:13px;font-weight:700;color:var(--fg)}
+.flt-cie{--p:0%;width:30px;height:30px;border-radius:50%;flex:none;padding:3px;background:conic-gradient(var(--yellow) var(--p),var(--line) 0)}
+.flt-cie.over{background:conic-gradient(var(--red, #D7263D) var(--p),var(--line) 0)}
+.flt-cie b{display:grid;place-items:center;width:100%;height:100%;border-radius:50%;background:var(--surface-2);color:var(--fg);font-size:10.5px;font-weight:800;letter-spacing:.02em}
+.fixed-header .flt.is-on .flt-cie b{background:var(--navy);color:#fff}
+html.dark .fixed-header .flt.is-on .flt-cie b{background:#2A3E7A}
+.flt-n{font-variant-numeric:tabular-nums}
+.flt-d{color:var(--muted);font-weight:600}
+.fixed-header .flt:not(.is-on) .tab-refresh{display:none}
+.fixed-header .flt .tab-refresh{border-left:0;width:26px;height:100%;color:var(--muted)}
+.fixed-header .flt:not(.is-on) .flt-go{padding-right:10px}

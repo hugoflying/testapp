@@ -2000,7 +2000,14 @@ function renderTabs(){
     const btn = document.createElement('button');
     btn.className = 'flt-go';
     btn.type = 'button';
-    btn.textContent = label || 'VOL';
+    // B3 : rond compagnie entouré de l'anneau d'avancement, puis n° et escale
+    const cieCode = (cie || volRef.slice(0,2) || '').slice(0,2);
+    const num = volRef ? (cieCode && volRef.startsWith(cieCode) ? volRef.slice(cieCode.length) : volRef) : '';
+    btn.innerHTML = (volRef || place)
+      ? `<span class="flt-cie"><b>${escapeHtml(cieCode || '–')}</b></span><span class="flt-n">${escapeHtml(num)}</span>${place ? `<span class="flt-d">${escapeHtml(place)}</span>` : ''}`
+      : `<span class="flt-cie"><b>–</b></span><span class="flt-n">VOL</span>`;
+    btn.setAttribute('aria-label', label || 'VOL');
+    wrap.dataset.tab = id;
     btn.onclick = ()=> switchTab(id);
     btn.ondblclick = ()=> openTabCloseModal(id);
 
@@ -6639,7 +6646,7 @@ function checkAndDeleteIfEmpty(){
 /* ===== Service Worker — enregistrement ===== */
 if ('serviceWorker' in navigator) {
   const swCode = `
-const CACHE = 'suivi-perf-v12';
+const CACHE = 'suivi-perf-v13';
 const PRECACHE = [];   // fichiers à précacher (vide = online-only)
 
 self.addEventListener('install', e => {
