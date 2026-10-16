@@ -891,3 +891,9 @@ html.dark .panel-vols .soon{color:var(--yellow)}
 .rc-cdbig b{font-size:28px;font-weight:600;letter-spacing:-.01em}
 .rc-t b{font-size:16px}
 .rc-cd{font-size:20px;font-weight:700}
+/* v2.17 : statut sol en bas des cartes du récap */
+.rc-blk{font-size:11px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;padding:2px 8px;border-radius:999px}
+.rc-blk.blk-out{background:var(--surface-2);color:var(--muted)!important}
+.rc-blk.blk-in{background:rgba(61,107,224,.12);color:#3D6BE0!important}
+.rc-blk.blk-dep{background:rgba(31,157,87,.12);color:var(--ok)!important}
+html.dark .rc-blk.blk-in{color:#8FA6FF!important}
