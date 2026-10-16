@@ -121,6 +121,30 @@
       if(f && p.style.display === 'none'){ try{ toggleDepExtra(p.dataset.ev); }catch(e){ p.style.display = 'block'; } }
     });
     const add = document.getElementById('evAddBtn');
+    syncEvDurations();
+  }
+
+  // Durée affichée dans l'en-tête des événements début / fin
+  const EV_PAIRS = {
+    dechargement:['DebutDechargementBagages','FinDechargementBagages'], repositionnement:['DebutRepositionnement','FinRepositionnement'],
+    chargement:['DebutChargementBagages','FinChargementBagages'], comptage:['DebutComptageBagages','FinComptageBagages'],
+    'recherche-bag':['RechercheBagDebut','RechercheBagFin'], gpu:['ArriveeNayak','DepartNayak']
+  };
+  function syncEvDurations(){
+    const n = new Date(), nowM = n.getHours()*60 + n.getMinutes();
+    Object.keys(EV_PAIRS).forEach(k => {
+      const p = document.getElementById('panel-' + k); if(!p) return;
+      const h = p.querySelector('.ev-h'); if(!h) return;
+      let el = h.querySelector('.ev-dur');
+      const a = toMin(val(EV_PAIRS[k][0])), b = toMin(val(EV_PAIRS[k][1]));
+      let t = '', run = false;
+      if(a != null && b != null) t = (((b - a) % 1440) + 1440) % 1440 + ' min';
+      else if(a != null){ t = (((nowM - a) % 1440) + 1440) % 1440 + ' min'; run = true; }
+      if(!t){ if(el) el.remove(); return; }
+      if(!el){ el = document.createElement('span'); el.className = 'ev-dur'; h.insertBefore(el, h.querySelector('.ev-x')); }
+      el.textContent = run ? 'En cours · ' + t : t;
+      el.classList.toggle('run', run);
+    });
   }
 
   function evSheet(){

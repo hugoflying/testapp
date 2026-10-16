@@ -3754,6 +3754,12 @@ function collectTimelineData(){
     const t = parseHHMM(document.getElementById(id)?.value || '');
     if(t!=null) fixedPoints.push({label, t, cls:'tl--std'});
   });
+  // Autres heures d'événements (début seul compris) : elles élargissent la fenêtre
+  ['ConnexionAgentCasque','AnnonceINAD','ArriveeINAD','AppelNayak','ArriveeNayak','DepartNayak','RechercheBagDebut','RechercheBagFin',
+   'DebutDechargementBagages','DebutRepositionnement','DebutChargementBagages','DebutComptageBagages'].forEach(id=>{
+    const t = parseHHMM(document.getElementById(id)?.value || '');
+    if(t!=null) fixedPoints.push({label:id, t, cls:'tl--ev'});
+  });
 
   // ===== Cabin release (Dernier débarqué -> Premier embarqué)
   // Affiché SAUF si (SOBT - SIBT) > 35 ou si Arr PNT/PNC rempli
@@ -3795,6 +3801,8 @@ function collectTimelineData(){
     {label:'Repositionnement', pair:getPairWindow('DebutRepositionnement','FinRepositionnement'), cls:'tl--std', color:'#3273dc'},
     {label:'Chargement', pair:getPairWindow('DebutChargementBagages','FinChargementBagages'), cls:'tl--std', color:'#0f766e'},
     {label:'Comptage bagages', pair:getPairWindow('DebutComptageBagages','FinComptageBagages'), cls:'tl--std', color:'#0d9488'},
+    {label:'Recherche bag', pair:getPairWindow('RechercheBagDebut','RechercheBagFin'), cls:'tl--std', color:'#ec4899'},
+    {label:'Nayak', pair:getPairWindow('ArriveeNayak','DepartNayak'), cls:'tl--std', color:'#FFAD00'},
   ];
 
   const durations = rows
@@ -3964,8 +3972,40 @@ function renderTimeline(){
 
   const POINT_EVENTS = new Set(['FermeturePorteAvion','RemiseLID','ConnexionCasque','ArriveeINAD','ArriveeNayak','ArrPNT','ArrPNC']);
 
+  // v2.22 : événements ajoutés → une ligne dès qu'une heure est saisie (début seul = barre en cours)
+  const EV_SPANS = [
+    ['Déchargement',     'DebutDechargementBagages', 'FinDechargementBagages'],
+    ['Repositionnement', 'DebutRepositionnement',    'FinRepositionnement'],
+    ['Chargement',       'DebutChargementBagages',   'FinChargementBagages'],
+    ['Comptage bagages', 'DebutComptageBagages',     'FinComptageBagages'],
+    ['Recherche bag',    'RechercheBagDebut',        'RechercheBagFin'],
+    ['Nayak',            'ArriveeNayak',             'DepartNayak'],
+  ];
+  const EV_POINTS = [
+    ['MiseEnPlaceTapis','Tapis bagages'], ['ReouverturePorteAvion','Réouverture porte'],
+    ['FermetureSouteAV','Soute AV fermée'], ['FermetureSouteAR','Soute AR fermée'],
+    ['RetraitEchelleAV','Retrait échelle AV'], ['RetraitEchelleAR','Retrait échelle AR'],
+    ['ConnexionPush','Connexion push'], ['ChangementPush','Changement push'],
+    ['AnnonceINAD','Annonce INAD'], ['AppelNayak','Appel Nayak'],
+  ];
+  EV_POINTS.forEach(([id]) => POINT_EVENTS.add(id));
+  function eventRows(){
+    const out = [];
+    EV_SPANS.forEach(([label, s, e]) => {
+      const done = durations.find(d => d.label === label);
+      if(done){ out.push({ ...done, status:'complete', displayLabel: label }); return; }
+      const a = parseHHMM(document.getElementById(s)?.value || '');
+      if(a !== null) out.push({ label, a, b:null, cls:'tl--std', color:null, status:'in-progress', displayLabel: label });
+    });
+    EV_POINTS.forEach(([id, label]) => {
+      const a = parseHHMM(document.getElementById(id)?.value || '');
+      if(a !== null) out.push({ label:id, a, b:a, cls:'tl--std', color:null, status:'complete', displayLabel: label });
+    });
+    return out.sort((x, y) => toExtended(x.a, min, max) - toExtended(y.a, min, max));
+  }
+
   const ORDER = ['Débarquement','Cabin release','Avitair','Lift (Arr)','Embarquement','Lift (Dep)',
-                 'ArrPNT','ArrPNC','RemiseLID','FermeturePorteAvion','ConnexionCasque','ArriveeINAD','ArriveeNayak']
+                 'ArrPNT','ArrPNC','RemiseLID','FermeturePorteAvion','ConnexionCasque','ArriveeINAD']
                  .filter(l => !(hideCabinTidy && l === 'Cabin release'));
 
   // Ces 5 lignes s'affichent toujours avec leurs cibles, même sans données saisies
@@ -4028,6 +4068,8 @@ function renderTimeline(){
       return null;
     }).filter(r => r !== null);
   }
+
+  rows = rows.concat(eventRows());
 
   // ── Hauteur totale (min 140px même sans actions) ──────────────
   const contentH = Math.max(140, CONTENT_TOP + Math.max(rows.length, 1) * ROW_H);
@@ -4238,7 +4280,7 @@ function renderTimeline(){
         bar.style.cssText = `left:${barL}px; width:${barW}px; top:${BAR_PAD + 2}px; height:${BAR_H - 4}px;`;
         bar.title = (d.displayLabel || d.label) + ' · ' + (d.status === 'in-progress' ? `${durMin}′ en cours` : `${durMin}′`);
 
-      if(showTimeLabels && barW > 26){
+      if(showTimeLabels){
         const bl = document.createElement('span');
         bl.className = 'tl-dur' + (isLate ? ' late' : '');
         bl.style.cssText = `left:${barL + barW + 4}px; top:${BAR_PAD - 1}px;`;
@@ -6642,7 +6684,7 @@ function checkAndDeleteIfEmpty(){
 /* ===== Service Worker — enregistrement ===== */
 if ('serviceWorker' in navigator) {
   const swCode = `
-const CACHE = 'suivi-perf-v26';
+const CACHE = 'suivi-perf-v27';
 const PRECACHE = [];   // fichiers à précacher (vide = online-only)
 
 self.addEventListener('install', e => {
