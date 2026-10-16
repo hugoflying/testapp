@@ -800,7 +800,12 @@ html.dark .fixed-header .flt.is-on .flt-cie b{background:#2A3E7A}
 .fixed-header .flt:not(.is-on) .tab-refresh{display:none}
 .fixed-header .flt .tab-refresh{border-left:0;width:26px;height:100%;color:var(--muted)}
 .fixed-header .flt:not(.is-on) .flt-go{padding-right:10px}
-/* v2.9 : anneau vert → jaune à EOBT−5 → rouge après EOBT */
+/* v2.9 : anneau (couleur de base remplacée en v2.10) → jaune à EOBT−5 → rouge après EOBT */
 .flt-cie{background:conic-gradient(var(--ok,#1F9D55) var(--p),var(--line) 0)}
+.flt-cie.soon{background:conic-gradient(var(--yellow) var(--p),var(--line) 0)}
+.flt-cie.over{background:conic-gradient(var(--crit) var(--p),var(--line) 0)}
+/* v2.10 : anneau bleu jusqu'à EOBT−5 (le vert reste réservé au « fait ») */
+.flt-cie{background:conic-gradient(#3D6BE0 var(--p),var(--line) 0)}
+html.dark .flt-cie{background:conic-gradient(#8FA6FF var(--p),var(--line) 0)}
 .flt-cie.soon{background:conic-gradient(var(--yellow) var(--p),var(--line) 0)}
 .flt-cie.over{background:conic-gradient(var(--crit) var(--p),var(--line) 0)}
