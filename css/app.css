@@ -657,3 +657,45 @@ html.dark .btn-primary{background:#22357A}
 .ak-h1{display:flex;align-items:center;gap:6px}
 .ak-cie{margin-left:auto;flex:none;min-width:26px;height:22px;padding:0 5px;border-radius:4px;background:var(--navy);color:#fff;font-family:var(--f-ui);font-size:11px;font-weight:800;display:grid;place-items:center}
 html.dark .ak-cie{background:#22357A}
+
+/* ---- v2.1 : bandeau comme la maquette ---- */
+.fh-band{background:var(--navy);color:var(--on-navy);margin:0 calc(-1 * var(--pad-x));padding:10px 14px 11px;display:flex;flex-direction:column;gap:9px}
+body.ak-open .fh-band{display:none}
+.fh-band .chronos{background:transparent;margin:0;padding:0}
+.fh-hero{display:flex;justify-content:space-between;align-items:flex-end;gap:10px}
+.fh-id{min-width:0}
+.fh-fno{font-family:var(--f-ui);font-size:23px;font-weight:800;line-height:1;letter-spacing:-.01em;white-space:nowrap}
+.fh-sub{font-family:var(--f-ui);font-size:12px;color:var(--on-navy-dim);font-weight:500;margin-top:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fh-hero .chip-cd{text-align:right;flex:none;padding:0}
+.fh-hero .chip-cd .k{font-size:10px}
+.fh-hero .chip-cd .v{font-size:30px;font-weight:300;line-height:1}
+.fh-prog{height:3px;background:rgba(255,255,255,.15);border-radius:2px;overflow:hidden}
+.fh-prog i{display:block;height:100%;width:0;background:var(--yellow);transition:width .5s}
+.fh-prog.over i{background:var(--red-on-navy)}
+.fh-prog.is-empty{display:none}
+
+/* ---- v2.1 : boutons eLID / Paper LID plus grands ---- */
+#lidModeBar{gap:6px!important;margin-bottom:8px!important}
+#lidModeBar button{min-height:32px;padding:0 12px!important;font-size:12px!important;border-radius:6px!important}
+
+/* ---- v2.1 : PREVI FR/RK en cercles (PAX avec + INF dedans, BAGS) ---- */
+#previFRRK .ld-row-3{display:grid;grid-template-columns:1fr 1fr;grid-template-areas:"pax bags";gap:8px}
+#previFRRK .ld-row-3 > .ld-stat:nth-child(1){grid-area:pax}
+#previFRRK .ld-row-3 > .ld-stat:nth-child(2){grid-area:pax}
+#previFRRK .ld-row-3 > .ld-stat:nth-child(3){grid-area:bags}
+#previFRRK .ld-row-3 > .ld-stat:nth-child(1),#previFRRK .ld-row-3 > .ld-stat:nth-child(3){align-items:center;padding:12px 8px 14px;gap:8px}
+#previFRRK .ld-row-3 > .ld-stat:nth-child(1) .ld-stat-label,#previFRRK .ld-row-3 > .ld-stat:nth-child(3) .ld-stat-label{font-family:var(--f-ui);text-transform:none;letter-spacing:0;font-size:13px;font-weight:500}
+#previFRRK .ld-row-3 > .ld-stat:nth-child(1) input,#previFRRK .ld-row-3 > .ld-stat:nth-child(3) input{width:124px;height:124px;line-height:normal;border-radius:50%;border:5px solid var(--navy);text-align:center;font-size:38px;font-weight:300;flex:none}
+html.dark #previFRRK .ld-row-3 > .ld-stat:nth-child(1) input,html.dark #previFRRK .ld-row-3 > .ld-stat:nth-child(3) input{border-color:#8FA6FF}
+#previFRRK .ld-row-3 > .ld-stat:nth-child(1) input{padding-bottom:20px}
+#previFRRK .ld-row-3 > .ld-stat:nth-child(2){align-self:start;justify-self:center;margin-top:118px;flex-direction:row;align-items:center;gap:3px;background:transparent;border:0;box-shadow:none;padding:0;z-index:2}
+#previFRRK .ld-row-3 > .ld-stat:nth-child(2) .ld-stat-label{order:2;font-family:var(--f-ui);text-transform:none;letter-spacing:0;font-size:12px;font-weight:500}
+#previFRRK .ld-row-3 > .ld-stat:nth-child(2) input{order:1;width:26px;height:22px;line-height:22px;font-size:13px;font-weight:600;text-align:right;color:var(--muted)}
+#previFRRK .ld-row-3 > .ld-stat:nth-child(2) input::placeholder{font-size:12px}
+#previFRRK .ld-row-3 > .ld-stat:nth-child(2):focus-within{box-shadow:none}
+#previFRRK .ld-row-3 > .ld-stat:nth-child(2) .ld-stat-label{display:none}
+#previFRRK .ld-row-3 > .ld-stat:nth-child(2)::before{content:"+";font-family:var(--f-ui);font-size:12px;color:var(--muted)}
+#previFRRK .ld-row-3 > .ld-stat:nth-child(2)::after{content:"inf";font-family:var(--f-ui);font-size:12px;color:var(--muted)}
+#previFRRK .ld-row-3 > .ld-stat:nth-child(2) input{text-align:center;width:28px}
+#previFRRK .ld-row-3 > .ld-stat:nth-child(2)::before{order:0}
+#previFRRK .ld-row-3 > .ld-stat:nth-child(2)::after{order:2}

@@ -6525,7 +6525,7 @@ function checkAndDeleteIfEmpty(){
 /* ===== Service Worker — enregistrement ===== */
 if ('serviceWorker' in navigator) {
   const swCode = `
-const CACHE = 'suivi-perf-v5';
+const CACHE = 'suivi-perf-v6';
 const PRECACHE = [];   // fichiers à précacher (vide = online-only)
 
 self.addEventListener('install', e => {
@@ -6610,7 +6610,11 @@ window.addEventListener('load', function(){
   }
   // Mise à jour à chaque changement de taille ou de contenu
   new ResizeObserver(syncOverflow).observe(wrap);
-  new MutationObserver(syncOverflow).observe(wrap, { childList:true, subtree:true });
+  // Changement d'onglet ou de panneau (Arrivée/Départ, Vol/Timing…) : la hauteur du contenu change sans ajout de nœud
+  const resync = () => requestAnimationFrame(syncOverflow);
+  new MutationObserver(resync).observe(wrap, { childList:true, subtree:true, attributes:true, attributeFilter:['style','class'] });
+  new MutationObserver(resync).observe(document.body, { attributes:true, attributeFilter:['data-panel','class'] });
+  wrap.querySelectorAll('.panel').forEach(p => new ResizeObserver(resync).observe(p));
   syncOverflow();
 });
 

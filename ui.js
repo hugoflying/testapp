@@ -60,7 +60,37 @@
     syncTabbar();
   };
 
+  // Bandeau marine : numéro du vol, route et avancement de la rotation
+  const txt = id => ((document.getElementById(id)||{}).textContent || '').trim();
+  const val = id => ((document.getElementById(id)||{}).value || '').trim();
+  const isSet = v => !!v && !/^[-–—\s]*$/.test(v);
+  const toMin = t => { const m = /^(\d{1,2}):(\d{2})/.exec(t||''); return m ? (+m[1])*60 + (+m[2]) : null; };
+  function syncHero(){
+    const fno = document.getElementById('fhFno'); if(!fno) return;
+    const dep = txt('kvDepVol'), arr = txt('kvArrVol');
+    fno.textContent = isSet(dep) ? dep : (isSet(arr) ? arr : '----');
+    const parts = [];
+    const from = txt('kvFrom'), to = txt('kvTo');
+    if(isSet(from) || isSet(to)) parts.push((isSet(from)?from:'---') + ' → ' + (isSet(to)?to:'---'));
+    [txt('kvImmat'), txt('kvType')].forEach(v => { if(isSet(v)) parts.push(v); });
+    const pk = txt('kvPark'); if(isSet(pk)) parts.push('P' + pk.replace(/^P/i,''));
+    document.getElementById('fhSub').textContent = parts.join(' · ');
+    // Avancement : de l'arrivée (AIBT, sinon SIBT) au départ (EOBT, sinon SOBT)
+    const wrap = document.getElementById('fhProgWrap'), bar = document.getElementById('fhProg');
+    let a = toMin(val('AIBT')) ?? toMin(val('SIBT'));
+    let d = toMin(txt('timer-eobt')) ?? toMin(val('SOBT'));
+    if(a == null || d == null){ wrap.classList.add('is-empty'); return; }
+    if(d <= a) d += 1440;
+    const n = new Date(); let now = n.getHours()*60 + n.getMinutes() + n.getSeconds()/60;
+    if(now < a - 720) now += 1440;
+    const r = (now - a) / (d - a);
+    wrap.classList.remove('is-empty');
+    wrap.classList.toggle('over', r > 1);
+    bar.style.width = Math.max(0, Math.min(1, r)) * 100 + '%';
+  }
+
   function init(){
+    syncHero(); setInterval(syncHero, 1000);
     let start = 'vol';
     try{ start = localStorage.getItem('uiPanel') || 'vol'; }catch(e){}
     showPanel(start);

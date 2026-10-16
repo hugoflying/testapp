@@ -22,7 +22,7 @@
 /* Mise a jour forcee : si version.json (lu sans cache) annonce une autre
    version que celle-ci, on vide les caches et on recharge la page.
    A chaque livraison : changer APP_VERSION ici, dans version.json et les ?v=. */
-window.APP_VERSION = '20261016r6';
+window.APP_VERSION = '20261016r7';
 (function(){
   function check(){
     fetch('./version.json?t=' + Date.now(), { cache: 'no-store' })
@@ -44,8 +44,8 @@ window.APP_VERSION = '20261016r6';
   document.addEventListener('visibilitychange', function(){ if(document.visibilityState === 'visible') check(); });
 })();
 </script>
-<link rel="stylesheet" href="./fonts/fonts.css?v=20261016r6" />
-<link rel="stylesheet" href="./css/app.css?v=20261016r6" />
+<link rel="stylesheet" href="./fonts/fonts.css?v=20261016r7" />
+<link rel="stylesheet" href="./css/app.css?v=20261016r7" />
 </head>
 <body>
 
@@ -348,6 +348,12 @@ function digitsOnly(el){ el.value = (el.value || '').replace(/[^0-9]/g, ''); }
     </button>
   </div>
 
+  <div class="fh-band">
+  <div class="fh-hero">
+    <div class="fh-id"><div class="fh-fno" id="fhFno">----</div><div class="fh-sub" id="fhSub"></div></div>
+    <div class="timer-chip chip chip-cd"><div class="k">CD</div><div id="timer-cd" class="v">--:--</div></div>
+  </div>
+  <div class="fh-prog" id="fhProgWrap"><i id="fhProg"></i></div>
   <div class="chronos timer-row">
     <div class="timer-chip chip"><div class="k">HLE</div><div id="timer-h40" class="v">--:--</div></div>
     <div class="timer-chip chip"><div class="k">H-15</div><div id="timer-h15" class="v">--:--</div></div>
@@ -358,7 +364,7 @@ function digitsOnly(el){ el.value = (el.value || '').replace(/[^0-9]/g, ''); }
       <div class="k">CTOT</div><div id="timer-ctot" class="v">--:--</div>
     </button>
     <input id="CTOT" type="hidden">
-    <div class="timer-chip chip chip-cd"><div class="k">CD</div><div id="timer-cd" class="v">--:--</div></div>
+  </div>
   </div>
 </div>
 
@@ -830,7 +836,7 @@ function digitsOnly(el){ el.value = (el.value || '').replace(/[^0-9]/g, ''); }
 
 <!-- Cache-busting : incrementer ?v= a CHAQUE deploiement pour forcer
      les navigateurs (et iOS) a recharger app.js au lieu du cache. -->
-<script src="./app.js?v=20261016r6"></script>
-<script src="./ui.js?v=20261016r6"></script>
+<script src="./app.js?v=20261016r7"></script>
+<script src="./ui.js?v=20261016r7"></script>
 </body>
 </html>
