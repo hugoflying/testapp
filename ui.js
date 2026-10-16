@@ -454,7 +454,7 @@
       if(bar.dataset.sig !== sig){
         bar.dataset.sig = sig;
         // Seules les soutes chargées apparaissent ; chacune garde une largeur lisible même avec peu de bagages
-        bar.innerHTML = segs.filter(x => x.n).map(x => '<div style="flex:' + x.n + ' 1 0">' + esc(x.lbl) + ' <b>' + x.n + '</b></div>').join('');
+        bar.innerHTML = segs.filter(x => x.n).map(x => '<div style="flex:' + x.n + ' 1 0"><span>' + esc(x.lbl) + '</span><i>-</i><b>' + x.n + '</b></div>').join('');
         bar.hidden = !pcs;
       }
       const hsum = document.getElementById('ldHoldSum');

@@ -977,3 +977,6 @@ html.dark #ldmModal .ld-tob.ld-hero{background:#16265E}
 /* v2.25 : soutes vides masquées, largeur mini lisible */
 .ld-holdbar div{min-width:max-content;padding:0 8px}
 .ld-holdbar[hidden],.ld-holdbar[hidden] + .ld-holdleg{display:none}
+.ld-holdbar div span{font-weight:600;opacity:.8}
+.ld-holdbar div i{font-style:normal;opacity:.6}
+.ld-holdbar div b{font-weight:800}
