@@ -985,3 +985,11 @@ html.dark #ldmModal .ld-tob.ld-hero{background:#16265E}
 #ldmModal .ld-stat.ld-ko .ld-stat-label,#ldmModal .ld-stat.ld-ko input{color:var(--crit)}
 #ldmModal #finalZonesRow .ld-stat.ld-over::after{background:var(--crit)}
 
+
+/* v2.30 : un seul style « en erreur » pour toutes les cases du LOAD (fond + contour + texte rouges) */
+#ldmModal .ld-stat:has(.is-danger),#ldmModal .ld-stat:has(.is-invalid),
+#ldmModal .ld-box .ld-stat:has(.is-danger),#ldmModal .ld-box .ld-stat:has(.is-invalid),
+#ldmModal .ld-box .ld-stat.ld-ko{background:var(--crit-soft)!important;border-color:var(--crit)!important}
+#ldmModal .ld-stat:has(.is-danger) .ld-stat-label,#ldmModal .ld-stat:has(.is-danger) input,
+#ldmModal .ld-stat:has(.is-invalid) .ld-stat-label,#ldmModal .ld-stat:has(.is-invalid) input,
+#ldmModal .ld-stat:has(.is-danger) .ld-hw{color:var(--crit)}
