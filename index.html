@@ -22,7 +22,7 @@
 /* Mise a jour forcee : si version.json (lu sans cache) annonce une autre
    version que celle-ci, on vide les caches et on recharge la page.
    A chaque livraison : changer APP_VERSION ici, dans version.json et les ?v=. */
-window.APP_VERSION = '20261016r12';
+window.APP_VERSION = '20261016r13';
 (function(){
   function check(){
     fetch('./version.json?t=' + Date.now(), { cache: 'no-store' })
@@ -44,8 +44,8 @@ window.APP_VERSION = '20261016r12';
   document.addEventListener('visibilitychange', function(){ if(document.visibilityState === 'visible') check(); });
 })();
 </script>
-<link rel="stylesheet" href="./fonts/fonts.css?v=20261016r12" />
-<link rel="stylesheet" href="./css/app.css?v=20261016r12" />
+<link rel="stylesheet" href="./fonts/fonts.css?v=20261016r13" />
+<link rel="stylesheet" href="./css/app.css?v=20261016r13" />
 </head>
 <body>
 
@@ -540,6 +540,7 @@ function digitsOnly(el){ el.value = (el.value || '').replace(/[^0-9]/g, ''); }
           <button type="button" class="tl-zoom-btn" onclick="timelineZoomIn()" title="Zoomer" aria-label="Zoomer"><svg class="ico"><use href="#i-plus"/></svg></button>
           <button type="button" class="tl-zoom-btn tl-zoom-reset" onclick="timelineZoomReset()" title="Réinitialiser le zoom">Reset</button>
         </div>
+        <button type="button" class="tl-follow" id="tlFollowBtn" onclick="uiTlFollow()" aria-pressed="true" title="Centrer automatiquement sur l'heure actuelle"><i></i>Suivre Now</button>
       </div>
       <div class="tl-outer" id="timelineOuter">
         <div class="tl-label-col" id="timelineLabelCol"></div>
@@ -836,7 +837,7 @@ function digitsOnly(el){ el.value = (el.value || '').replace(/[^0-9]/g, ''); }
 
 <!-- Cache-busting : incrementer ?v= a CHAQUE deploiement pour forcer
      les navigateurs (et iOS) a recharger app.js au lieu du cache. -->
-<script src="./app.js?v=20261016r12"></script>
-<script src="./ui.js?v=20261016r12"></script>
+<script src="./app.js?v=20261016r13"></script>
+<script src="./ui.js?v=20261016r13"></script>
 </body>
 </html>

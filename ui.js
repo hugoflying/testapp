@@ -114,7 +114,6 @@
       if(f && p.style.display === 'none'){ try{ toggleDepExtra(p.dataset.ev); }catch(e){ p.style.display = 'block'; } }
     });
     const add = document.getElementById('evAddBtn');
-    if(add) add.hidden = EVENTS.every(e => evShown(e.k));
   }
 
   function evSheet(){
@@ -129,7 +128,8 @@
       const it = e.target.closest('.ev-item');
       if(!it || it.disabled) return;
       m.style.display = 'none';
-      if(!evShown(it.dataset.k)) toggleDepExtra(it.dataset.k);
+      if(evShown(it.dataset.k)){ toggleDepExtra(it.dataset.k); syncEvents(); return; }   // re-toucher = retirer
+      toggleDepExtra(it.dataset.k);
       const p = document.getElementById('panel-'+it.dataset.k);
       if(p){ p.scrollIntoView({ behavior:'smooth', block:'center' }); p.classList.add('ev-flash'); setTimeout(()=>p.classList.remove('ev-flash'), 900); }
       syncEvents();
@@ -141,15 +141,71 @@
     const m = evSheet();
     m.querySelector('.ev-list').innerHTML = EVENTS.map(e => {
       const on = evShown(e.k);
-      return '<button type="button" class="ev-item" data-k="'+e.k+'"'+(on?' disabled':'')+'>'
-        + '<i style="background:'+e.c+'"></i><span><b>'+e.t+'</b><small>'+(on?'Déjà affiché':e.d)+'</small></span>'
+      const p = document.getElementById('panel-'+e.k);
+      const full = on && p && evFilled(p);
+      const sub = full ? 'Contient une heure, reste affiché' : on ? 'Affiché · toucher pour retirer' : e.d;
+      return '<button type="button" class="ev-item'+(on?' is-on':'')+'" data-k="'+e.k+'"'+(full?' disabled':'')+'>'
+        + '<i style="background:'+e.c+'"></i><span><b>'+e.t+'</b><small>'+sub+'</small></span>'
         + '<em>'+(on?'✓':'+')+'</em></button>';
     }).join('');
     m.style.display = 'flex';
   };
 
+  /* ===== Timing : swipe Arrivée ⇄ Départ ⇄ Timeline ===== */
+  const SEG = ['arr','dep','tl'];
+  function curSeg(){
+    const tl = document.getElementById('timelineCard');
+    if(tl && tl.style.display !== 'none') return 'tl';
+    const dep = document.getElementById('panel-dep');
+    return (dep && dep.style.display !== 'none') ? 'dep' : 'arr';
+  }
+  function initSwipe(){
+    const zone = document.getElementById('appWrap');
+    if(!zone) return;
+    let x0 = null, y0 = 0, t0 = 0;
+    zone.addEventListener('touchstart', e => {
+      x0 = null;
+      if(e.touches.length !== 1 || document.body.dataset.panel !== 'timing') return;
+      if(e.target.closest('#timelineScroll, input, textarea, select, .sheet-modal')) return;
+      x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; t0 = Date.now();
+    }, { passive:true });
+    zone.addEventListener('touchend', e => {
+      if(x0 === null) return;
+      const t = e.changedTouches[0], dx = t.clientX - x0, dy = t.clientY - y0;
+      x0 = null;
+      if(Math.abs(dx) < 60 || Math.abs(dx) < Math.abs(dy) * 1.6 || Date.now() - t0 > 700) return;
+      const i = SEG.indexOf(curSeg()) + (dx < 0 ? 1 : -1);
+      if(i < 0 || i >= SEG.length) return;
+      switchTimingPanel(SEG[i]);
+      const el = SEG[i] === 'tl' ? document.getElementById('timelineCard') : document.getElementById('panel-'+SEG[i]);
+      if(el){ el.classList.remove('sw-l','sw-r'); void el.offsetWidth; el.classList.add(dx < 0 ? 'sw-l' : 'sw-r'); }
+      const w = document.getElementById('appWrap'); if(w) w.scrollTop = 0;
+    }, { passive:true });
+  }
+
+  /* ===== Timeline : option « Suivre Now » ===== */
+  function syncFollowBtn(){
+    const b = document.getElementById('tlFollowBtn');
+    if(!b) return;
+    let on = true; try{ on = localStorage.getItem('tlFollowNow') !== '0'; }catch(e){}
+    b.setAttribute('aria-pressed', on ? 'true' : 'false');
+  }
+  window.uiTlFollow = function(){
+    let on = true; try{ on = localStorage.getItem('tlFollowNow') !== '0'; }catch(e){}
+    try{ localStorage.setItem('tlFollowNow', on ? '0' : '1'); }catch(e){}
+    window._tlLastTouch = 0;
+    syncFollowBtn();
+    try{ renderTimeline(); }catch(e){}
+  };
+  function tlTick(){
+    const tl = document.getElementById('timelineCard');
+    if(!tl || tl.style.display === 'none' || document.body.dataset.panel !== 'timing') return;
+    try{ renderTimeline(); }catch(e){}
+  }
+
   function init(){
     syncHero(); setInterval(()=>{ syncHero(); syncEvents(); }, 1000);
+    initSwipe(); syncFollowBtn(); setInterval(tlTick, 15000);
     document.addEventListener('click', e => { if(e.target.closest('.ev-x, .tw-zone')) setTimeout(syncEvents, 0); });
     let start = 'vol';
     try{ start = localStorage.getItem('uiPanel') || 'vol'; }catch(e){}
