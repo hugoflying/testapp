@@ -22,7 +22,7 @@
 /* Mise a jour forcee : si version.json (lu sans cache) annonce une autre
    version que celle-ci, on vide les caches et on recharge la page.
    A chaque livraison : changer APP_VERSION ici, dans version.json et les ?v=. */
-window.APP_VERSION = '20261016r20';
+window.APP_VERSION = '20261016r21';
 (function(){
   function check(){
     fetch('./version.json?t=' + Date.now(), { cache: 'no-store' })
@@ -44,8 +44,8 @@ window.APP_VERSION = '20261016r20';
   document.addEventListener('visibilitychange', function(){ if(document.visibilityState === 'visible') check(); });
 })();
 </script>
-<link rel="stylesheet" href="./fonts/fonts.css?v=20261016r20" />
-<link rel="stylesheet" href="./css/app.css?v=20261016r20" />
+<link rel="stylesheet" href="./fonts/fonts.css?v=20261016r21" />
+<link rel="stylesheet" href="./css/app.css?v=20261016r21" />
 </head>
 <body>
 
@@ -665,7 +665,7 @@ function digitsOnly(el){ el.value = (el.value || '').replace(/[^0-9]/g, ''); }
 
 <!-- ===== BARRE D'ONGLETS ===== -->
 <nav class="tabbar" id="tabbar" aria-label="Sections">
-  <button type="button" data-tab="vols" onclick="uiTab('vols')"><svg class="ico"><use href="#i-list"/></svg>Vols<span class="tb-badge" id="volsBadge" hidden></span></button>
+  <button type="button" data-tab="vols" onclick="uiTab('vols')"><svg class="ico"><use href="#i-list"/></svg>Récap<span class="tb-badge" id="volsBadge" hidden></span></button>
   <button type="button" data-tab="vol" onclick="uiTab('vol')"><svg class="ico"><use href="#i-info"/></svg>Vol</button>
   <button type="button" data-tab="timing" onclick="uiTab('timing')"><svg class="ico"><use href="#i-clock"/></svg>Timing</button>
   <button type="button" data-tab="load" id="loadFab" onclick="uiTab('load')"><svg class="ico"><use href="#i-bag"/></svg>Load</button>
@@ -851,7 +851,7 @@ function digitsOnly(el){ el.value = (el.value || '').replace(/[^0-9]/g, ''); }
 
 <!-- Cache-busting : incrementer ?v= a CHAQUE deploiement pour forcer
      les navigateurs (et iOS) a recharger app.js au lieu du cache. -->
-<script src="./app.js?v=20261016r20"></script>
-<script src="./ui.js?v=20261016r20"></script>
+<script src="./app.js?v=20261016r21"></script>
+<script src="./ui.js?v=20261016r21"></script>
 </body>
 </html>
