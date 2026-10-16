@@ -754,3 +754,8 @@ html.dark .ev-item em{color:#8FA6FF}
 .ev-item:disabled{opacity:.5;cursor:default}
 .ev-item:not(:disabled):active{background:var(--surface-2)}
 .ev-list{overflow-y:auto;-webkit-overflow-scrolling:touch}
+
+/* ---- v2.5 : « Now » sans pastille (la couleur reste sur le titre de la carte) ---- */
+#timing-grid .time-wrap.tw-empty .tw-display::before{display:none}
+#timing-grid .time-wrap.tw-empty .tw-display{color:var(--navy);letter-spacing:.02em}
+html.dark #timing-grid .time-wrap.tw-empty .tw-display{color:#8FA6FF}
