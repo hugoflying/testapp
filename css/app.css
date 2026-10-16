@@ -984,3 +984,11 @@ html.dark #ldmModal .ld-tob.ld-hero{background:#16265E}
 #ldmModal .ld-box .ld-stat.ld-ko{background:var(--crit-soft);border-color:var(--crit)}
 #ldmModal .ld-stat.ld-ko .ld-stat-label,#ldmModal .ld-stat.ld-ko input{color:var(--crit)}
 #ldmModal #finalZonesRow .ld-stat.ld-over::after{background:var(--crit)}
+
+/* v2.28 : Recherche bag — nombre de bags en compteur −1 / +1, comme les heures */
+.bag-step{display:grid;grid-template-columns:minmax(0,1fr) 32px 32px;gap:0 5px;align-items:center;height:38px;margin:0 -10px;padding:0 10px 8px;box-sizing:content-box;border-bottom:2px solid var(--line)}
+.bag-step:has(input:not(:placeholder-shown)){border-bottom-color:var(--ok)}
+.bag-step input{min-width:0;border:0;background:transparent;outline:0;padding:0;font-family:var(--f-ui);font-size:30px;font-weight:300;color:var(--fg);font-variant-numeric:tabular-nums}
+.bag-step input::placeholder{color:var(--faint)}
+.bag-step .bs-btn{width:32px;height:32px;border-radius:50%;font:700 11.5px var(--f-ui);background:var(--surface-2);border:1px solid var(--line);color:var(--fg);padding:0;cursor:pointer}
+.bag-step .bs-btn:active{background:var(--navy);color:#fff;border-color:var(--navy)}
