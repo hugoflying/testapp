@@ -209,7 +209,7 @@
     if(d <= a) d += 1440;
     const n = new Date(); let now = n.getHours()*60 + n.getMinutes() + n.getSeconds()/60;
     if(now < a - 720) now += 1440;
-    return (now - a) / (d - a);
+    return { r:(now - a) / (d - a), left: d - now };
   }
   function syncTabRings(){
     document.querySelectorAll('#tab-bar .flt[data-tab]').forEach(t => {
@@ -221,9 +221,11 @@
         let d = {}; try{ d = JSON.parse(localStorage.getItem('tab-' + t.dataset.tab) || '{}'); }catch(e){}
         r = ringRatio(toMin(d.AIBT || ''), toMin(d.SOBT || ''));
       }
-      const p = r == null ? 0 : Math.max(0, Math.min(1, r)) * 100;
+      // Vert, puis jaune à EOBT −5 min, rouge une fois l'EOBT dépassée
+      const p = r == null ? 0 : Math.max(0, Math.min(1, r.r)) * 100;
       ring.style.setProperty('--p', p.toFixed(1) + '%');
-      ring.classList.toggle('over', r != null && r > 1);
+      ring.classList.toggle('over', r != null && r.left < 0);
+      ring.classList.toggle('soon', r != null && r.left >= 0 && r.left <= 5);
     });
   }
 
