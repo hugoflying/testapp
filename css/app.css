@@ -678,24 +678,34 @@ body.ak-open .fh-band{display:none}
 #lidModeBar{gap:6px!important;margin-bottom:8px!important}
 #lidModeBar button{min-height:32px;padding:0 12px!important;font-size:12px!important;border-radius:6px!important}
 
-/* ---- v2.1 : PREVI FR/RK en cercles (PAX avec + INF dedans, BAGS) ---- */
-#previFRRK .ld-row-3{display:grid;grid-template-columns:1fr 1fr;grid-template-areas:"pax bags";gap:8px}
-#previFRRK .ld-row-3 > .ld-stat:nth-child(1){grid-area:pax}
-#previFRRK .ld-row-3 > .ld-stat:nth-child(2){grid-area:pax}
-#previFRRK .ld-row-3 > .ld-stat:nth-child(3){grid-area:bags}
-#previFRRK .ld-row-3 > .ld-stat:nth-child(1),#previFRRK .ld-row-3 > .ld-stat:nth-child(3){align-items:center;padding:12px 8px 14px;gap:8px}
-#previFRRK .ld-row-3 > .ld-stat:nth-child(1) .ld-stat-label,#previFRRK .ld-row-3 > .ld-stat:nth-child(3) .ld-stat-label{font-family:var(--f-ui);text-transform:none;letter-spacing:0;font-size:13px;font-weight:500}
-#previFRRK .ld-row-3 > .ld-stat:nth-child(1) input,#previFRRK .ld-row-3 > .ld-stat:nth-child(3) input{width:124px;height:124px;line-height:normal;border-radius:50%;border:5px solid var(--navy);text-align:center;font-size:38px;font-weight:300;flex:none}
-html.dark #previFRRK .ld-row-3 > .ld-stat:nth-child(1) input,html.dark #previFRRK .ld-row-3 > .ld-stat:nth-child(3) input{border-color:#8FA6FF}
-#previFRRK .ld-row-3 > .ld-stat:nth-child(1) input{padding-bottom:20px}
-#previFRRK .ld-row-3 > .ld-stat:nth-child(2){align-self:start;justify-self:center;margin-top:118px;flex-direction:row;align-items:center;gap:3px;background:transparent;border:0;box-shadow:none;padding:0;z-index:2}
-#previFRRK .ld-row-3 > .ld-stat:nth-child(2) .ld-stat-label{order:2;font-family:var(--f-ui);text-transform:none;letter-spacing:0;font-size:12px;font-weight:500}
-#previFRRK .ld-row-3 > .ld-stat:nth-child(2) input{order:1;width:26px;height:22px;line-height:22px;font-size:13px;font-weight:600;text-align:right;color:var(--muted)}
-#previFRRK .ld-row-3 > .ld-stat:nth-child(2) input::placeholder{font-size:12px}
-#previFRRK .ld-row-3 > .ld-stat:nth-child(2):focus-within{box-shadow:none}
-#previFRRK .ld-row-3 > .ld-stat:nth-child(2) .ld-stat-label{display:none}
-#previFRRK .ld-row-3 > .ld-stat:nth-child(2)::before{content:"+";font-family:var(--f-ui);font-size:12px;color:var(--muted)}
-#previFRRK .ld-row-3 > .ld-stat:nth-child(2)::after{content:"inf";font-family:var(--f-ui);font-size:12px;color:var(--muted)}
-#previFRRK .ld-row-3 > .ld-stat:nth-child(2) input{text-align:center;width:28px}
-#previFRRK .ld-row-3 > .ld-stat:nth-child(2)::before{order:0}
-#previFRRK .ld-row-3 > .ld-stat:nth-child(2)::after{order:2}
+
+/* ---- v2.2 : TOB dans un cercle (lecture seule) ---- */
+.ld-tob,.ldm-card .ld-tob,#ldmFinal .ld-tob{position:relative;display:flex;flex-direction:column;align-items:center;gap:8px;background:transparent;border:0;box-shadow:none;padding:0;min-height:0;margin:14px 0 10px}
+.ld-tob::before{content:"";width:150px;height:150px;border-radius:50%;border:5px solid var(--navy);background:var(--surface);box-sizing:border-box;box-shadow:var(--tile-shadow)}
+html.dark .ld-tob::before{border-color:#8FA6FF}
+.ld-tob .ld-tob-label{position:absolute;top:40px;left:50%;transform:translateX(-50%);font-family:var(--f-ui);font-size:13px;font-weight:600;letter-spacing:.06em;color:var(--muted)}
+.ld-tob input{position:absolute;top:60px;left:50%;transform:translateX(-50%);width:132px;text-align:center;font-family:var(--f-ui);font-size:30px;font-weight:300;color:var(--fg);background:transparent;border:0;pointer-events:none}
+.ld-tob #lidGuideBtn{position:static;transform:none}
+
+/* ---- v2.2 : timings compacts, heure à gauche, −1 / +1 en pastilles à droite ---- */
+#timing-grid .field{padding:9px 10px 0;gap:6px}
+#timing-grid .field .label{min-height:0}
+#timing-grid .time-wrap{grid-template-columns:minmax(0,1fr) 32px 32px;grid-template-rows:38px;gap:0 5px;align-items:center;padding-bottom:8px;border-bottom-width:2px}
+#timing-grid .tw-display{grid-column:1;grid-row:1;font-size:26px}
+#timing-grid .tw-zone-center{grid-column:1;grid-row:1}
+#timing-grid .tw-zone-left{grid-column:2;grid-row:1}
+#timing-grid .tw-zone-right{grid-column:3;grid-row:1}
+#timing-grid .tw-zone-left,#timing-grid .tw-zone-right{width:32px;height:32px;border-radius:50%;font-size:11.5px;font-weight:700;background:var(--surface-2);border:1px solid var(--line);color:var(--fg)}
+#timing-grid .tw-zone-left:active,#timing-grid .tw-zone-right:active{background:var(--navy);color:#fff;border-color:var(--navy)}
+#timing-grid .time-wrap.tw-empty .tw-display{font-size:14px}
+#timing-grid .field:has(.tw-set)::after{top:8px;right:8px;width:14px;height:14px;background-size:14px}
+#timing-grid .field .label{padding-right:20px}
+
+/* ---- v2.2 : onglets vols délimités ---- */
+.fh-top{gap:6px;padding-top:6px;padding-bottom:6px;min-height:0}
+.fixed-header .flights{gap:6px}
+.fixed-header .flt{height:34px;border:1px solid var(--line);border-radius:6px;background:var(--surface-2);border-bottom-width:1px}
+.fixed-header .flt.is-on{background:var(--surface);border:1.5px solid var(--navy);box-shadow:inset 0 -3px 0 var(--yellow)}
+html.dark .fixed-header .flt.is-on{border-color:#8FA6FF}
+.fixed-header .flt .tab-refresh{border-left:1px solid var(--line)}
+.fixed-header .vols-btn{height:34px}
