@@ -2539,7 +2539,40 @@ function generateTimingFields(){
           <div class="span-6">${fieldHTML('DepartLiftArr','Départ lift',false,false,'is-success')}</div>
         </div>
       </div>
-    </div>`;
+    </div>
+
+    <div id="evZoneArr">
+    <div id="panel-tapis" class="card mb-3 ev-panel" data-ev="tapis" style="display:none;">
+      <div class="ev-h"><i style="background:#0d9488"></i><b>Tapis bagages</b><button type="button" class="ev-x" onclick="toggleDepExtra('tapis')" aria-label="Masquer Tapis bagages">×</button></div>
+      <div class="card-content">
+        <div class="grid-auto">
+          <div class="span-6">${fieldHTML('MiseEnPlaceTapis','Mise en place tapis',false,false,'is-success')}</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="panel-dechargement" class="card mb-3 ev-panel" data-ev="dechargement" style="display:none;">
+      <div class="ev-h"><i style="background:#15803d"></i><b>Déchargement bagages</b><button type="button" class="ev-x" onclick="toggleDepExtra('dechargement')" aria-label="Masquer Déchargement bagages">×</button></div>
+      <div class="card-content">
+        <div class="grid-auto">
+          <div class="span-6">${fieldHTML('DebutDechargementBagages','Début déchargement',false,false,'is-success')}</div>
+          <div class="span-6">${fieldHTML('FinDechargementBagages','Fin déchargement',false,false,'is-success')}</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="panel-repositionnement" class="card mb-3 ev-panel" data-ev="repositionnement" style="display:none;">
+      <div class="ev-h"><i style="background:#3273dc"></i><b>Repositionnement avion</b><button type="button" class="ev-x" onclick="toggleDepExtra('repositionnement')" aria-label="Masquer Repositionnement avion">×</button></div>
+      <div class="card-content">
+        <div class="grid-auto">
+          <div class="span-6">${fieldHTML('DebutRepositionnement','Début repositionnement',false,false,'is-link')}</div>
+          <div class="span-6">${fieldHTML('FinRepositionnement','Fin repositionnement',false,false,'is-link')}</div>
+        </div>
+      </div>
+    </div>
+    </div>
+    <button type="button" class="ev-add" id="evAddBtnArr" onclick="uiEvOpen('arr')"><span>+</span> Ajouter un événement</button>
+`;
 
   /* ===== DÉPART ===== */
   const depNoHeader = `
@@ -2565,6 +2598,16 @@ function generateTimingFields(){
     </div>
 
     <div id="evZone">
+    <div id="panel-chargement" class="card mb-3 ev-panel" data-ev="chargement" style="display:none;">
+      <div class="ev-h"><i style="background:#15803d"></i><b>Chargement bagages</b><button type="button" class="ev-x" onclick="toggleDepExtra('chargement')" aria-label="Masquer Chargement bagages">×</button></div>
+      <div class="card-content">
+        <div class="grid-auto">
+          <div class="span-6">${fieldHTML('DebutChargementBagages','Début chargement',false,false,'is-success')}</div>
+          <div class="span-6">${fieldHTML('FinChargementBagages','Fin chargement',false,false,'is-success')}</div>
+        </div>
+      </div>
+    </div>
+
     <div id="panel-casque" class="card mb-3 ev-panel" data-ev="casque" style="display:none;">
       <div class="ev-h"><i style="background:#7c3aed"></i><b>Connexion casque</b><button type="button" class="ev-x" onclick="toggleDepExtra('casque')" aria-label="Masquer Connexion casque">×</button></div>
       <div class="card-content">
@@ -2675,7 +2718,7 @@ function generateTimingFields(){
       </div>
     </div>
     </div>
-    <button type="button" class="ev-add" id="evAddBtn" onclick="uiEvOpen()"><span>+</span> Ajouter un événement</button>
+    <button type="button" class="ev-add" id="evAddBtn" onclick="uiEvOpen('dep')"><span>+</span> Ajouter un événement</button>
 `;
 
   const toggle = `
@@ -3697,6 +3740,7 @@ function collectTimelineData(){
     ['ArrPNC','Arrivée PNC'],
     ['FermeturePorteAvion','Fermeture porte avion'],
     ['ReouverturePorteAvion','Réouverture porte'],
+    ['MiseEnPlaceTapis','Tapis bagages'],
     ['FermetureSouteAV','Fermeture soute AV'],
     ['FermetureSouteAR','Fermeture soute AR'],
     ['RetraitEchelleAV','Retrait échelle AV'],
@@ -3745,6 +3789,9 @@ function collectTimelineData(){
     {label:'Avitair',      pair:getPairWindow('ArriveeFuel','DepartFuel'), cls:'tl--std', color:'#f59e0b'},
     {label:'Lift (Arr)',   pair:getPairWindow('ArriveeLiftArr','DepartLiftArr'), cls:'tl--std', color:'#a855f7'},
     {label:'Lift (Dep)',   pair:getPairWindow('ArriveeLift','DepartLift'), cls:'tl--std', color:'#16a34a'},
+    {label:'Déchargement', pair:getPairWindow('DebutDechargementBagages','FinDechargementBagages'), cls:'tl--std', color:'#15803d'},
+    {label:'Repositionnement', pair:getPairWindow('DebutRepositionnement','FinRepositionnement'), cls:'tl--std', color:'#3273dc'},
+    {label:'Chargement', pair:getPairWindow('DebutChargementBagages','FinChargementBagages'), cls:'tl--std', color:'#0f766e'},
     {label:'Comptage bagages', pair:getPairWindow('DebutComptageBagages','FinComptageBagages'), cls:'tl--std', color:'#0d9488'},
   ];
 
@@ -5688,12 +5735,19 @@ function doValidate() {
   body += br();
   if(t('ArriveeLiftArr') || t('DepartLiftArr'))
     body += r('LIFT ARR', `${t('ArriveeLiftArr')||'--:--'} → ${t('DepartLiftArr')||'--:--'}`);
+  if(t('MiseEnPlaceTapis')) body += r('TAPIS BAGAGES', t('MiseEnPlaceTapis'));
+  if(t('DebutDechargementBagages') || t('FinDechargementBagages'))
+    body += r('DECHARGEMENT', `${t('DebutDechargementBagages')||'--:--'} → ${t('FinDechargementBagages')||'--:--'}`);
+  if(t('DebutRepositionnement') || t('FinRepositionnement'))
+    body += r('REPOSITIONNEMENT', `${t('DebutRepositionnement')||'--:--'} → ${t('FinRepositionnement')||'--:--'}`);
 
   body += br();
   if(t('AvionPremierEmbarque')) { body += r('PREMIER EMBARQUE',  t('AvionPremierEmbarque')); }
   if(t('AvionDernierEmbarque')) { body += r('DERNIER EMBARQUE',  t('AvionDernierEmbarque')); }
 
   body += br();
+  if(t('DebutChargementBagages') || t('FinChargementBagages'))
+    body += r('CHARGEMENT', `${t('DebutChargementBagages')||'--:--'} → ${t('FinChargementBagages')||'--:--'}`);
   if(t('ArriveeLift') || t('DepartLift'))
     body += r('LIFT DEP', `${t('ArriveeLift')||'--:--'} → ${t('DepartLift')||'--:--'}`);
   if(t('ArriveeFuel') || t('DepartFuel'))
@@ -6202,6 +6256,7 @@ function confirmClearFields(){
     'ArriveeLift','DepartLift','AvionPremierEmbarque','AvionDernierEmbarque',
     'FermeturePorteAvion','RemiseLID','ConnexionAgentCasque','ArriveeINAD',
     'ArrPNT','ArrPNC','AnnonceINAD','AppelNayak','ArriveeNayak','DepartNayak','RechercheBagNombre','RechercheBagDebut','RechercheBagFin',
+    'MiseEnPlaceTapis','DebutDechargementBagages','FinDechargementBagages','DebutRepositionnement','FinRepositionnement','DebutChargementBagages','FinChargementBagages',
     'ConnexionPush','ChangementPush','FermetureSouteAV','FermetureSouteAR','RetraitEchelleAV','RetraitEchelleAR','ReouverturePorteAvion','DebutComptageBagages','FinComptageBagages',
     'CommChiffresPorte', 'CommChargementPiste',
     'ArrPAX_MAIN','ArrPAX_INF','ArrBAGS','ArrPOIDS','ArrSI',
@@ -6646,7 +6701,7 @@ function checkAndDeleteIfEmpty(){
 /* ===== Service Worker — enregistrement ===== */
 if ('serviceWorker' in navigator) {
   const swCode = `
-const CACHE = 'suivi-perf-v15';
+const CACHE = 'suivi-perf-v16';
 const PRECACHE = [];   // fichiers à précacher (vide = online-only)
 
 self.addEventListener('install', e => {
