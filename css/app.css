@@ -835,3 +835,52 @@ html.dark{--tl-eobt:#8FA6FF;--tl-tgt:rgba(143,166,255,.18);--tl-blue:#8FA6FF}
 .tl-marker-chip{font-family:var(--f-ui);font-size:9.5px;font-weight:800;padding:2px 6px;border-radius:4px;letter-spacing:.02em}
 .tl-legend-v2{display:flex;gap:14px;flex-wrap:wrap;font-size:11.5px;color:var(--muted);padding:2px 2px 0}
 .tl-legend-v2 i{display:inline-block;width:14px;height:7px;border-radius:3px;margin-right:5px;vertical-align:1px}
+
+/* ---- v2.14 : onglet « Vols » (récap des vols ouverts, vue détaillée / compacte) ---- */
+.tabbar{grid-template-columns:repeat(6,1fr)}
+.tabbar button{font-size:11px}
+body[data-panel="vols"] .panel-vols{display:flex}
+.panel-vols{flex-direction:column;gap:8px}
+.tb-badge{position:absolute;top:2px;left:calc(50% + 4px);min-width:16px;height:16px;padding:0 4px;border-radius:999px;background:var(--crit);color:#fff;font-size:10px;font-weight:800;line-height:16px;text-align:center}
+.tb-badge[hidden]{display:none}
+.rc-head{display:flex;align-items:flex-end;justify-content:space-between;gap:10px;margin-bottom:2px}
+.rc-title{margin:0;font-size:18px;font-weight:800;color:var(--fg)}
+.rc-sub{font-size:12px;color:var(--muted);font-weight:600;margin-top:2px}
+.rc-seg{display:inline-flex;background:var(--surface-2);border:1px solid var(--line);border-radius:8px;padding:2px;flex:none}
+.rc-seg button{border:0;background:transparent;border-radius:6px;height:30px;padding:0 10px;font:inherit;font-size:12.5px;font-weight:700;color:var(--muted);cursor:pointer}
+.rc-seg button.is-on{background:var(--surface);color:var(--fg);box-shadow:0 1px 3px rgba(11,30,79,.12)}
+.rc-sec{font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:8px 2px 0}
+.rc-empty{padding:28px 14px;text-align:center;color:var(--muted);font-size:14px;background:var(--surface);border:1px dashed var(--line);border-radius:var(--r-lg)}
+.rc-ring{width:36px;height:36px}
+.rc-ring b{font-size:11px}
+.flt-cie.done{background:conic-gradient(var(--ok) var(--p),var(--line) 0)}
+.rc-card,.rc-row{display:grid;width:100%;text-align:left;font:inherit;color:var(--fg);cursor:pointer;background:var(--surface);border:1px solid var(--line)}
+.rc-card{grid-template-columns:auto minmax(0,1fr) auto;gap:4px 10px;align-items:center;padding:11px 12px;border-radius:var(--r-lg);box-shadow:var(--tile-shadow)}
+.rc-card.is-cur{border-color:var(--navy);box-shadow:inset 3px 0 0 var(--navy),var(--tile-shadow)}
+html.dark .rc-card.is-cur{border-color:#8FA6FF}
+.rc-card.is-done{opacity:.6}
+.rc-t{min-width:0}
+.rc-t b{display:block;font-size:15px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rc-t small{display:block;font-size:11.5px;color:var(--muted);font-weight:600}
+.rc-cdbig{text-align:right}
+.rc-cdbig small{display:block;font-size:10px;font-weight:700;letter-spacing:.06em;color:var(--muted)}
+.rc-cdbig b{display:block;font-size:26px;font-weight:300;line-height:1.05;font-variant-numeric:tabular-nums}
+.rc-next{grid-column:1 / -1;display:flex;align-items:center;gap:7px;font-size:12.5px;font-weight:700}
+.rc-next i{width:6px;height:6px;border-radius:50%;background:var(--yellow);flex:none}
+.rc-meta{grid-column:1 / -1;display:flex;gap:14px;align-items:center;font-size:11.5px;color:var(--muted);border-top:1px solid var(--line);padding-top:7px;margin-top:3px}
+.rc-meta b{color:var(--fg);font-weight:700;font-variant-numeric:tabular-nums}
+.rc-meta em{margin-left:auto;font-style:normal;font-weight:800;color:var(--muted)}
+.rc-list{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--tile-shadow)}
+.rc-row{grid-template-columns:auto minmax(0,1fr) auto 64px;gap:10px;align-items:center;padding:9px 12px;border:0;border-top:1px solid var(--line);border-radius:0}
+.rc-row:first-child{border-top:0}
+.rc-row.is-cur{box-shadow:inset 3px 0 0 var(--navy)}
+.rc-row.is-done{opacity:.6}
+.rc-row .rc-t b{font-size:14px}
+.rc-e{font-size:11px;font-weight:600;color:var(--muted);text-align:right}
+.rc-e b{display:block;font-size:13px;color:var(--fg);font-variant-numeric:tabular-nums}
+.rc-cd{text-align:right;font-size:19px;font-weight:600;font-variant-numeric:tabular-nums}
+.panel-vols .late{color:var(--crit)}
+.panel-vols .soon{color:#B77700}
+html.dark .panel-vols .soon{color:var(--yellow)}
+.panel-vols .ok{color:var(--ok)}
+.panel-vols .mut{color:var(--muted)}

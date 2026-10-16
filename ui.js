@@ -5,7 +5,7 @@
    affichent une section de la page.
    ===================================================================== */
 (function(){
-  const PANELS = ['vol', 'timing', 'retard', 'notes'];
+  const PANELS = ['vols', 'vol', 'timing', 'retard', 'notes'];
 
   function ldmIsOpen(){
     const m = document.getElementById('ldmModal');
@@ -31,6 +31,7 @@
       const tl = document.getElementById('timelineCard');
       if(tl && tl.style.display !== 'none') requestAnimationFrame(()=>{ try{ renderTimeline(); }catch(e){} });
     }
+    if(name === 'vols') renderRecap();
     if(name === 'notes'){
       // Mode Stylet / Clavier : rétablit le dernier mode si aucun n'est actif
       if(!document.querySelector('#bnPenLi.is-active, #bnTextLi.is-active') && typeof bnSwitchMode === 'function'){
@@ -234,9 +235,98 @@
     });
   }
 
+  /* ===== Onglet « Vols » : récap de tous les vols ouverts ===== */
+  const esc = v => String(v == null ? '' : v).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  const fmtHM = m => { m = ((Math.round(m) % 1440) + 1440) % 1440; return String(Math.floor(m/60)).padStart(2,'0') + ':' + String(m%60).padStart(2,'0'); };
+  const fmtLeft = l => l < 0 ? '+' + Math.round(-l) + '′' : (l < 60 ? Math.floor(l) + '′' : Math.floor(l/60) + 'h' + String(Math.floor(l%60)).padStart(2,'0'));
+  function nowMin(){ const n = new Date(); return n.getHours()*60 + n.getMinutes() + n.getSeconds()/60; }
+  function rel(t, ref){ if(t == null) return null; while(t - ref > 720) t -= 1440; while(ref - t > 720) t += 1440; return t; }
+
+  function flightInfo(id){
+    const cur = (typeof currentTabId !== 'undefined') && String(currentTabId) === String(id);
+    let d = {}; try{ d = JSON.parse(localStorage.getItem('tab-' + id) || '{}'); }catch(e){}
+    const g = k => (cur ? val(k) : String(d[k] || '')).trim();
+    const cie = g('Cie').toUpperCase();
+    const depFF = (d.akMeta?.depFF || '').toUpperCase(), arrFF = (d.akMeta?.arrFF || '').toUpperCase();
+    const fno = depFF || arrFF || (cie + g('NVol').toUpperCase()) || 'VOL';
+    const place = (depFF || !arrFF ? g('To') : g('From')).toUpperCase();
+    const now = nowMin();
+    const eobtCur = cur ? toMin(txt('timer-eobt')) : null;
+    const sobt = toMin(g('SOBT')), sibt = toMin(g('SIBT')), aibt = toMin(g('AIBT')), aobt = toMin(g('AOBT'));
+    let eobt = rel(eobtCur ?? sobt, now);
+    const hle = cur && toMin(txt('timer-h40')) != null ? rel(toMin(txt('timer-h40')), now) : (eobt != null ? eobt - 40 : null);
+    const left = eobt != null ? eobt - now : null;
+    let st, cls = '', next;
+    const has = k => !!g(k);
+    if(aobt != null){ st = 'Parti ' + fmtHM(aobt); cls = 'ok'; next = 'Off-block ' + fmtHM(aobt); }
+    else if(aibt == null){ st = sibt != null ? 'Arr. ' + fmtHM(sibt) : 'Pas arrivé'; cls = 'mut'; next = sibt != null ? 'Arrivée prévue ' + fmtHM(sibt) : 'Arrivée à saisir'; }
+    else {
+      next = !has('DernierDebarque') ? 'Débarquement' + (has('PremierDebarque') ? ' en cours' : ' à lancer')
+           : !has('AvionPremierEmbarque') ? 'Embarquement à lancer'
+           : !has('AvionDernierEmbarque') ? 'Embarquement en cours'
+           : !has('RemiseLID') ? 'Remise LID'
+           : !has('FermeturePorteAvion') ? 'Fermeture porte'
+           : 'Off-block';
+      if(left != null && left < 0){ st = '+' + Math.round(-left) + '′'; cls = 'late'; }
+      else if(left != null && left <= 5){ st = 'EOBT −5'; cls = 'soon'; }
+      else st = 'En escale';
+    }
+    let p = 0;
+    if(aobt != null) p = 100;
+    else if(aibt != null && eobt != null){ const a = rel(aibt, now); p = Math.max(0, Math.min(1, (now - a) / Math.max(1, eobt - a))) * 100; }
+    const ringCls = aobt != null ? 'done' : cls === 'late' ? 'over' : cls === 'soon' ? 'soon' : '';
+    return { id, cur, cie: (cie || fno.slice(0,2)).slice(0,2), fno, place, park: g('Parking'), immat: g('Immat').toUpperCase(),
+             eobt, hle, left: aobt != null ? null : left, st, cls, next, p, ringCls, done: aobt != null, late: cls === 'late' };
+  }
+
+  function recapView(){ try{ return localStorage.getItem('rcView') === 'cmp' ? 'cmp' : 'det'; }catch(e){ return 'det'; } }
+  window.uiRecapView = function(v){ try{ localStorage.setItem('rcView', v); }catch(e){} renderRecap(); };
+  window.uiOpenFlight = function(id){ try{ switchTab(id); }catch(e){} uiTab('vol'); };
+
+  function ringHTML(f){ return '<span class="flt-cie rc-ring ' + f.ringCls + '" style="--p:' + f.p.toFixed(1) + '%"><b>' + esc(f.cie || '–') + '</b></span>'; }
+  function cdHTML(f){
+    if(f.done) return '<small>OFF-BLOCK</small><b class="ok">' + esc(f.st.replace('Parti ','')) + '</b>';
+    if(f.left == null) return '<small>CD</small><b class="mut">—</b>';
+    return '<small>' + (f.late ? 'RETARD' : 'CD') + '</small><b class="' + f.cls + '">' + fmtLeft(f.left) + '</b>';
+  }
+
+  function renderRecap(){
+    const list = document.getElementById('rcList'); if(!list) return;
+    let ids = []; try{ ids = JSON.parse(localStorage.getItem('flightTabs') || '[]'); }catch(e){}
+    const F = (Array.isArray(ids) ? ids : []).map(flightInfo);
+    const lateN = F.filter(f => f.late).length;
+    const badge = document.getElementById('volsBadge');
+    if(badge){ badge.hidden = !lateN; badge.textContent = lateN; }
+    if(document.body.dataset.panel !== 'vols') return;
+    const view = recapView();
+    document.querySelectorAll('.rc-seg button').forEach(b => b.classList.toggle('is-on', b.dataset.view === view));
+    document.getElementById('rcSub').textContent = F.length ? F.length + ' vol' + (F.length > 1 ? 's' : '') + ' · ' + fmtHM(nowMin()) + (lateN ? ' · ' + lateN + ' en retard' : '') : '';
+    if(!F.length){ list.innerHTML = '<div class="rc-empty">Aucun vol ouvert. Touche « + Vols » en haut pour en ajouter un.</div>'; return; }
+    const key = f => f.done ? 1e6 : (f.left == null ? 1e5 : f.left);
+    const sorted = F.slice().sort((a,b) => key(a) - key(b));
+    if(view === 'cmp'){
+      list.innerHTML = '<div class="rc-list">' + sorted.map(f =>
+        '<button type="button" class="rc-row' + (f.cur ? ' is-cur' : '') + (f.done ? ' is-done' : '') + '" onclick="uiOpenFlight(\'' + esc(f.id) + '\')">' + ringHTML(f)
+        + '<span class="rc-t"><b>' + esc(f.fno) + '</b><small>' + esc([f.place, f.park && 'P' + f.park.replace(/^P/i,'')].filter(Boolean).join(' · ')) + '</small></span>'
+        + '<span class="rc-e">EOBT<b>' + (f.eobt != null ? fmtHM(f.eobt) : '--:--') + '</b></span>'
+        + '<span class="rc-cd ' + (f.done ? 'ok' : f.left == null ? 'mut' : f.cls) + '">' + (f.done ? '✓' : f.left == null ? '—' : fmtLeft(f.left)) + '</span></button>').join('') + '</div>';
+      return;
+    }
+    const card = f => '<button type="button" class="rc-card' + (f.cur ? ' is-cur' : '') + (f.done ? ' is-done' : '') + '" onclick="uiOpenFlight(\'' + esc(f.id) + '\')">'
+      + ringHTML(f)
+      + '<span class="rc-t"><b>' + esc(f.fno) + (f.place ? ' · ' + esc(f.place) : '') + '</b><small>' + esc([f.park && 'P' + f.park.replace(/^P/i,''), f.immat].filter(Boolean).join(' · ') || '—') + '</small></span>'
+      + '<span class="rc-cdbig">' + cdHTML(f) + '</span>'
+      + (f.done ? '' : '<span class="rc-next"><i></i>' + esc(f.next) + '</span>'
+      + '<span class="rc-meta"><span>HLE <b>' + (f.hle != null ? fmtHM(f.hle) : '--:--') + '</b></span><span>EOBT <b>' + (f.eobt != null ? fmtHM(f.eobt) : '--:--') + '</b></span><em class="' + f.cls + '">' + esc(f.st) + '</em></span>')
+      + '</button>';
+    const live = sorted.filter(f => !f.done), done = sorted.filter(f => f.done);
+    list.innerHTML = (live.length ? '<div class="rc-sec">En cours · ' + live.length + '</div>' + live.map(card).join('') : '')
+      + (done.length ? '<div class="rc-sec">Terminés · ' + done.length + '</div>' + done.map(card).join('') : '');
+  }
+
   function init(){
     syncHero(); setInterval(()=>{ syncHero(); syncEvents(); syncTabRings(); }, 1000);
-    initSwipe(); syncFollowBtn(); syncTabRings();
+    initSwipe(); syncFollowBtn(); syncTabRings(); renderRecap(); setInterval(renderRecap, 15000);
     const tb = document.getElementById('tab-bar'); if(tb) new MutationObserver(()=>requestAnimationFrame(syncTabRings)).observe(tb, { childList:true }); setInterval(tlTick, 15000);
     document.addEventListener('click', e => { if(e.target.closest('.ev-x, .tw-zone')) setTimeout(syncEvents, 0); });
     let start = 'vol';
