@@ -759,3 +759,9 @@ html.dark .ev-item em{color:#8FA6FF}
 #timing-grid .time-wrap.tw-empty .tw-display::before{display:none}
 #timing-grid .time-wrap.tw-empty .tw-display{color:var(--navy);letter-spacing:.02em}
 html.dark #timing-grid .time-wrap.tw-empty .tw-display{color:#8FA6FF}
+
+/* ---- v2.6 : « Now » en pastille contour marine avec horloge (choix A) ---- */
+#timing-grid .time-wrap.tw-empty .tw-display{justify-self:start;align-self:center;height:30px;padding:0 11px 0 9px;margin-right:6px;gap:5px;border:1.5px solid var(--navy)!important;border-radius:999px!important;color:var(--navy);font-size:14px;font-weight:700;letter-spacing:.01em}
+#timing-grid .time-wrap.tw-empty .tw-display::before{content:"";display:block;width:14px;height:14px;border-radius:0;margin:0;background:currentColor;-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.4' stroke-linecap='round'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Cpath d='M12 7v5l3 2'/%3E%3C/svg%3E") center/contain no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.4' stroke-linecap='round'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Cpath d='M12 7v5l3 2'/%3E%3C/svg%3E") center/contain no-repeat}
+#timing-grid .time-wrap.tw-empty:has(.tw-zone-center:active) .tw-display{background:var(--navy)!important;color:#fff}
+html.dark #timing-grid .time-wrap.tw-empty .tw-display{border-color:#8FA6FF!important;color:#8FA6FF}
