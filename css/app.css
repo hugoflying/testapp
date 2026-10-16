@@ -538,3 +538,122 @@ body.pv-locked .home-actions{display:none}
 .ldm-card .ld-tob{margin:12px 0}
 #ldmFinal .ld-tob{margin:12px 0 4px}
 .ld-row-4 .ld-stat input::placeholder{font-size:11px;letter-spacing:-.01em}
+
+/* =====================================================================
+   v2 : style « opérations compagnie »
+   Marine + cartes blanches sur gris clair, grands chiffres fins,
+   jaune réservé à ce qui demande l'attention, rouge = retard, vert = fait.
+   ===================================================================== */
+:root{
+  --bg:#F2F4F7; --surface:#FFFFFF; --surface-2:#F4F6F9; --surface-3:#E9EDF3;
+  --line:#E4E8EF; --line-strong:#CBD2DE; --fg:#0B1E4F; --muted:#8A93A6; --faint:#B5BDCB;
+  --accent:#0B1E4F; --accent-soft:rgba(11,30,79,.07); --accent-ink:#FFFFFF;
+  --navy:#0B1E4F; --on-navy:#FFFFFF; --on-navy-dim:#9AA8CC; --yellow:#FFAD00;
+  --ok:#1F9D57; --ok-soft:#E7F6EE; --warn:#C98300; --warn-soft:#FFF4D9; --crit:#D93636; --crit-soft:#FDECEC;
+  --arr:#0B1E4F; --dep:#0B1E4F; --early:#2F6FDE; --red-on-navy:#FF7A7A;
+  --tile-shadow:0 1px 2px rgba(11,30,79,.06),0 4px 14px rgba(11,30,79,.05);
+  --scrim:rgba(11,30,79,.45); --shadow:0 18px 50px rgba(11,30,79,.18);
+  --f-ui:"Manrope","Barlow",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --f-lab:"Manrope","Barlow Semi Condensed",system-ui,sans-serif;
+  --f-num:"Manrope","Barlow",system-ui,sans-serif;
+  --r-sm:4px; --r:6px; --r-lg:8px;
+}
+html.dark{
+  --bg:#0A1124; --surface:#121B33; --surface-2:#18233F; --surface-3:#202C4A;
+  --line:#202C4A; --line-strong:#2E3C60; --fg:#EEF2FA; --muted:#8792AD; --faint:#56627D;
+  --accent:#8FA6FF; --accent-soft:rgba(143,166,255,.12); --accent-ink:#0A1124;
+  --navy:#16245A; --yellow:#FFB81F;
+  --ok:#40C97F; --ok-soft:rgba(64,201,127,.12); --warn:#FFB81F; --warn-soft:rgba(255,184,31,.14); --crit:#FF6464; --crit-soft:rgba(255,100,100,.14);
+  --arr:#EEF2FA; --dep:#EEF2FA; --early:#8FA6FF; --red-on-navy:#FF8A8A;
+  --tile-shadow:none; --scrim:rgba(3,6,14,.6); --shadow:0 18px 50px rgba(0,0,0,.5);
+}
+.num,.chip .v,.tw-display,.kv dd,.ld-stat input,.ld-tob input{font-variant-numeric:tabular-nums;letter-spacing:0}
+
+/* En-tête : onglets texte sur blanc, chronos sur bandeau marine */
+.fixed-header{background:var(--surface);border-bottom:0;padding-bottom:0}
+.fh-top{min-height:44px;border-bottom:1px solid var(--line);margin:0 calc(-1 * var(--pad-x));padding:0 var(--pad-x)}
+.fixed-header .vols-btn{background:var(--navy);border:0;color:#fff;border-radius:6px;height:32px}
+.dark .fixed-header .vols-btn,html.dark .fixed-header .vols-btn{background:#22357A}
+.fixed-header .flt{background:transparent;border:0;border-bottom:3px solid transparent;border-radius:0;height:44px}
+.fixed-header .flt-go{color:var(--muted);font-family:var(--f-ui);font-weight:700;font-size:13px}
+.fixed-header .flt .tab-refresh{color:var(--faint)}
+.fixed-header .flt.is-on{background:transparent;border-bottom-color:var(--yellow)}
+.fixed-header .flt.is-on .flt-go{color:var(--fg)}
+.fixed-header .flt.is-on .tab-refresh{color:var(--muted)}
+#moreBtn{color:var(--muted)}
+.chronos{background:var(--navy);margin:0 calc(-1 * var(--pad-x));padding:9px var(--pad-x) 11px;gap:2px}
+.chip,.chip-key,button.chip{background:transparent;border:0;border-radius:0;text-align:left;padding:0 2px;color:var(--on-navy)}
+.chip .k{color:var(--on-navy-dim);font-family:var(--f-ui);font-size:10px;font-weight:700;letter-spacing:.05em}
+.chip .v{font-family:var(--f-ui);font-size:15px;font-weight:600;color:var(--on-navy)}
+.chip:has(.v.chip-soon),.chip:has(.v.chip-late),.chip:has(.v.cd-over){background:transparent;border:0}
+.chip .v.chip-soon{color:var(--yellow)}
+.chip .v.chip-late,.chip .v.cd-over{color:var(--red-on-navy)}
+.chip-cd{text-align:right}
+.chip-cd .v{font-size:19px;font-weight:300;line-height:1.05}
+.app-wrap{padding-top:12px}
+
+/* Cartes */
+.card{border-radius:var(--r-lg);box-shadow:var(--tile-shadow)}
+.sec-t{font-family:var(--f-ui);font-weight:700}
+
+/* Onglets segmentés (Arrivée/Départ/Timeline, ARR/PREVI/FINAL/FUEL) : soulignés */
+.tabs.is-toggle ul,.lm-seg{display:flex;justify-content:flex-start;gap:20px;background:transparent;border:0;border-bottom:1px solid var(--line);border-radius:0;padding:0 2px}
+.tabs.is-toggle li a,.lm-seg .button{height:auto;min-height:0;padding:6px 0 9px;border-radius:0;background:transparent!important;box-shadow:none!important;border-bottom:3px solid transparent!important;font-family:var(--f-ui);font-weight:700;font-size:14px;color:var(--muted);margin-bottom:-1px}
+.tabs.is-toggle li.is-active a,.lm-seg .button.is-active{color:var(--fg);border-bottom-color:var(--yellow)!important}
+
+/* Barre du bas : blanche, icône + libellé, trait jaune sur l'onglet actif */
+.tabbar{background:var(--surface);border-top:1px solid var(--line)}
+.tabbar button{color:var(--muted);font-family:var(--f-ui);font-weight:600}
+.tabbar button.is-on{color:var(--fg);font-weight:800}
+.tabbar button.is-on::before{background:var(--yellow);top:-7px}
+
+/* Vol : colonnes horaires sobres */
+.hcol{border:1px solid var(--line);border-top:1px solid var(--line);box-shadow:var(--tile-shadow);background:var(--surface)}
+.hcol-t{color:var(--fg);font-family:var(--f-ui);font-weight:800}
+.time-wrap.tw-plan .tw-display{font-weight:300;font-family:var(--f-ui)}
+.hrow.real .tw-display{font-weight:600}
+.delta{border-radius:4px;font-family:var(--f-ui)}
+
+/* Timing : 2 colonnes de tuiles, heure en grand puis −1 / +1 */
+#timing-grid .card{background:transparent;border:0;box-shadow:none;padding:0}
+#timing-grid .grid-auto{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+#timing-grid .grid-auto > .span-12{grid-column:1 / -1}
+#timing-grid .field{display:flex;flex-direction:column;align-items:stretch;gap:2px;padding:10px 10px 0;border:1px solid var(--line);border-radius:var(--r-lg);background:var(--surface);box-shadow:var(--tile-shadow);height:100%;overflow:hidden;position:relative}
+#timing-grid .grid-auto > div:last-child .field{border-bottom:1px solid var(--line)}
+#timing-grid .field .label{font-family:var(--f-ui);font-size:11.5px;font-weight:600;color:var(--muted);line-height:1.25;min-height:29px;padding-right:18px}
+#timing-grid .field .label .tw-dot{width:6px;height:6px;margin-right:6px;vertical-align:1px}
+#timing-grid .control{margin-top:auto}
+#timing-grid .time-wrap{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:42px 30px;gap:6px 6px;height:auto;border:0;background:transparent;overflow:visible;padding-bottom:10px;border-bottom:3px solid var(--line);margin:0 -10px;padding-left:10px;padding-right:10px}
+#timing-grid .tw-display{grid-column:1 / -1;grid-row:1;justify-content:flex-start;border:0;background:transparent!important;font-family:var(--f-ui);font-size:30px;font-weight:300;color:var(--fg);padding:0}
+#timing-grid .tw-zone-center{grid-column:1 / -1;grid-row:1}
+#timing-grid .tw-zone-left{grid-column:1;grid-row:2}
+#timing-grid .tw-zone-right{grid-column:2;grid-row:2}
+#timing-grid .tw-zone-left,#timing-grid .tw-zone-right{background:var(--surface-2);border:1px solid var(--line);border-radius:4px;color:var(--fg);font-family:var(--f-ui);font-size:13px}
+#timing-grid .time-wrap.tw-empty .tw-display{font-size:15px;font-weight:700;color:var(--fg)}
+#timing-grid .time-wrap.tw-empty .tw-display::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--yellow);margin-right:7px}
+#timing-grid .time-wrap.tw-empty .tw-zone-left,#timing-grid .time-wrap.tw-empty .tw-zone-right{color:var(--fg)}
+#timing-grid .time-wrap.tw-set{border-bottom-color:var(--ok)}
+#timing-grid .field:has(.tw-set)::after{content:"";position:absolute;top:9px;right:9px;width:16px;height:16px;border-radius:50%;background:var(--ok) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M4.5 8.2l2.3 2.3 4.7-4.9' fill='none' stroke='%23fff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/16px no-repeat}
+#timing-grid .field-optional .label{color:var(--faint)}
+
+/* Load */
+.ld-stat{border-radius:var(--r-lg);box-shadow:var(--tile-shadow)}
+.ld-stat input{font-family:var(--f-ui);font-weight:300;font-size:22px}
+.ld-tob{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:var(--tile-shadow)}
+.ld-tob-label{color:var(--muted);font-family:var(--f-ui);letter-spacing:.06em}
+.ld-tob input{font-family:var(--f-ui);font-weight:300;font-size:30px;color:var(--fg)}
+.ld-tob #lidGuideBtn{color:var(--fg)}
+
+/* Boutons */
+.btn{border-radius:var(--r)}
+.btn-primary{background:var(--navy);color:#fff}
+html.dark .btn-primary{background:#22357A}
+
+/* Accueil */
+.home-brand .ico{color:var(--yellow)}
+.home-screen .btn-primary{background:#FFFFFF;color:#0B1E4F}
+.home-login input:focus{border-color:#FFAD00}
+/* Liste des vols : code compagnie (en attendant les dérives) */
+.ak-h1{display:flex;align-items:center;gap:6px}
+.ak-cie{margin-left:auto;flex:none;min-width:26px;height:22px;padding:0 5px;border-radius:4px;background:var(--navy);color:#fff;font-family:var(--f-ui);font-size:11px;font-weight:800;display:grid;place-items:center}
+html.dark .ak-cie{background:#22357A}

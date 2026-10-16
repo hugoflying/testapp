@@ -4694,7 +4694,8 @@ function _renderAKListWithRza(pairs, list, akIdToRza){
 
     return '<button type="button" class="'+cls+'" '+onclick+'>'
       + barHtml
-      + '<span class="ak-h1"><span class="dir '+fl+'">'+flow+'</span><b>'+escapeHtml(iata||'---')+'</b></span>'
+      + '<span class="ak-h1"><span class="dir '+fl+'">'+flow+'</span><b>'+escapeHtml(iata||'---')+'</b>'
+      + (ff ? '<span class="ak-cie">'+escapeHtml(ff.slice(0,2).toUpperCase())+'</span>' : '') + '</span>'
       + '<span class="ak-h2">'+escapeHtml(ff||'—')+' · P'+escapeHtml(stand||'—')+' · '+escapeHtml(reg||'—')+'</span>'
       + '<span class="ak-h3">'+timeStr+estimatedStr+'</span>'
       + (status ? '<span class="ak-h4">'+escapeHtml(status)+'</span>' : '')
@@ -6524,7 +6525,7 @@ function checkAndDeleteIfEmpty(){
 /* ===== Service Worker — enregistrement ===== */
 if ('serviceWorker' in navigator) {
   const swCode = `
-const CACHE = 'suivi-perf-v4';
+const CACHE = 'suivi-perf-v5';
 const PRECACHE = [];   // fichiers à précacher (vide = online-only)
 
 self.addEventListener('install', e => {
