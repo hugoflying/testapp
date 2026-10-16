@@ -4266,8 +4266,27 @@ function renderTimeline(){
       } else {
         // Fin : d.b si complété, sinon NOW plafonné à deadline+15min
         let endExt;
+        // Fin non saisie mais l'étape suivante a commencé (ou l'avion est parti) :
+        // l'action est forcément finie, la barre s'arrête là (« ≤ N′ »)
+        const NEXT_STEP = {
+          'Débarquement':  ['AvionPremierEmbarque','AvionDernierEmbarque','FermeturePorteAvion'],
+          'Cabin release': ['AvionDernierEmbarque','FermeturePorteAvion'],
+          'Embarquement':  ['FermeturePorteAvion'],
+        };
+        let capExt = null;
+        if(d.status === 'in-progress'){
+          [...(NEXT_STEP[d.label] || []), 'AOBT'].forEach(id => {
+            const t = parseHHMM(document.getElementById(id)?.value || '');
+            if(t == null) return;
+            const e = toExtended(t, min, max);
+            if(e >= aExt && (capExt == null || e < capExt)) capExt = e;
+          });
+        }
+        const open = capExt != null;
         if(d.status === 'complete'){
           endExt = toExtended(d.b, min, max);
+        } else if(open){
+          endExt = capExt;
         } else {
           // En cours : jusqu'à maintenant (la fenêtre inclut NOW), plafonné au bord
           endExt = Math.min(nowExt, max);
@@ -4281,12 +4300,14 @@ function renderTimeline(){
 
         const durMin = d.status === 'complete'
           ? Math.round(Math.abs(d.b - d.a))
+          : open ? Math.round(endExt - aExt)
           : Math.round(Math.abs(nowM - d.a) % 1440);
+        const running = d.status === 'in-progress' && !open;
 
         const bar = document.createElement('div');
-        bar.className = 'tl-actual' + (isLate ? ' late' : '') + (d.status === 'in-progress' ? ' run' : '');
+        bar.className = 'tl-actual' + (isLate ? ' late' : '') + (running ? ' run' : '') + (open ? ' open' : '');
         bar.style.cssText = `left:${barL}px; width:${barW}px; top:${BAR_PAD + 2}px; height:${BAR_H - 4}px;`;
-        bar.title = (d.displayLabel || d.label) + ' · ' + (d.status === 'in-progress' ? `${durMin}′ en cours` : `${durMin}′`);
+        bar.title = (d.displayLabel || d.label) + ' · ' + (running ? `${durMin}′ en cours` : open ? `fin non saisie, ${durMin}′ au plus` : `${durMin}′`);
 
       if(showTimeLabels){
         const bl = document.createElement('span');
@@ -4294,7 +4315,7 @@ function renderTimeline(){
         // Pas la place à droite (bord de la timeline) : la durée passe à gauche de la barre
         const lblX = (barL + barW + 40 > LEFT_PAD + trackW && barL > 40) ? barL - 36 : barL + barW + 4;
         bl.style.cssText = `left:${lblX}px; top:${BAR_PAD - 1}px;`;
-        bl.textContent = d.status === 'in-progress' ? `${durMin}′…` : `${durMin}′`;
+        bl.textContent = running ? `${durMin}′…` : open ? `≤ ${durMin}′` : `${durMin}′`;
         track.appendChild(bl);
       }
 
@@ -6694,7 +6715,7 @@ function checkAndDeleteIfEmpty(){
 /* ===== Service Worker — enregistrement ===== */
 if ('serviceWorker' in navigator) {
   const swCode = `
-const CACHE = 'suivi-perf-v37';
+const CACHE = 'suivi-perf-v38';
 const PRECACHE = [];   // fichiers à précacher (vide = online-only)
 
 self.addEventListener('install', e => {

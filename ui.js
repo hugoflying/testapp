@@ -287,7 +287,8 @@
     if(aobt != null){ st = 'Parti ' + fmtHM(aobt); cls = 'ok'; next = 'Off-block ' + fmtHM(aobt); }
     else if(aibt == null){ st = sibt != null ? 'Arr. ' + fmtHM(sibt) : 'Pas arrivé'; cls = 'mut'; next = sibt != null ? 'Arrivée prévue ' + fmtHM(sibt) : 'Arrivée à saisir'; }
     else {
-      next = !has('DernierDebarque') ? 'Débarquement' + (has('PremierDebarque') ? ' en cours' : ' à lancer')
+      // Embarquement commencé = débarquement forcément fini, même sans « Dernier débarqué »
+      next = !has('DernierDebarque') && !has('AvionPremierEmbarque') ? 'Débarquement' + (has('PremierDebarque') ? ' en cours' : ' à lancer')
            : !has('AvionPremierEmbarque') ? 'Embarquement à lancer'
            : !has('AvionDernierEmbarque') ? 'Embarquement en cours'
            : !has('RemiseLID') ? 'Remise LID'

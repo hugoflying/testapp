@@ -1031,3 +1031,5 @@ html.dark .wn-foot .btn{background:#3D6BE0}
 @keyframes wnPop{to{opacity:1;transform:scale(1)}}
 @keyframes wnUp{to{opacity:1;transform:none}}
 @media (prefers-reduced-motion:reduce){#wnModal *,#wnModal{animation-duration:.01s!important;animation-delay:0s!important;transition:none!important}}
+/* v2.33 : action sans heure de fin mais étape suivante commencée */
+.tl-actual.open{opacity:.55}
