@@ -884,3 +884,10 @@ html.dark .rc-card.is-cur{border-color:#8FA6FF}
 html.dark .panel-vols .soon{color:var(--yellow)}
 .panel-vols .ok{color:var(--ok)}
 .panel-vols .mut{color:var(--muted)}
+/* v2.16 : cartes du récap espacées et chiffres plus lisibles */
+#rcList{display:flex;flex-direction:column;gap:10px}
+.rc-sec{margin:10px 2px -2px}
+.rc-card{padding:13px 14px;gap:6px 12px}
+.rc-cdbig b{font-size:28px;font-weight:600;letter-spacing:-.01em}
+.rc-t b{font-size:16px}
+.rc-cd{font-size:20px;font-weight:700}

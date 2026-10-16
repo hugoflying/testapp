@@ -275,7 +275,7 @@
     if(aobt != null) p = 100;
     else if(aibt != null && eobt != null){ const a = rel(aibt, now); p = Math.max(0, Math.min(1, (now - a) / Math.max(1, eobt - a))) * 100; }
     const ringCls = aobt != null ? 'done' : cls === 'late' ? 'over' : cls === 'soon' ? 'soon' : '';
-    return { id, cur, cie: (cie || fno.slice(0,2)).slice(0,2), fno, place, park: g('Parking'), immat: g('Immat').toUpperCase(),
+    return { id, cur, cie: (cie || (fno !== 'VOL' ? fno.slice(0,2) : '')).slice(0,2), fno, place, park: g('Parking'), immat: g('Immat').toUpperCase(),
              eobt, hle, left: aobt != null ? null : left, st, cls, next, p, ringCls, done: aobt != null, late: cls === 'late' };
   }
 
