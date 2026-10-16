@@ -3833,9 +3833,9 @@ function renderTimeline(){
 
   const PPM        = trackW / total;
   const AXIS_H     = 40;
-  let   ROW_H      = 34;
+  const ROW_H      = 38;
   const BAR_H      = 12;
-  let   BAR_PAD    = (ROW_H - BAR_H) / 2;
+  const BAR_PAD    = (ROW_H - BAR_H) / 2;
   const CONTENT_TOP = AXIS_H;
 
   const toPx = t => LEFT_PAD + ((toExtended(t, min, max) - min) / total) * trackW;
@@ -4028,21 +4028,6 @@ function renderTimeline(){
       return null;
     }).filter(r => r !== null);
   }
-
-  // ── Lignes étirées pour remplir la hauteur d'écran restante ───
-  try{
-    const outerEl = document.getElementById('timelineOuter');
-    const bar = document.getElementById('tabbar');
-    const br = bar ? bar.getBoundingClientRect() : null;
-    const bottom = (br && br.height > 0) ? br.top : window.innerHeight;
-    const top = outerEl ? outerEl.getBoundingClientRect().top : 0;
-    const avail = bottom - Math.max(top, 0) - 16 - (scroller.offsetHeight - scroller.clientHeight);
-    const n = Math.max(rows.length, 1);
-    const fit = Math.floor((avail - CONTENT_TOP - (window._tlExtraH || 0)) / n);
-    if(top > 0 && fit > ROW_H){ ROW_H = Math.min(fit, 64); BAR_PAD = (ROW_H - BAR_H) / 2; window._tlStretched = true; }
-    else window._tlStretched = false;
-    window._tlBottomLimit = bottom - 16;
-  }catch(e){}
 
   // ── Hauteur totale (min 140px même sans actions) ──────────────
   const contentH = Math.max(140, CONTENT_TOP + Math.max(rows.length, 1) * ROW_H);
@@ -4381,16 +4366,6 @@ function renderTimeline(){
 
   const zlbl = document.getElementById('timelineZoomLabel');
   if(zlbl) zlbl.textContent = `${Math.round(timelineZoom*100)}%`;
-
-  // Hauteur hors lignes (puces, bordures…) mesurée après coup : un second passage ajuste
-  if(window._tlStretched && !window._tlFixing){
-    const ob = document.getElementById('timelineOuter')?.getBoundingClientRect().bottom || 0;
-    const over = Math.round(ob - window._tlBottomLimit);
-    if(Math.abs(over) > 2){
-      window._tlExtraH = Math.max(0, (window._tlExtraH || 0) + over);
-      window._tlFixing = true; try{ renderTimeline(); } finally { window._tlFixing = false; }
-    }
-  }
 }
 
 
@@ -6667,7 +6642,7 @@ function checkAndDeleteIfEmpty(){
 /* ===== Service Worker — enregistrement ===== */
 if ('serviceWorker' in navigator) {
   const swCode = `
-const CACHE = 'suivi-perf-v17';
+const CACHE = 'suivi-perf-v18';
 const PRECACHE = [];   // fichiers à précacher (vide = online-only)
 
 self.addEventListener('install', e => {
