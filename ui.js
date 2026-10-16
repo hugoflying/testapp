@@ -326,9 +326,37 @@
       + (done.length ? '<div class="rc-sec">Terminés · ' + done.length + '</div>' + done.map(card).join('') : '');
   }
 
+  /* ===== LOAD : swipe ARR ⇄ PREVI ⇄ FINAL ⇄ FUEL ===== */
+  const LDM = ['arr','previ','final','fuel'];
+  const LDM_EL = { arr:'ldmArr', previ:'ldmPrevi', final:'ldmFinal', fuel:'ldmFuel' };
+  function initLdmSwipe(){
+    const m = document.getElementById('ldmModal');
+    if(!m) return;
+    let x0 = null, y0 = 0, t0 = 0;
+    m.addEventListener('touchstart', e => {
+      x0 = null;
+      if(e.touches.length !== 1) return;
+      // Les cases du LOAD couvrent presque tout l'écran : on accepte le swipe dessus, sauf sur la case en cours d'édition
+      if(e.target.closest('textarea, select, .sheet-modal, [data-noswipe]') || e.target === document.activeElement) return;
+      x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; t0 = Date.now();
+    }, { passive:true });
+    m.addEventListener('touchend', e => {
+      if(x0 === null) return;
+      const t = e.changedTouches[0], dx = t.clientX - x0, dy = t.clientY - y0;
+      x0 = null;
+      if(Math.abs(dx) < 60 || Math.abs(dx) < Math.abs(dy) * 1.6 || Date.now() - t0 > 700) return;
+      const cur = (typeof _ldmMode !== 'undefined' && LDM.includes(_ldmMode)) ? _ldmMode : 'arr';
+      const i = LDM.indexOf(cur) + (dx < 0 ? 1 : -1);
+      if(i < 0 || i >= LDM.length || typeof ldmSwitch !== 'function') return;
+      ldmSwitch(LDM[i]);
+      const el = document.getElementById(LDM_EL[LDM[i]]);
+      if(el){ el.classList.remove('sw-l','sw-r'); void el.offsetWidth; el.classList.add(dx < 0 ? 'sw-l' : 'sw-r'); }
+    }, { passive:true });
+  }
+
   function init(){
     syncHero(); setInterval(()=>{ syncHero(); syncEvents(); syncTabRings(); }, 1000);
-    initSwipe(); syncFollowBtn(); syncTabRings(); renderRecap(); setInterval(renderRecap, 15000);
+    initSwipe(); initLdmSwipe(); syncFollowBtn(); syncTabRings(); renderRecap(); setInterval(renderRecap, 15000);
     const tb = document.getElementById('tab-bar'); if(tb) new MutationObserver(()=>requestAnimationFrame(syncTabRings)).observe(tb, { childList:true }); setInterval(tlTick, 15000);
     document.addEventListener('click', e => { if(e.target.closest('.ev-x, .tw-zone')) setTimeout(syncEvents, 0); });
     let start = 'vol';

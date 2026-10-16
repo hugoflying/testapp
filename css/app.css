@@ -897,3 +897,4 @@ html.dark .panel-vols .soon{color:var(--yellow)}
 .rc-blk.blk-in{background:rgba(61,107,224,.12);color:#3D6BE0!important}
 .rc-blk.blk-dep{background:rgba(31,157,87,.12);color:var(--ok)!important}
 html.dark .rc-blk.blk-in{color:#8FA6FF!important}
+#ldmModal{touch-action:pan-y pinch-zoom}
