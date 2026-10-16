@@ -453,7 +453,9 @@
       const sig = segs.map(x => x.lbl + x.n).join('|');
       if(bar.dataset.sig !== sig){
         bar.dataset.sig = sig;
-        bar.innerHTML = segs.map(x => '<div class="' + (x.n ? '' : 'e') + '" style="flex:' + (x.n || Math.max(1, pcs * .08)) + '">' + esc(x.lbl) + (x.n ? ' <b>' + x.n + '</b>' : '') + '</div>').join('');
+        // Seules les soutes chargées apparaissent ; chacune garde une largeur lisible même avec peu de bagages
+        bar.innerHTML = segs.filter(x => x.n).map(x => '<div style="flex:' + x.n + ' 1 0">' + esc(x.lbl) + ' <b>' + x.n + '</b></div>').join('');
+        bar.hidden = !pcs;
       }
       const hsum = document.getElementById('ldHoldSum');
       const bags = ldInt('FinalBAGS');

@@ -974,3 +974,6 @@ html.dark #ldmModal .ld-tob.ld-hero{background:#16265E}
 #finalPaxRow[data-n="4"] .ld-dl{right:6px;bottom:8px;padding:1px 5px}
 /* Indications (30 pcs, Remainder, 27 (1-5)…) : petites et grises */
 #ldmModal .ld-box .ld-stat input::placeholder{font-size:13px;font-weight:500}
+/* v2.25 : soutes vides masquées, largeur mini lisible */
+.ld-holdbar div{min-width:max-content;padding:0 8px}
+.ld-holdbar[hidden],.ld-holdbar[hidden] + .ld-holdleg{display:none}
