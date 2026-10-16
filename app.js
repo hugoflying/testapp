@@ -3673,6 +3673,15 @@ function computeTimelineWindow(allTimes){
 
   const ends = [SOBT, AOBT, EOBT, CTOT, ...(allTimes || [])].filter(v => v != null);
 
+  // Avion au bloc et pas encore parti : la fenetre va jusqu'a maintenant (ligne NOW
+  // visible, barres en cours non coupees), dans la limite de 6 h apres l'arrivee.
+  if(AIBT != null && AOBT == null){
+    const d = new Date();
+    const nowM = (typeof isUTC !== 'undefined' && isUTC) ? d.getUTCHours()*60 + d.getUTCMinutes() : d.getHours()*60 + d.getMinutes();
+    const since = ((nowM - AIBT) % 1440 + 1440) % 1440;
+    if(since <= 360) ends.push(AIBT + since + 3);
+  }
+
   if(starts.length && ends.length){
     let startRef = Math.min(...starts);
     let endRef   = Math.max(...ends);
@@ -4155,6 +4164,7 @@ function renderTimeline(){
   for(let t = Math.ceil(min/tickStep)*tickStep; t <= Math.floor(max/tickStep)*tickStep; t += tickStep){
     const lbl = document.createElement('div');
     lbl.className = 'tl-axis-label';
+    if(toPx(t) < 16) continue;   // libellé qui serait coupé par le bord gauche
     lbl.style.left = toPx(t) + 'px';
     lbl.textContent = fmtHHMM(t);
     axisTrack.appendChild(lbl);
@@ -4258,10 +4268,9 @@ function renderTimeline(){
         let endExt;
         if(d.status === 'complete'){
           endExt = toExtended(d.b, min, max);
-        } else if(hasTarget && deadlineExt !== null && nowExt > deadlineExt + 15){
-          endExt = deadlineExt + 15; // plafond pour éviter barre infinie
         } else {
-          endExt = nowExt;
+          // En cours : jusqu'à maintenant (la fenêtre inclut NOW), plafonné au bord
+          endExt = Math.min(nowExt, max);
         }
 
         const barL = toPx(aExt);
@@ -4282,7 +4291,9 @@ function renderTimeline(){
       if(showTimeLabels){
         const bl = document.createElement('span');
         bl.className = 'tl-dur' + (isLate ? ' late' : '');
-        bl.style.cssText = `left:${barL + barW + 4}px; top:${BAR_PAD - 1}px;`;
+        // Pas la place à droite (bord de la timeline) : la durée passe à gauche de la barre
+        const lblX = (barL + barW + 40 > LEFT_PAD + trackW && barL > 40) ? barL - 36 : barL + barW + 4;
+        bl.style.cssText = `left:${lblX}px; top:${BAR_PAD - 1}px;`;
         bl.textContent = d.status === 'in-progress' ? `${durMin}′…` : `${durMin}′`;
         track.appendChild(bl);
       }
@@ -6683,7 +6694,7 @@ function checkAndDeleteIfEmpty(){
 /* ===== Service Worker — enregistrement ===== */
 if ('serviceWorker' in navigator) {
   const swCode = `
-const CACHE = 'suivi-perf-v35';
+const CACHE = 'suivi-perf-v36';
 const PRECACHE = [];   // fichiers à précacher (vide = online-only)
 
 self.addEventListener('install', e => {
