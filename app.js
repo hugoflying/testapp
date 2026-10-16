@@ -2848,7 +2848,9 @@ function checkAutoSwitchToDep(){
     const dd  = (document.getElementById('DernierDebarque')?.value  || '').trim();
     const al  = (document.getElementById('ArriveeLiftArr')?.value   || '').trim();
     const dl  = (document.getElementById('DepartLiftArr')?.value    || '').trim();
-    if(dd && !(al && !dl)) switchTimingPanel('dep');
+    // Seulement depuis Arrivée : ne pas arracher l'utilisateur de la Timeline
+    const onArr = document.getElementById('panel-arr')?.style.display !== 'none';
+    if(dd && !(al && !dl) && onArr) switchTimingPanel('dep');
   }, 3000);
 }
 
@@ -3822,25 +3824,24 @@ function renderTimeline(){
   const total = Math.max(1, max - min);
 
   // ── Constantes layout ─────────────────────────────────────────
-  const LABEL_W    = 108;
-  const LEFT_PAD   = 24;
-  const MIN_PPM    = 9;
+  const LABEL_W    = 104;
+  const LEFT_PAD   = 10;
   const viewport   = scroller.clientWidth || 360;
-  const minTrackW  = Math.round(total * MIN_PPM);
-  const trackW     = Math.max(Math.round(viewport * timelineZoom), minTrackW);
+  // v2.12 « Gantt épuré » : à 100 % toute l'escale tient dans la largeur, le zoom agrandit
+  const trackW     = Math.max(120, Math.round((viewport - LEFT_PAD - 12) * timelineZoom));
   canvas.style.width = (trackW + LEFT_PAD) + 'px';
 
   const PPM        = trackW / total;
-  const AXIS_H     = 42;
-  let   ROW_H      = 52;
-  const BAR_H      = 34;
+  const AXIS_H     = 40;
+  let   ROW_H      = 34;
+  const BAR_H      = 12;
   let   BAR_PAD    = (ROW_H - BAR_H) / 2;
   const CONTENT_TOP = AXIS_H;
 
   const toPx = t => LEFT_PAD + ((toExtended(t, min, max) - min) / total) * trackW;
 
   // ── Tick adaptatif ────────────────────────────────────────────
-  const tickStep = [2,5,10,15,20,30].find(s => s * PPM >= 42) || 30;
+  const tickStep = [5,10,15,20,30,60].find(s => s * PPM >= 46) || 60;
 
   // ── Couleurs ──────────────────────────────────────────────────
   const barColors = {
@@ -4038,7 +4039,7 @@ function renderTimeline(){
     const avail = bottom - Math.max(top, 0) - 16 - (scroller.offsetHeight - scroller.clientHeight);
     const n = Math.max(rows.length, 1);
     const fit = Math.floor((avail - CONTENT_TOP - (window._tlExtraH || 0)) / n);
-    if(top > 0 && fit > ROW_H){ ROW_H = Math.min(fit, 96); BAR_PAD = (ROW_H - BAR_H) / 2; window._tlStretched = true; }
+    if(top > 0 && fit > ROW_H){ ROW_H = Math.min(fit, 64); BAR_PAD = (ROW_H - BAR_H) / 2; window._tlStretched = true; }
     else window._tlStretched = false;
     window._tlBottomLimit = bottom - 16;
   }catch(e){}
@@ -4061,12 +4062,12 @@ function renderTimeline(){
   // Labels des actions
   rows.forEach((d, i) => {
     const cell = document.createElement('div');
-    cell.className = 'tl-lc-cell' + (i % 2 ? ' alt' : '');
+    cell.className = 'tl-lc-cell';
     cell.style.height = ROW_H + 'px';
 
     const name = document.createElement('span');
     name.textContent = d.displayLabel || d.label;
-    name.style.cssText = 'font-size:11px; font-weight:700; line-height:1;';
+    name.style.cssText = 'font-size:11.5px; font-weight:700; line-height:1.15; color:var(--fg); white-space:normal;';
     cell.appendChild(name);
 
     // Statut (uniquement si action complète et cible connue)
@@ -4088,8 +4089,8 @@ function renderTimeline(){
           while(ref - endAdj >  720) endAdj += 1440;
           const onTime = endAdj <= deadline;
           const badge = document.createElement('span');
-          badge.textContent = onTime ? '✓ On time' : '✗ Late';
-          badge.style.cssText = `font-size:9px;font-weight:800;letter-spacing:.03em;color:${onTime ? '#16a34a' : '#dc2626'};`;
+          badge.textContent = onTime ? 'À l\'heure' : 'Retard';
+          badge.style.cssText = `font-size:10px;font-weight:700;color:${onTime ? 'var(--ok)' : 'var(--crit)'};`;
           cell.appendChild(badge);
         }
       }
@@ -4110,12 +4111,10 @@ function renderTimeline(){
   // ─────────────────────────────────────────────────────────────
 
   // 1. Grille verticale — trait fin chaque minute, medium à 5min, major au tickStep
-  for(let t = Math.ceil(min); t <= max; t++){
+  for(let t = Math.ceil(min/tickStep)*tickStep; t <= max; t += tickStep){
     const x = toPx(t);
     const line = document.createElement('div');
-    const isMajor  = t % tickStep === 0;
-    const isMedium = !isMajor && t % 5 === 0;
-    line.className = 'tl-vgrid' + (isMajor ? ' major' : isMedium ? ' medium' : '');
+    line.className = 'tl-vgrid';
     line.style.cssText = `left:${x}px; top:${CONTENT_TOP}px; height:${contentH - CONTENT_TOP}px;`;
     canvas.appendChild(line);
   }
@@ -4182,7 +4181,6 @@ function renderTimeline(){
     const row = document.createElement('div');
     row.className = 'tl-gantt-row';
     row.style.height = ROW_H + 'px';
-    if(i % 2) row.style.background = 'rgba(0,0,0,.03)';
 
     const track = document.createElement('div');
     track.className = 'tl-row-track';
@@ -4195,15 +4193,10 @@ function renderTimeline(){
       const dashColor = '#94a3b8';
 
       const tBar = document.createElement('div');
+      tBar.className = 'tl-target';
       tBar.style.cssText = [
-        `position:absolute`,
         `left:${targetL}px`, `width:${targetW}px`,
         `height:${BAR_H}px`, `top:${BAR_PAD}px`,
-        `border-radius:8px`,
-        `border:2px dashed ${dashColor}`,
-        `background:color-mix(in srgb, ${dashColor} 5%, transparent)`,
-        `box-sizing:border-box`,
-        `opacity:${deadlinePassed ? '0.6' : '0.4'}`,
       ].join(';');
       track.appendChild(tBar);
     }
@@ -4212,18 +4205,10 @@ function renderTimeline(){
     if(hasTarget && d.a === null && POINT_EVENTS.has(d.label) && targetTo !== null){
       const cx  = toPx(toExtended(targetTo, min, max));
       const cy  = ROW_H / 2;
-      const R   = 10;
+      const R   = 6;
       const dot = document.createElement('div');
-      dot.style.cssText = [
-        `position:absolute`,
-        `left:${cx - R}px`, `top:${cy - R}px`,
-        `width:${R*2}px`, `height:${R*2}px`,
-        `border-radius:50%`,
-        `border:2px dashed #94a3b8`,
-        `background:transparent`,
-        `box-sizing:border-box`,
-        `opacity:0.5`,
-      ].join(';');
+      dot.className = 'tl-pt';
+      dot.style.cssText = `left:${cx - R}px; top:${cy - R}px;`;
       track.appendChild(dot);
     }
 
@@ -4236,19 +4221,11 @@ function renderTimeline(){
         // Cercle vide centré sur l'heure
         const cx = toPx(aExt);
         const cy = ROW_H / 2;
-        const R  = 10;
+        const R  = 6;
         const onTime = hasTarget ? (aExt <= deadlineExt) : true;
-        const circleColor = hasTarget ? (onTime ? '#16a34a' : '#dc2626') : '#64748b';
         const dot = document.createElement('div');
-        dot.style.cssText = [
-          `position:absolute`,
-          `left:${cx - R}px`, `top:${cy - R}px`,
-          `width:${R*2}px`, `height:${R*2}px`,
-          `border-radius:50%`,
-          `border:2.5px solid ${circleColor}`,
-          `background:transparent`,
-          `box-sizing:border-box`,
-        ].join(';');
+        dot.className = 'tl-pt done' + (onTime ? '' : ' late');
+        dot.style.cssText = `left:${cx - R}px; top:${cy - R}px;`;
         track.appendChild(dot);
       } else {
         // Fin : d.b si complété, sinon NOW plafonné à deadline+15min
@@ -4264,34 +4241,24 @@ function renderTimeline(){
         const barL = toPx(aExt);
         const barW = Math.max(4, toPx(Math.max(aExt, endExt)) - barL);
 
-        // Couleur : vert si dans les temps, rouge si dépassé
-        let fillColor = color;
-        if(hasTarget){
-          const isLate = endExt > deadlineExt;
-          fillColor = isLate ? '#dc2626' : '#16a34a';
-        }
+        // Bleu = réel, rouge = hors cible, rayé = en cours
+        const isLate = hasTarget && endExt > deadlineExt;
 
         const durMin = d.status === 'complete'
           ? Math.round(Math.abs(d.b - d.a))
           : Math.round(Math.abs(nowM - d.a) % 1440);
 
         const bar = document.createElement('div');
-        bar.style.cssText = [
-          `position:absolute`,
-          `left:${barL}px`, `width:${barW}px`, `height:${BAR_H}px`, `top:${BAR_PAD}px`,
-          `border-radius:8px`,
-          `background:color-mix(in srgb, ${fillColor} 28%, transparent)`,
-          `border:1.5px solid color-mix(in srgb, ${fillColor} 60%, transparent)`,
-          `border-left:4px solid ${fillColor}`,
-          `display:flex`, `align-items:center`, `overflow:hidden`,
-          `box-shadow:0 1px 4px color-mix(in srgb, ${fillColor} 15%, transparent)`,
-        ].join(';');
+        bar.className = 'tl-actual' + (isLate ? ' late' : '') + (d.status === 'in-progress' ? ' run' : '');
+        bar.style.cssText = `left:${barL}px; width:${barW}px; top:${BAR_PAD + 2}px; height:${BAR_H - 4}px;`;
+        bar.title = (d.displayLabel || d.label) + ' · ' + (d.status === 'in-progress' ? `${durMin}′ en cours` : `${durMin}′`);
 
-      if(barW > 28 && showTimeLabels){
+      if(showTimeLabels && barW > 26){
         const bl = document.createElement('span');
-        bl.style.cssText = `font-size:11px;font-weight:700;color:${fillColor};padding-left:7px;white-space:nowrap;`;
+        bl.className = 'tl-dur' + (isLate ? ' late' : '');
+        bl.style.cssText = `left:${barL + barW + 4}px; top:${BAR_PAD - 1}px;`;
         bl.textContent = d.status === 'in-progress' ? `${durMin}′…` : `${durMin}′`;
-        bar.appendChild(bl);
+        track.appendChild(bl);
       }
 
       track.appendChild(bar);
@@ -4320,20 +4287,15 @@ function renderTimeline(){
   // Collecte tous les marqueurs
   const allMarkers = [];
 
-  fixedPoints.filter(p => ['SIBT','AIBT','SOBT','AOBT'].includes(p.label)).forEach(p => {
-    allMarkers.push({ x: toPx(p.t), label: p.label, bg: '#64748b', color: '#fff', lineClass: 'tl-marker-line', lineStyle: '' });
-  });
 
   if(nowExt >= min && nowExt <= max){
     const x = LEFT_PAD + ((nowExt - min)/total)*trackW;
-    allMarkers.push({ x, label: 'NOW', bg: '#3b82f6', color: '#fff', lineClass: 'tl-now-line', lineStyle: '' });
+    allMarkers.push({ x, label: 'NOW', bg: 'var(--yellow)', color: '#1b1b1b', lineClass: 'tl-now-line', lineStyle: '' });
   }
 
   const eobtPt = fixedPoints.find(p => p.label === 'EOBT');
   if(eobtPt){
-    const isDark = document.documentElement.classList.contains('dark');
-    const ec = isDark ? '#9ca3af' : '#6b7280';
-    allMarkers.push({ x: toPx(eobtPt.t), label: 'EOBT', bg: ec, color: '#fff', lineClass: 'tl-eobt-line', lineStyle: `border-color:${ec};` });
+    allMarkers.push({ x: toPx(eobtPt.t), label: 'EOBT', bg: 'var(--tl-eobt)', color: 'var(--surface)', lineClass: 'tl-eobt-line', lineStyle: '' });
   }
 
   const ctotPt = fixedPoints.find(p => p.label === 'CTOT');
@@ -4356,7 +4318,7 @@ function renderTimeline(){
 
   // ── Placement dynamique des chips — anti-collision ────────────
   const CHIP_H = 22;
-  const CHIP_W = 46;
+  const CHIP_W = 42;
 
   // Définit le côté de chaque chip (gauche = avant la ligne, droite = après)
   const LEFT_CHIPS = new Set(['AIBT','SIBT']);
@@ -4367,8 +4329,8 @@ function renderTimeline(){
     return {
       ...m,
       isLeft,
-      xStart: isLeft ? m.x - CHIP_W - 4 : m.x + 4,
-      xEnd:   isLeft ? m.x - 4           : m.x + 4 + CHIP_W,
+      xStart: m.x - CHIP_W / 2,
+      xEnd:   m.x + CHIP_W / 2,
     };
   });
 
@@ -4377,8 +4339,14 @@ function renderTimeline(){
 
   const placed = [];
 
+  // v2.12 : une seule rangée de puces au-dessus de l'axe ; en cas de chevauchement on décale à droite
+  let lastEnd = -Infinity;
   chipDefs.forEach(chip => {
-    let y = overlayTop + 2;
+    if(chip.xStart < lastEnd + 3){ const dx = lastEnd + 3 - chip.xStart; chip.x += dx; chip.xStart += dx; chip.xEnd += dx; }
+    lastEnd = chip.xEnd;
+  });
+  chipDefs.forEach(chip => {
+    let y = 1;
     let tries = 0;
     while(tries < 10){
       const collision = placed.some(p => {
@@ -4396,9 +4364,7 @@ function renderTimeline(){
     const el = document.createElement('div');
     el.className = 'tl-marker-chip';
     el.textContent = chip.label;
-    const t = chip.isLeft
-      ? 'transform:translateX(calc(-100% - 4px));'
-      : 'transform:translateX(4px);';
+    const t = 'transform:translateX(-50%);';
     el.style.cssText = `left:${chip.x}px; top:${y}px; background:${chip.bg}; color:${chip.color}; ${t} z-index:20;`;
     canvas.appendChild(el);
   });
@@ -6701,7 +6667,7 @@ function checkAndDeleteIfEmpty(){
 /* ===== Service Worker — enregistrement ===== */
 if ('serviceWorker' in navigator) {
   const swCode = `
-const CACHE = 'suivi-perf-v16';
+const CACHE = 'suivi-perf-v17';
 const PRECACHE = [];   // fichiers à précacher (vide = online-only)
 
 self.addEventListener('install', e => {

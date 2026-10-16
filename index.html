@@ -22,7 +22,7 @@
 /* Mise a jour forcee : si version.json (lu sans cache) annonce une autre
    version que celle-ci, on vide les caches et on recharge la page.
    A chaque livraison : changer APP_VERSION ici, dans version.json et les ?v=. */
-window.APP_VERSION = '20261016r17';
+window.APP_VERSION = '20261016r18';
 (function(){
   function check(){
     fetch('./version.json?t=' + Date.now(), { cache: 'no-store' })
@@ -44,8 +44,8 @@ window.APP_VERSION = '20261016r17';
   document.addEventListener('visibilitychange', function(){ if(document.visibilityState === 'visible') check(); });
 })();
 </script>
-<link rel="stylesheet" href="./fonts/fonts.css?v=20261016r17" />
-<link rel="stylesheet" href="./css/app.css?v=20261016r17" />
+<link rel="stylesheet" href="./fonts/fonts.css?v=20261016r18" />
+<link rel="stylesheet" href="./css/app.css?v=20261016r18" />
 </head>
 <body>
 
@@ -548,6 +548,7 @@ function digitsOnly(el){ el.value = (el.value || '').replace(/[^0-9]/g, ''); }
           <div id="timelineCanvas" class="timeline-canvas"></div>
         </div>
       </div>
+      <div class="tl-legend-v2"><span><i style="background:var(--tl-tgt)"></i>Fenêtre cible</span><span><i style="background:var(--tl-blue)"></i>Réel</span><span><i style="background:var(--crit)"></i>Hors cible</span></div>
     </div>
   </section>
 
@@ -837,7 +838,7 @@ function digitsOnly(el){ el.value = (el.value || '').replace(/[^0-9]/g, ''); }
 
 <!-- Cache-busting : incrementer ?v= a CHAQUE deploiement pour forcer
      les navigateurs (et iOS) a recharger app.js au lieu du cache. -->
-<script src="./app.js?v=20261016r17"></script>
-<script src="./ui.js?v=20261016r17"></script>
+<script src="./app.js?v=20261016r18"></script>
+<script src="./ui.js?v=20261016r18"></script>
 </body>
 </html>

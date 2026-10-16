@@ -809,3 +809,29 @@ html.dark .fixed-header .flt.is-on .flt-cie b{background:#2A3E7A}
 html.dark .flt-cie{background:conic-gradient(#8FA6FF var(--p),var(--line) 0)}
 .flt-cie.soon{background:conic-gradient(var(--yellow) var(--p),var(--line) 0)}
 .flt-cie.over{background:conic-gradient(var(--crit) var(--p),var(--line) 0)}
+
+/* ---- v2.12 : Timeline « Gantt épuré » ---- */
+:root{--tl-eobt:#0B1E4F;--tl-tgt:rgba(61,107,224,.14);--tl-blue:#3D6BE0}
+html.dark{--tl-eobt:#8FA6FF;--tl-tgt:rgba(143,166,255,.18);--tl-blue:#8FA6FF}
+.tl-outer{border-radius:10px}
+.tl-lc-cell{padding:0 8px 0 12px;gap:2px;border-top:1px solid var(--line)}
+.tl-lc-cell.alt{background:transparent}
+.tl-gantt-row{border-top:1px solid var(--line)}
+.tl-axis-row{border-bottom:1px solid var(--line)}
+.tl-axis-label{bottom:5px;font-size:10.5px}
+.tl-vgrid,.tl-vgrid.medium,.tl-vgrid.major{width:1px;opacity:.55;background:var(--line)}
+.tl-target{position:absolute;border-radius:3px;background:var(--tl-tgt)}
+.tl-actual{position:absolute;border-radius:4px;background:var(--tl-blue)}
+.tl-actual.late{background:var(--crit)}
+.tl-actual.run{background:repeating-linear-gradient(45deg,var(--tl-blue) 0 4px,color-mix(in srgb,var(--tl-blue) 55%,#fff) 4px 8px)}
+.tl-actual.run.late{background:repeating-linear-gradient(45deg,var(--crit) 0 4px,color-mix(in srgb,var(--crit) 55%,#fff) 4px 8px)}
+.tl-dur{position:absolute;font-family:var(--f-num);font-size:10px;font-weight:700;color:var(--muted);white-space:nowrap;line-height:14px}
+.tl-dur.late{color:var(--crit)}
+.tl-pt{position:absolute;width:12px;height:12px;border-radius:50%;border:2px solid var(--faint);background:var(--surface);box-sizing:border-box}
+.tl-pt.done{border-color:var(--tl-blue);background:var(--tl-blue)}
+.tl-pt.done.late{border-color:var(--crit);background:var(--crit)}
+.tl-now-line{width:2px;background:var(--yellow)}
+.tl-eobt-line{border-left:2px dashed var(--tl-eobt);opacity:1}
+.tl-marker-chip{font-family:var(--f-ui);font-size:9.5px;font-weight:800;padding:2px 6px;border-radius:4px;letter-spacing:.02em}
+.tl-legend-v2{display:flex;gap:14px;flex-wrap:wrap;font-size:11.5px;color:var(--muted);padding:2px 2px 0}
+.tl-legend-v2 i{display:inline-block;width:14px;height:7px;border-radius:3px;margin-right:5px;vertical-align:1px}
