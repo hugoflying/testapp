@@ -898,3 +898,7 @@ html.dark .panel-vols .soon{color:var(--yellow)}
 .rc-blk.blk-dep{background:rgba(31,157,87,.12);color:var(--ok)!important}
 html.dark .rc-blk.blk-in{color:#8FA6FF!important}
 #ldmModal{touch-action:pan-y pinch-zoom}
+
+/* v2.20 : Récap — SOBT / EOBT / CTOT en pied de carte */
+.rc-meta{gap:10px;flex-wrap:wrap;row-gap:4px}
+.rc-meta .rc-ctot b{color:var(--fg);background:var(--warn-soft);padding:0 4px;border-radius:4px}

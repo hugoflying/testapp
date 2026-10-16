@@ -254,7 +254,7 @@
     const eobtCur = cur ? toMin(txt('timer-eobt')) : null;
     const sobt = toMin(g('SOBT')), sibt = toMin(g('SIBT')), aibt = toMin(g('AIBT')), aobt = toMin(g('AOBT'));
     let eobt = rel(eobtCur ?? sobt, now);
-    const hle = cur && toMin(txt('timer-h40')) != null ? rel(toMin(txt('timer-h40')), now) : (eobt != null ? eobt - 40 : null);
+    const ctot = rel(toMin(g('CTOT') || (cur ? txt('timer-ctot') : String(d.timer_ctot || ''))), now);
     const left = eobt != null ? eobt - now : null;
     let st, cls = '', next;
     const has = k => !!g(k);
@@ -278,7 +278,7 @@
     // Statut sol affiché en bas des cartes
     const blk = aobt != null ? { t:'Departed', c:'blk-dep' } : aibt != null ? { t:'In block', c:'blk-in' } : { t:'Not in block', c:'blk-out' };
     return { blk, id, cur, cie: (cie || (fno !== 'VOL' ? fno.slice(0,2) : '')).slice(0,2), fno, place, park: g('Parking'), immat: g('Immat').toUpperCase(),
-             eobt, hle, left: aobt != null ? null : left, st, cls, next, p, ringCls, done: aobt != null, late: cls === 'late' };
+             sobt: rel(sobt, now), eobt, ctot, left: aobt != null ? null : left, st, cls, next, p, ringCls, done: aobt != null, late: cls === 'late' };
   }
 
   function recapView(){ try{ return localStorage.getItem('rcView') === 'cmp' ? 'cmp' : 'det'; }catch(e){ return 'det'; } }
@@ -291,6 +291,8 @@
     if(f.left == null) return '<small>CD</small><b class="mut">—</b>';
     return '<small>' + (f.late ? 'RETARD' : 'CD') + '</small><b class="' + f.cls + '">' + fmtLeft(f.left) + '</b>';
   }
+
+  const metaT = (k, v, c) => '<span' + (c ? ' class="' + c + '"' : '') + '>' + k + ' <b>' + (v != null ? fmtHM(v) : '--:--') + '</b></span>';
 
   function renderRecap(){
     const list = document.getElementById('rcList'); if(!list) return;
@@ -318,8 +320,8 @@
       + ringHTML(f)
       + '<span class="rc-t"><b>' + esc(f.fno) + (f.place ? ' · ' + esc(f.place) : '') + '</b><small>' + esc([f.park && 'P' + f.park.replace(/^P/i,''), f.immat].filter(Boolean).join(' · ') || '—') + '</small></span>'
       + '<span class="rc-cdbig">' + cdHTML(f) + '</span>'
-      + (f.done ? '<span class="rc-meta"><span>EOBT <b>' + (f.eobt != null ? fmtHM(f.eobt) : '--:--') + '</b></span><em class="rc-blk ' + f.blk.c + '">' + f.blk.t + '</em></span>' : '<span class="rc-next"><i></i>' + esc(f.next) + '</span>'
-      + '<span class="rc-meta"><span>HLE <b>' + (f.hle != null ? fmtHM(f.hle) : '--:--') + '</b></span><span>EOBT <b>' + (f.eobt != null ? fmtHM(f.eobt) : '--:--') + '</b></span><em class="rc-blk ' + f.blk.c + '">' + f.blk.t + '</em></span>')
+      + (f.done ? '' : '<span class="rc-next"><i></i>' + esc(f.next) + '</span>')
+      + '<span class="rc-meta">' + metaT('SOBT', f.sobt) + metaT('EOBT', f.eobt) + metaT('CTOT', f.ctot, f.ctot != null ? 'rc-ctot' : '') + '<em class="rc-blk ' + f.blk.c + '">' + f.blk.t + '</em></span>'
       + '</button>';
     const live = sorted.filter(f => !f.done), done = sorted.filter(f => f.done);
     list.innerHTML = (live.length ? '<div class="rc-sec">En cours · ' + live.length + '</div>' + live.map(card).join('') : '')
