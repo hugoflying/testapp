@@ -3146,13 +3146,13 @@ function updateDLCode() {
   // si incomplet : on ne force rien
   if(sobt == null || aobt == null || tobt == null) return;
 
-  // total retard
-  let total = aobt - sobt;
-  if(total < 0) total += 1440;
+  // total retard : diff signé (gère minuit) ; départ en avance = pas de retard
+  const total = totalDelayMinutes() || 0;
 
-  // 93/93A = EOBT - SOBT (borné)
+  // 93/93A = EOBT - SOBT (borné au retard réel)
   let fixed = tobt - sobt;
-  if(fixed < 0) fixed += 1440;
+  if(fixed < -720) fixed += 1440;
+  if(fixed >  720) fixed -= 1440;
   fixed = Math.max(0, Math.min(fixed, total));
 
   const v1 = (c1.value || '').toUpperCase().trim();
@@ -6642,7 +6642,7 @@ function checkAndDeleteIfEmpty(){
 /* ===== Service Worker — enregistrement ===== */
 if ('serviceWorker' in navigator) {
   const swCode = `
-const CACHE = 'suivi-perf-v23';
+const CACHE = 'suivi-perf-v24';
 const PRECACHE = [];   // fichiers à précacher (vide = online-only)
 
 self.addEventListener('install', e => {
