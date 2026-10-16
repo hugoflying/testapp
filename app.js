@@ -2533,15 +2533,88 @@ function generateTimingFields(){
 
   /* ===== DÉPART ===== */
   const depNoHeader = `
-    <div class="buttons mb-4" style="justify-content:center;gap:.5rem;">
+    <div class="dep-extra-legacy" hidden>
       <button class="button is-rounded is-light dep-extra-btn" id="btn-crew" type="button" onclick="toggleDepExtra('crew')" style="font-weight:700;">Crew</button>
       <button class="button is-rounded is-light dep-extra-btn" id="btn-recherche-bag" type="button" onclick="toggleDepExtra('recherche-bag')" style="font-weight:700;">Recherche bag</button>
       <button class="button is-rounded is-light dep-extra-btn" id="btn-inad" type="button" onclick="toggleDepExtra('inad')" style="font-weight:700;">INAD</button>
       <button class="button is-rounded is-light dep-extra-btn" id="btn-gpu" type="button" onclick="toggleDepExtra('gpu')" style="font-weight:700;">Nayak</button>
     </div>
 
+    <div class="card">
+      <div class="card-content">
+        <div class="grid-auto">
+          <div class="span-6">${fieldHTML('AvionPremierEmbarque','Premier embarqué')}</div>
+          <div class="span-6">${fieldHTML('AvionDernierEmbarque','Dernier embarqué')}</div>
+          <div class="span-6">${fieldHTML('ArriveeLift','Arrivée lift',false,false,'is-success')}</div>
+          <div class="span-6">${fieldHTML('DepartLift','Départ lift',false,false,'is-success')}</div>
+          <div class="span-6">${fieldHTML('DepartFuel','Départ Avitair',false,false,'is-warning')}</div>
+          <div class="span-6">${fieldHTML('RemiseLID', 'Remise LDS/LDF')}</div>
+          <div class="span-6">${fieldHTML('FermeturePorteAvion','Fermeture porte avion',false,false,'is-bordeaux')}</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="evZone">
+    <div id="panel-casque" class="card mb-3 ev-panel" data-ev="casque" style="display:none;">
+      <div class="ev-h"><i style="background:#7c3aed"></i><b>Connexion casque</b><button type="button" class="ev-x" onclick="toggleDepExtra('casque')" aria-label="Masquer Connexion casque">×</button></div>
+      <div class="card-content">
+        <div class="grid-auto">
+          <div class="span-6">${fieldHTML('ConnexionAgentCasque','Connexion casque',false,false,'is-purple')}</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="panel-push" class="card mb-3 ev-panel" data-ev="push" style="display:none;">
+      <div class="ev-h"><i style="background:#3273dc"></i><b>Push</b><button type="button" class="ev-x" onclick="toggleDepExtra('push')" aria-label="Masquer Push">×</button></div>
+      <div class="card-content">
+        <div class="grid-auto">
+          <div class="span-6">${fieldHTML('ConnexionPush','Connexion push',false,false,'is-link')}</div>
+          <div class="span-6">${fieldHTML('ChangementPush','Changement de push',false,false,'is-link')}</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="panel-soutes" class="card mb-3 ev-panel" data-ev="soutes" style="display:none;">
+      <div class="ev-h"><i style="background:#7f1d1d"></i><b>Portes de soute</b><button type="button" class="ev-x" onclick="toggleDepExtra('soutes')" aria-label="Masquer Portes de soute">×</button></div>
+      <div class="card-content">
+        <div class="grid-auto">
+          <div class="span-6">${fieldHTML('FermetureSouteAV','Fermeture soute AV',false,false,'is-bordeaux')}</div>
+          <div class="span-6">${fieldHTML('FermetureSouteAR','Fermeture soute AR',false,false,'is-bordeaux')}</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="panel-echelles" class="card mb-3 ev-panel" data-ev="echelles" style="display:none;">
+      <div class="ev-h"><i style="background:#636363"></i><b>Retrait échelles</b><button type="button" class="ev-x" onclick="toggleDepExtra('echelles')" aria-label="Masquer Retrait échelles">×</button></div>
+      <div class="card-content">
+        <div class="grid-auto">
+          <div class="span-6">${fieldHTML('RetraitEchelleAV','Retrait échelle AV',false,false,'is-dark')}</div>
+          <div class="span-6">${fieldHTML('RetraitEchelleAR','Retrait échelle AR',false,false,'is-dark')}</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="panel-reouverture" class="card mb-3 ev-panel" data-ev="reouverture" style="display:none;">
+      <div class="ev-h"><i style="background:#D7263D"></i><b>Réouverture porte</b><button type="button" class="ev-x" onclick="toggleDepExtra('reouverture')" aria-label="Masquer Réouverture porte">×</button></div>
+      <div class="card-content">
+        <div class="grid-auto">
+          <div class="span-6">${fieldHTML('ReouverturePorteAvion','Réouverture porte avion',false,false,'is-bordeaux')}</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="panel-comptage" class="card mb-3 ev-panel" data-ev="comptage" style="display:none;">
+      <div class="ev-h"><i style="background:#15803d"></i><b>Comptage bagages</b><button type="button" class="ev-x" onclick="toggleDepExtra('comptage')" aria-label="Masquer Comptage bagages">×</button></div>
+      <div class="card-content">
+        <div class="grid-auto">
+          <div class="span-6">${fieldHTML('DebutComptageBagages','Début comptage',false,false,'is-success')}</div>
+          <div class="span-6">${fieldHTML('FinComptageBagages','Fin comptage',false,false,'is-success')}</div>
+        </div>
+      </div>
+    </div>
     <!-- Panneau Crew -->
-    <div id="panel-crew" class="card mb-3" style="display:none;">
+    <div id="panel-crew" class="card mb-3 ev-panel" data-ev="crew" style="display:none;">
+      <div class="ev-h"><i style="background:#334155"></i><b>Crew</b><button type="button" class="ev-x" onclick="toggleDepExtra('crew')" aria-label="Masquer Crew">×</button></div>
       <div class="card-content">
         <div class="grid-auto">
           <div class="span-6">${fieldHTML('ArrPNT','Arrivée PNT',false,true,'is-dark')}</div>
@@ -2551,7 +2624,8 @@ function generateTimingFields(){
     </div>
 
     <!-- Panneau Recherche bag -->
-    <div id="panel-recherche-bag" class="card mb-3" style="display:none;">
+    <div id="panel-recherche-bag" class="card mb-3 ev-panel" data-ev="recherche-bag" style="display:none;">
+      <div class="ev-h"><i style="background:#ec4899"></i><b>Recherche bag</b><button type="button" class="ev-x" onclick="toggleDepExtra('recherche-bag')" aria-label="Masquer Recherche bag">×</button></div>
       <div class="card-content">
         <div class="grid-auto">
           <div class="span-4">
@@ -2569,7 +2643,8 @@ function generateTimingFields(){
     </div>
 
     <!-- Panneau INAD -->
-    <div id="panel-inad" class="card mb-3" style="display:none;">
+    <div id="panel-inad" class="card mb-3 ev-panel" data-ev="inad" style="display:none;">
+      <div class="ev-h"><i style="background:#D7263D"></i><b>INAD</b><button type="button" class="ev-x" onclick="toggleDepExtra('inad')" aria-label="Masquer INAD">×</button></div>
       <div class="card-content">
         <div class="grid-auto">
           <div class="span-6">${fieldHTML('AnnonceINAD','Annonce INAD',false,true,'is-red')}</div>
@@ -2579,7 +2654,8 @@ function generateTimingFields(){
     </div>
 
     <!-- Panneau GPU -->
-    <div id="panel-gpu" class="card mb-3" style="display:none;">
+    <div id="panel-gpu" class="card mb-3 ev-panel" data-ev="gpu" style="display:none;">
+      <div class="ev-h"><i style="background:#FFAD00"></i><b>Nayak</b><button type="button" class="ev-x" onclick="toggleDepExtra('gpu')" aria-label="Masquer Nayak">×</button></div>
       <div class="card-content">
         <div class="grid-auto">
           <div class="span-4">${fieldHTML('AppelNayak','Appel Nayak',false,false,'is-jaune')}</div>
@@ -2588,21 +2664,9 @@ function generateTimingFields(){
         </div>
       </div>
     </div>
-
-    <div class="card">
-      <div class="card-content">
-        <div class="grid-auto">
-          <div class="span-6">${fieldHTML('AvionPremierEmbarque','Premier embarqué')}</div>
-          <div class="span-6">${fieldHTML('AvionDernierEmbarque','Dernier embarqué')}</div>
-          <div class="span-6">${fieldHTML('ArriveeLift','Arrivée lift',false,false,'is-success')}</div>
-          <div class="span-6">${fieldHTML('DepartLift','Départ lift',false,false,'is-success')}</div>
-          <div class="span-6">${fieldHTML('DepartFuel','Départ Avitair',false,false,'is-warning')}</div>
-          <div class="span-6">${fieldHTML('RemiseLID', 'Remise LDS/LDF')}</div>
-          <div class="span-6">${fieldHTML('FermeturePorteAvion','Fermeture porte avion',false,false,'is-bordeaux')}</div>
-          <div class="span-6">${fieldHTML('ConnexionAgentCasque','Connexion casque',false,false,'is-purple')}</div>
-        </div>
-      </div>
-    </div>`;
+    </div>
+    <button type="button" class="ev-add" id="evAddBtn" onclick="uiEvOpen()"><span>+</span> Ajouter un événement</button>
+`;
 
   const toggle = `
     <div class="tabs is-toggle is-toggle-rounded is-centered mb-4">
@@ -3622,6 +3686,13 @@ function collectTimelineData(){
     ['ArrPNT','Arrivée PNT'],
     ['ArrPNC','Arrivée PNC'],
     ['FermeturePorteAvion','Fermeture porte avion'],
+    ['ReouverturePorteAvion','Réouverture porte'],
+    ['FermetureSouteAV','Fermeture soute AV'],
+    ['FermetureSouteAR','Fermeture soute AR'],
+    ['RetraitEchelleAV','Retrait échelle AV'],
+    ['RetraitEchelleAR','Retrait échelle AR'],
+    ['ConnexionPush','Connexion push'],
+    ['ChangementPush','Changement de push'],
   ];
   singles.forEach(([id,label])=>{
     const t = parseHHMM(document.getElementById(id)?.value || '');
@@ -3664,6 +3735,7 @@ function collectTimelineData(){
     {label:'Avitair',      pair:getPairWindow('ArriveeFuel','DepartFuel'), cls:'tl--std', color:'#f59e0b'},
     {label:'Lift (Arr)',   pair:getPairWindow('ArriveeLiftArr','DepartLiftArr'), cls:'tl--std', color:'#a855f7'},
     {label:'Lift (Dep)',   pair:getPairWindow('ArriveeLift','DepartLift'), cls:'tl--std', color:'#16a34a'},
+    {label:'Comptage bagages', pair:getPairWindow('DebutComptageBagages','FinComptageBagages'), cls:'tl--std', color:'#0d9488'},
   ];
 
   const durations = rows
@@ -5593,6 +5665,15 @@ function doValidate() {
   if(t('RemiseLID'))            { body += r('REMISE LID',       t('RemiseLID')); }
   if(t('FermeturePorteAvion'))  { body += r('FERMETURE PORTE',  t('FermeturePorteAvion')); }
   if(t('ConnexionAgentCasque')) { body += r('CONNEXION CASQUE', t('ConnexionAgentCasque')); }
+  if(t('ReouverturePorteAvion')) { body += r('REOUVERTURE PORTE', t('ReouverturePorteAvion')); }
+  if(t('FermetureSouteAV'))     { body += r('FERMETURE SOUTE AV', t('FermetureSouteAV')); }
+  if(t('FermetureSouteAR'))     { body += r('FERMETURE SOUTE AR', t('FermetureSouteAR')); }
+  if(t('RetraitEchelleAV'))     { body += r('RETRAIT ECHELLE AV', t('RetraitEchelleAV')); }
+  if(t('RetraitEchelleAR'))     { body += r('RETRAIT ECHELLE AR', t('RetraitEchelleAR')); }
+  if(t('ConnexionPush'))        { body += r('CONNEXION PUSH',     t('ConnexionPush')); }
+  if(t('ChangementPush'))       { body += r('CHANGEMENT PUSH',    t('ChangementPush')); }
+  if(t('DebutComptageBagages') || t('FinComptageBagages'))
+    body += r('COMPTAGE BAGAGES', `${t('DebutComptageBagages')||'--:--'} → ${t('FinComptageBagages')||'--:--'}`);
 
   // ── OPS : INAD / NAYAK ───────────────────────────────────────────────────
   const hasInad = t('ArriveeINAD') || v('ArrSI') || v('PreviSI');
@@ -6082,6 +6163,8 @@ function confirmClearFields(){
     'ArrPNT','ArrPNC','ArriveeFuel','DepartFuel','ArriveeLiftArr','DepartLiftArr',
     'ArriveeLift','DepartLift','AvionPremierEmbarque','AvionDernierEmbarque',
     'FermeturePorteAvion','RemiseLID','ConnexionAgentCasque','ArriveeINAD',
+    'ArrPNT','ArrPNC','AnnonceINAD','AppelNayak','ArriveeNayak','DepartNayak','RechercheBagNombre','RechercheBagDebut','RechercheBagFin',
+    'ConnexionPush','ChangementPush','FermetureSouteAV','FermetureSouteAR','RetraitEchelleAV','RetraitEchelleAR','ReouverturePorteAvion','DebutComptageBagages','FinComptageBagages',
     'CommChiffresPorte', 'CommChargementPiste',
     'ArrPAX_MAIN','ArrPAX_INF','ArrBAGS','ArrPOIDS','ArrSI',
     'PreviPAX_MAIN','PreviPAX_INF','PreviBAGS','PreviPOIDS','PreviSI',
@@ -6525,7 +6608,7 @@ function checkAndDeleteIfEmpty(){
 /* ===== Service Worker — enregistrement ===== */
 if ('serviceWorker' in navigator) {
   const swCode = `
-const CACHE = 'suivi-perf-v8';
+const CACHE = 'suivi-perf-v9';
 const PRECACHE = [];   // fichiers à précacher (vide = online-only)
 
 self.addEventListener('install', e => {

@@ -89,8 +89,68 @@
     bar.style.width = Math.max(0, Math.min(1, r)) * 100 + '%';
   }
 
+
+  /* ===== Événements optionnels du Départ (Crew, Recherche bag, INAD, Nayak) ===== */
+  const EVENTS = [
+    { k:'crew',          t:'Crew',          d:'Arrivée PNT et PNC',             c:'#334155' },
+    { k:'recherche-bag', t:'Recherche bag', d:'Nombre de bags, début et fin',   c:'#ec4899' },
+    { k:'inad',          t:'INAD',          d:'Annonce et arrivée INAD',        c:'#D7263D' },
+    { k:'gpu',           t:'Nayak',         d:'Appel, arrivée et départ Nayak', c:'#FFAD00' },
+    { k:'casque',        t:'Connexion casque',  d:'Connexion de l’agent casque',     c:'#7c3aed' },
+    { k:'push',          t:'Push',              d:'Connexion et changement de push', c:'#3273dc' },
+    { k:'soutes',        t:'Portes de soute',   d:'Fermeture soute AV et AR',        c:'#7f1d1d' },
+    { k:'echelles',      t:'Retrait échelles',  d:'Retrait échelle AV et AR',        c:'#636363' },
+    { k:'reouverture',   t:'Réouverture porte', d:'Réouverture porte avion',         c:'#D7263D' },
+    { k:'comptage',      t:'Comptage bagages',  d:'Début et fin du comptage',        c:'#15803d' }
+  ];
+  function evShown(k){ const p = document.getElementById('panel-'+k); return !!p && p.style.display !== 'none'; }
+  function evFilled(p){ return [...p.querySelectorAll('input')].some(i => i.value && !/^[-–—\s0]*$/.test(i.value)); }
+
+  // Un bloc qui contient une heure reste toujours affiché, sans croix
+  function syncEvents(){
+    document.querySelectorAll('.ev-panel').forEach(p => {
+      const f = evFilled(p);
+      p.classList.toggle('has-val', f);
+      if(f && p.style.display === 'none'){ try{ toggleDepExtra(p.dataset.ev); }catch(e){ p.style.display = 'block'; } }
+    });
+    const add = document.getElementById('evAddBtn');
+    if(add) add.hidden = EVENTS.every(e => evShown(e.k));
+  }
+
+  function evSheet(){
+    let m = document.getElementById('evSheet');
+    if(m) return m;
+    m = document.createElement('div');
+    m.id = 'evSheet'; m.className = 'sheet-modal'; m.style.display = 'none';
+    m.innerHTML = '<div class="sheet-card"><div class="ev-sh-head"><b>Ajouter un événement</b>'
+      + '<button type="button" class="ev-x" aria-label="Fermer">×</button></div><div class="ev-list"></div></div>';
+    m.addEventListener('click', e => {
+      if(e.target === m || e.target.closest('.ev-sh-head .ev-x')){ m.style.display = 'none'; return; }
+      const it = e.target.closest('.ev-item');
+      if(!it || it.disabled) return;
+      m.style.display = 'none';
+      if(!evShown(it.dataset.k)) toggleDepExtra(it.dataset.k);
+      const p = document.getElementById('panel-'+it.dataset.k);
+      if(p){ p.scrollIntoView({ behavior:'smooth', block:'center' }); p.classList.add('ev-flash'); setTimeout(()=>p.classList.remove('ev-flash'), 900); }
+      syncEvents();
+    });
+    document.body.appendChild(m);
+    return m;
+  }
+  window.uiEvOpen = function(){
+    const m = evSheet();
+    m.querySelector('.ev-list').innerHTML = EVENTS.map(e => {
+      const on = evShown(e.k);
+      return '<button type="button" class="ev-item" data-k="'+e.k+'"'+(on?' disabled':'')+'>'
+        + '<i style="background:'+e.c+'"></i><span><b>'+e.t+'</b><small>'+(on?'Déjà affiché':e.d)+'</small></span>'
+        + '<em>'+(on?'✓':'+')+'</em></button>';
+    }).join('');
+    m.style.display = 'flex';
+  };
+
   function init(){
-    syncHero(); setInterval(syncHero, 1000);
+    syncHero(); setInterval(()=>{ syncHero(); syncEvents(); }, 1000);
+    document.addEventListener('click', e => { if(e.target.closest('.ev-x, .tw-zone')) setTimeout(syncEvents, 0); });
     let start = 'vol';
     try{ start = localStorage.getItem('uiPanel') || 'vol'; }catch(e){}
     showPanel(start);
