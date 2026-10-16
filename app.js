@@ -291,23 +291,29 @@ function updateFinalTHOB(){
   thobEl.dispatchEvent(new Event('change', {bubbles:true}));
 }
 
-function updateHWeights(){
-  const cie  = (document.getElementById('Cie')?.value || '').toUpperCase().trim();
-  const to   = (document.getElementById('To')?.value  || '').toUpperCase().trim();
-  const show = (cie === 'FR' || cie === 'RK');
-  const mult = (to === 'AMM') ? 15 : 13;
+/* Poids par soute :
+   FR/RK = 13 kg par bagage standard (15 kg vers AMM)
+   autres = poids moyen du FINAL (POIDS / BAGS), affiché « ≈ » */
+function holdBagKg(){
+  const cie = (document.getElementById('Cie')?.value || '').toUpperCase().trim();
+  const to  = (document.getElementById('To')?.value  || '').toUpperCase().trim();
+  if(cie === 'FR' || cie === 'RK') return { kg: (to === 'AMM') ? 15 : 13, approx:false };
+  const poids = parseInt(document.getElementById('FinalPOIDS')?.value, 10);
+  const bags  = parseInt(document.getElementById('FinalBAGS')?.value, 10);
+  if(poids > 0 && bags > 0) return { kg: poids / bags, approx:true };
+  return null;
+}
 
+function updateHWeights(){
+  const k = holdBagKg();
   ['FinalH1','FinalH2','FinalH3','FinalH4'].forEach(id => {
     const inp = document.getElementById(id);
     const lbl = document.getElementById(id + 'w');
-    if(!inp) return;
-    if(lbl){
-      lbl.style.display = show ? '' : 'none';
-      if(show){
-        const bags = parseInt(inp.value, 10);
-        lbl.textContent = isNaN(bags) || bags === 0 ? '' : `${bags * mult} kg`;
-      }
-    }
+    if(!inp || !lbl) return;
+    const bags = parseInt(inp.value, 10);
+    const show = !!k && !isNaN(bags) && bags > 0;
+    lbl.style.display = show ? '' : 'none';
+    lbl.textContent = show ? `${k.approx ? '≈ ' : ''}${Math.round(bags * k.kg)} kg` : '';
   });
 }
 
@@ -392,13 +398,21 @@ function updateFinalWeightIfNeeded(){
   updatePoidsCorrige();
 }
 
-/* ===== POIDS CORRIGÉ = POIDS + GB*13 (si GB > 0, sinon = POIDS) ===== */
+/* ===== Poids d'un GB : 13 kg, sauf Volotea vers BIA ou AJA = 11 kg ===== */
+function gbKg(){
+  const cie = (document.getElementById('Cie')?.value || '').toUpperCase().trim();
+  const to  = (document.getElementById('To')?.value  || '').toUpperCase().trim();
+  return (cie === 'V7' && (to === 'BIA' || to === 'AJA')) ? 11 : 13;
+}
+
+/* ===== POIDS CORRIGÉ = POIDS + GB × poids GB (si GB > 0, sinon = POIDS) ===== */
 function updatePoidsCorrige(){
   const poids = parseInt(document.getElementById('FinalPOIDS')?.value) || 0;
   const gb    = parseInt(document.getElementById('FinalGB')?.value)    || 0;
   const el    = document.getElementById('FinalPoidsCorrige');
   if(!el) return;
-  el.value = gb > 0 ? poids + (gb * 13) : (poids || '');
+  el.value = gb > 0 ? poids + (gb * gbKg()) : (poids || '');
+  updateHWeights();
 }
 
 /* ===== POIDS auto FR / RK : ARR + EXP ===== */
@@ -800,27 +814,20 @@ function renderLidModeToggle(){
   if(!bar){
     bar = document.createElement('div');
     bar.id = 'lidModeBar';
-    bar.style.cssText = 'display:flex; gap:4px; align-items:center; justify-content:flex-end; margin-bottom:5px;';
-    bar.innerHTML = `
-      <span style="font-size:10px; font-weight:800; opacity:.6; margin-right:2px;">SAISIE</span>
-      <button type="button" id="lidModeELID" style="font-size:10px; font-weight:800; padding:2px 8px; border-radius:7px; cursor:pointer; border:1px solid transparent;">eLID</button>
-      <button type="button" id="lidModeLID"  style="font-size:10px; font-weight:800; padding:2px 8px; border-radius:7px; cursor:pointer; border:1px solid transparent;">Paper LID</button>
-    `;
-    row.insertAdjacentElement('beforebegin', bar);
+    bar.className = 'lid-sw';
+    bar.innerHTML = `<button type="button" id="lidModeELID">eLID</button><button type="button" id="lidModeLID">Paper LID</button>`;
+    // v2.23 : le sélecteur est dans le bandeau TOB
+    const slot = document.getElementById('ldHeroLid');
+    if(slot) slot.appendChild(bar); else row.insertAdjacentElement('beforebegin', bar);
     bar.querySelector('#lidModeELID').addEventListener('click', ()=> switchLidMode('ELID'));
     bar.querySelector('#lidModeLID').addEventListener('click',  ()=> switchLidMode('LID'));
   }
 
   bar.style.display = 'flex';
 
-  const on  = 'background:#dbeafe; color:#1e40af; border:1px solid #93c5fd;';
-  const off = 'background:transparent; color:#6b7280; border:1px solid #d1d5db;';
   const elid = isELID();
-  const bE = bar.querySelector('#lidModeELID');
-  const bL = bar.querySelector('#lidModeLID');
-  const base = 'font-size:10px; font-weight:800; padding:2px 8px; border-radius:7px; cursor:pointer;';
-  if(bE) bE.style.cssText = base + (elid ? on : off);
-  if(bL) bL.style.cssText = base + (elid ? off : on);
+  bar.querySelector('#lidModeELID')?.classList.toggle('on', elid);
+  bar.querySelector('#lidModeLID')?.classList.toggle('on', !elid);
 }
 
 function updateFinalLoadLayout(){
@@ -6684,7 +6691,7 @@ function checkAndDeleteIfEmpty(){
 /* ===== Service Worker — enregistrement ===== */
 if ('serviceWorker' in navigator) {
   const swCode = `
-const CACHE = 'suivi-perf-v27';
+const CACHE = 'suivi-perf-v28';
 const PRECACHE = [];   // fichiers à précacher (vide = online-only)
 
 self.addEventListener('install', e => {

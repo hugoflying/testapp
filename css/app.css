@@ -913,3 +913,64 @@ body[data-panel="vols"] .fh-band{display:none}
 /* v2.22 : durée des événements début / fin */
 .ev-h .ev-dur{flex:none;font-size:12px;font-weight:800;letter-spacing:0;text-transform:none;color:var(--fg);background:var(--surface-2);border-radius:999px;padding:2px 9px;font-variant-numeric:tabular-nums}
 .ev-h .ev-dur.run{background:var(--warn-soft)}
+
+/* ===== v2.23 : LOAD option B — TOB en vedette, grandes tuiles, écarts vs PRÉVI, zones, soutes ===== */
+#ldmModal .ldm-grid{gap:10px}
+#ldmModal .ld-stat{position:relative;padding:9px 11px 8px;gap:0;border-radius:14px}
+#ldmModal .ld-stat-label{font-family:var(--f-ui);font-size:11px;font-weight:800;letter-spacing:.06em}
+#ldmModal .ld-stat input{font-family:var(--f-ui);font-size:26px;font-weight:600;height:36px;line-height:36px}
+#ldmModal .ld-stat input[readonly]{color:var(--fg)}
+#ldmModal .ld-stat:has(input[readonly]){background:var(--surface-2);border-style:solid}
+#ldmModal .ld-row-4 .ld-stat input::placeholder,#ldmModal .ld-stat input::placeholder{font-size:20px;font-weight:400}
+/* tuiles larges : 2 par ligne pour les blocs de 4 (ARR, bagages, FUEL) */
+#ldmArr .ld-row-4,#bagsPoidsBgRow,#ldmFuel .ld-row-4{grid-template-columns:repeat(2,minmax(0,1fr))}
+#finalPaxRow{grid-template-columns:repeat(var(--n,2),minmax(0,1fr))}
+#lidModeBar[style*="flex"]{margin:0}
+
+/* Écart avec le PRÉVI */
+.ld-dl{position:absolute;right:9px;bottom:10px;font-size:11px;font-weight:800;border-radius:999px;padding:1px 7px;background:var(--surface-2);color:var(--muted);font-variant-numeric:tabular-nums;pointer-events:none}
+.ld-dl.up{background:var(--warn-soft);color:#9A6700}
+html.dark .ld-dl.up{color:var(--yellow)}
+
+/* Bandeau TOB (compact) */
+#ldmModal .ld-tob.ld-hero{position:relative;display:flex;flex-direction:column;align-items:stretch;gap:0;min-height:0;margin:0;padding:10px 14px 10px;background:var(--navy);border:0;border-radius:16px;box-shadow:none;color:#fff}
+#ldmModal .ld-tob.ld-hero::before{display:none}
+#ldmModal .ld-hero .ld-hero-top{display:flex;justify-content:space-between;align-items:center;min-height:26px}
+#ldmModal .ld-hero .ld-tob-label{position:static;transform:none;font-family:var(--f-ui);font-size:11px;font-weight:800;letter-spacing:.1em;color:#AFC0EC}
+#ldmModal .ld-hero input{position:static;transform:none;width:100%;text-align:left;font-family:var(--f-ui);font-size:36px;font-weight:300;line-height:1.1;height:auto;color:#fff;padding:0;pointer-events:none}
+#ldmModal .ld-hero input::placeholder{color:rgba(255,255,255,.35);font-size:30px}
+#ldmModal .ld-hero input.is-invalid{color:#FF8A8A}
+#ldmModal .ld-hero .ld-hero-bot{display:flex;justify-content:space-between;align-items:center;min-height:0}
+#ldmModal .ld-hero .ld-hero-bot:has(.ld-cmp:empty):has(#lidGuideBtn[style*="none"]){display:none}
+#ldmModal .ld-hero .ld-cmp{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:600;color:#AFC0EC}
+#ldmModal .ld-hero .ld-cmp b{color:#fff;font-variant-numeric:tabular-nums}
+#ldmModal .ld-hero .ld-cmp .ld-dl{position:static;background:rgba(255,255,255,.12);color:#fff}
+#ldmModal .ld-hero .ld-cmp .ld-dl.up{background:rgba(255,173,0,.2);color:var(--yellow)}
+#ldmModal .ld-hero #lidGuideBtn{position:static;transform:none;color:#fff;font-size:12.5px;font-weight:700;display:inline-flex;align-items:center;gap:5px;margin-left:auto}
+#ldmModal .ld-hero #lidGuideBtn .ico{width:15px;height:15px}
+.lid-sw{display:flex;background:rgba(255,255,255,.12);border-radius:999px;padding:2px}
+.lid-sw button{border:0;background:transparent;font:800 11.5px var(--f-ui);color:#AFC0EC;padding:4px 10px;border-radius:999px;cursor:pointer}
+.lid-sw button.on{background:#fff;color:var(--navy)}
+html.dark #ldmModal .ld-tob.ld-hero{background:#16265E}
+
+/* Cartes Zones / Soutes */
+.ld-box{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:0 0 10px;box-shadow:var(--tile-shadow)}
+.ld-box-h{display:flex;justify-content:space-between;align-items:center;padding:10px 12px 6px;font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.ld-box-h span{letter-spacing:0;text-transform:none;font-size:12px;font-weight:700;font-variant-numeric:tabular-nums}
+.ld-box-h b.ok{color:var(--ok)}.ld-box-h b.ko{color:var(--crit)}
+.ld-box .ld-row-4{padding:0 10px;gap:8px}
+#ldmModal .ld-box .ld-stat{background:var(--surface-2);border-color:transparent;box-shadow:none;overflow:hidden}
+#ldmModal #finalZonesRow .ld-stat::after{content:"";position:absolute;left:0;bottom:0;height:3px;width:var(--zw,0%);background:#3D6BE0;transition:width .3s}
+.ld-holdbar{display:flex;gap:2px;height:32px;margin:0 12px 4px;border-radius:9px;overflow:hidden}
+.ld-holdbar div{display:flex;align-items:center;justify-content:center;gap:4px;min-width:0;white-space:nowrap;overflow:hidden;font-size:11.5px;font-weight:700;color:#fff;background:#3D6BE0}
+.ld-holdbar div:nth-child(2){background:#2C55C4}.ld-holdbar div:nth-child(3){background:#5B82EA}.ld-holdbar div:nth-child(4){background:#2C55C4}
+.ld-holdbar div.e{background:var(--surface-2);color:var(--muted)}
+.ld-holdleg{display:flex;justify-content:space-between;padding:0 12px 8px;font-size:11px;font-weight:600;color:var(--muted)}
+#ldmModal .ld-hw{font-family:var(--f-ui);font-size:12px;font-weight:700;color:var(--muted);margin-top:-2px}
+#previFRRK,#previOTHER{display:flex;flex-direction:column;gap:10px}
+#previFRRK[style*="none"],#previOTHER[style*="none"]{display:none}
+/* 4 tuiles par ligne : chiffres un peu plus petits pour laisser la place à l'écart */
+#finalPaxRow[data-n="4"] .ld-stat input,#ldmModal .ld-box .ld-row-4 .ld-stat input{font-size:23px}
+#finalPaxRow[data-n="4"] .ld-dl{right:6px;bottom:8px;padding:1px 5px}
+/* Indications (30 pcs, Remainder, 27 (1-5)…) : petites et grises */
+#ldmModal .ld-box .ld-stat input::placeholder{font-size:13px;font-weight:500}

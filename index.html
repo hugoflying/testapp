@@ -22,7 +22,7 @@
 /* Mise a jour forcee : si version.json (lu sans cache) annonce une autre
    version que celle-ci, on vide les caches et on recharge la page.
    A chaque livraison : changer APP_VERSION ici, dans version.json et les ?v=. */
-window.APP_VERSION = '20261016r28';
+window.APP_VERSION = '20261016r29';
 (function(){
   function check(){
     fetch('./version.json?t=' + Date.now(), { cache: 'no-store' })
@@ -44,8 +44,8 @@ window.APP_VERSION = '20261016r28';
   document.addEventListener('visibilitychange', function(){ if(document.visibilityState === 'visible') check(); });
 })();
 </script>
-<link rel="stylesheet" href="./fonts/fonts.css?v=20261016r28" />
-<link rel="stylesheet" href="./css/app.css?v=20261016r28" />
+<link rel="stylesheet" href="./fonts/fonts.css?v=20261016r29" />
+<link rel="stylesheet" href="./css/app.css?v=20261016r29" />
 </head>
 <body>
 
@@ -194,8 +194,8 @@ function digitsOnly(el){ el.value = (el.value || '').replace(/[^0-9]/g, ''); }
             <div class="ld-stat"><span class="ld-stat-label">+ INF</span><input class="ldm-in" id="PreviPAX_INF" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="3" oninput="digitsOnly(this); updatePreviTOB_FRRK()"></div>
             <div class="ld-stat"><span class="ld-stat-label">BAGS</span><input class="ldm-in" id="PreviBAGS" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="4" oninput="digitsOnly(this); updateHBagsValidity('previ')"></div>
           </div>
-          <div class="ld-tob">
-            <span class="ld-tob-label">TOB</span>
+          <div class="ld-tob ld-hero">
+            <div class="ld-hero-top"><span class="ld-tob-label">TOB PRÉVI</span></div>
             <input id="PreviTOB_FRRK" type="text" readonly>
           </div>
         </div>
@@ -208,8 +208,8 @@ function digitsOnly(el){ el.value = (el.value || '').replace(/[^0-9]/g, ''); }
             <div class="ld-stat"><span class="ld-stat-label">CHILD</span><input class="ldm-in" id="PreviCHILD" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="3" oninput="digitsOnly(this); updatePreviTOB()"></div>
             <div class="ld-stat"><span class="ld-stat-label">INFANT</span><input class="ldm-in" id="PreviINFANT" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="3" oninput="digitsOnly(this); updatePreviTOB()"></div>
           </div>
-          <div class="ld-tob">
-            <span class="ld-tob-label">TOB</span>
+          <div class="ld-tob ld-hero">
+            <div class="ld-hero-top"><span class="ld-tob-label">TOB PRÉVI</span></div>
             <input id="PreviTOB" type="text" readonly>
           </div>
           <div class="ld-row-2">
@@ -235,6 +235,19 @@ function digitsOnly(el){ el.value = (el.value || '').replace(/[^0-9]/g, ''); }
     <section class="ldm-card ldm-final" id="ldmFinal" style="display:none;">
       <div class="ldm-grid">
 
+        <!-- v2.23 : TOB en vedette (option B) -->
+        <div class="ld-tob ld-hero" id="ldFinalHero">
+          <div class="ld-hero-top"><span class="ld-tob-label">TOB FINAL</span><span id="ldHeroLid"></span></div>
+          <input id="FinalTOB" type="text" readonly>
+          <div class="ld-hero-bot"><span class="ld-cmp" id="ldFinalCmp"></span><button id="lidGuideBtn" class="link" type="button" onclick="toggleFinalImage()" style="display:none;"><svg class="ico"><use href="#i-img"/></svg>Guide LID</button></div>
+        </div>
+        <div id="finalImageBox" style="display:none;">
+          <img id="finalImage"
+               src="https://pub-c7a84a2cfc4d46d3b0562e0e646eff71.r2.dev/lid-completion-guide.jpg"
+               alt="Guide LID"
+               onclick="openLightbox(this.src)">
+        </div>
+
         <!-- PAX : FR/RK = ADULT CHILD INFANT / autres = MALE FEMALE CHILD INFANT -->
         <div id="finalPaxRow">
           <div class="ld-stat" id="finalStatMALE"><span class="ld-stat-label">MALE</span><input class="ldm-in" id="FinalMALE" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="3" oninput="digitsOnly(this); syncAdultGenderLocks(); updateFinalTOB()"></div>
@@ -244,30 +257,14 @@ function digitsOnly(el){ el.value = (el.value || '').replace(/[^0-9]/g, ''); }
           <div class="ld-stat"><span class="ld-stat-label">INFANT</span><input class="ldm-in" id="FinalINFANT" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="3" oninput="digitsOnly(this); updateFinalTOB()"></div>
         </div>
 
-        <!-- TOB + LID Guide -->
-        <div class="ld-tob">
-          <span class="ld-tob-label">TOB</span>
-          <input id="FinalTOB" type="text" readonly>
-          <button id="lidGuideBtn" class="link" type="button" onclick="toggleFinalImage()" style="display:none;"><svg class="ico"><use href="#i-img"/></svg>Guide LID</button>
-        </div>
-        <div id="finalImageBox" style="display:none;">
-          <img id="finalImage"
-               src="https://pub-c7a84a2cfc4d46d3b0562e0e646eff71.r2.dev/lid-completion-guide.jpg"
-               alt="Guide LID"
-               onclick="openLightbox(this.src)">
-        </div>
-
-        <div class="ld-divider"></div>
-
-        <!-- Offload OA–OD -->
+        <!-- Zones OA–OD (FWD/MID/AFT en FR/RK) -->
+        <div class="ld-box" id="ldZonesBox"><div class="ld-box-h">Zones<span id="ldZonesSum"></span></div>
         <div id="finalZonesRow" class="ld-row-4">
           <div class="ld-stat"><span class="ld-stat-label">OA</span><input class="ldm-in" id="FinalOA" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="3" oninput="digitsOnly(this); updateFinalTOB()"></div>
           <div class="ld-stat"><span class="ld-stat-label">OB</span><input class="ldm-in" id="FinalOB" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="3" oninput="digitsOnly(this); updateFinalTOB()"></div>
           <div class="ld-stat"><span class="ld-stat-label">OC</span><input class="ldm-in" id="FinalOC" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="3" oninput="digitsOnly(this); updateFinalTOB()"></div>
           <div class="ld-stat"><span class="ld-stat-label">OD</span><input class="ldm-in" id="FinalOD" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="3" oninput="digitsOnly(this); updateFinalTOB()"></div>
-        </div>
-
-        <div class="ld-divider"></div>
+        </div></div>
 
         <!-- Bags / Poids -->
         <div class="ld-row-4" id="bagsPoidsBgRow">
@@ -277,7 +274,10 @@ function digitsOnly(el){ el.value = (el.value || '').replace(/[^0-9]/g, ''); }
           <div class="ld-stat"><span class="ld-stat-label"><span class="poids-corr-short">POIDS CORR.</span><span class="poids-corr-full">POIDS CORRIGÉ</span></span><input class="ldm-in" id="FinalPoidsCorrige" type="text" readonly></div>
         </div>
 
-        <!-- H bags (CP) -->
+        <!-- Soutes H1–H4 (CP1–CP4) -->
+        <div class="ld-box" id="ldHoldBox"><div class="ld-box-h">Soutes<span id="ldHoldSum"></span></div>
+        <div class="ld-holdbar" id="ldHoldBar"></div>
+        <div class="ld-holdleg"><span>Avant</span><span>Arrière</span></div>
         <div class="ld-row-4" id="hBagsRow">
           <div class="ld-stat">
             <span class="ld-stat-label">H1</span>
@@ -299,9 +299,7 @@ function digitsOnly(el){ el.value = (el.value || '').replace(/[^0-9]/g, ''); }
             <input class="ldm-in" id="FinalH4" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="4" oninput="digitsOnly(this); updateHBagsValidity('final'); updateHWeights(); updateCommChargementPiste()">
             <div id="FinalH4w" class="ld-hw" style="display:none;"></div>
           </div>
-        </div>
-
-        <div class="ld-divider"></div>
+        </div></div>
 
         <!-- SI -->
         <div class="field">
@@ -851,7 +849,7 @@ function digitsOnly(el){ el.value = (el.value || '').replace(/[^0-9]/g, ''); }
 
 <!-- Cache-busting : incrementer ?v= a CHAQUE deploiement pour forcer
      les navigateurs (et iOS) a recharger app.js au lieu du cache. -->
-<script src="./app.js?v=20261016r28"></script>
-<script src="./ui.js?v=20261016r28"></script>
+<script src="./app.js?v=20261016r29"></script>
+<script src="./ui.js?v=20261016r29"></script>
 </body>
 </html>

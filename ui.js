@@ -382,8 +382,90 @@
     }, { passive:true });
   }
 
+
+  /* ===== LOAD v2.23 (option B) : écarts vs PRÉVI, zones, barre des soutes ===== */
+  const ldInt = id => { const v = val(id); if(v === '') return null; const n = parseInt(v, 10); return isNaN(n) ? null : n; };
+  const isShown = el => !!el && el.offsetParent !== null;
+  const fmtKg = n => Math.round(n).toLocaleString('fr-FR').replace(/ | /g, ' ');
+  function setDelta(finalId, previVal){
+    const inp = document.getElementById(finalId); if(!inp) return;
+    const tile = inp.closest('.ld-stat'); if(!tile) return;
+    let chip = tile.querySelector('.ld-dl');
+    const f = ldInt(finalId);
+    if(f == null || previVal == null){ if(chip) chip.remove(); return; }
+    if(!chip){ chip = document.createElement('span'); chip.className = 'ld-dl'; tile.appendChild(chip); }
+    const d = f - previVal;
+    chip.textContent = d === 0 ? '=' : (d > 0 ? '+' + d : '−' + (-d));
+    chip.classList.toggle('up', d !== 0);
+    chip.title = 'Écart avec le PRÉVI (' + previVal + ')';
+  }
+  function syncLoadUI(){
+    const m = document.getElementById('ldmModal');
+    if(!m || m.style.display === 'none') return;
+    const cie = val('Cie').toUpperCase(), frrk = cie === 'FR' || cie === 'RK';
+    const elid = frrk && (typeof isELID === 'function') && isELID();
+    // Écarts par tuile
+    if(frrk){
+      setDelta('FinalADULT', elid ? ldInt('PreviPAX_MAIN') : null);
+      setDelta('FinalCHILD', null);
+      setDelta('FinalINFANT', ldInt('PreviPAX_INF'));
+      setDelta('FinalBAGS', ldInt('PreviBAGS'));
+      setDelta('FinalPOIDS', null);
+      ['FinalMALE','FinalFEMALE'].forEach(id => setDelta(id, null));
+    } else {
+      setDelta('FinalMALE', ldInt('PreviMALE')); setDelta('FinalFEMALE', ldInt('PreviFEMALE'));
+      setDelta('FinalCHILD', ldInt('PreviCHILD')); setDelta('FinalINFANT', ldInt('PreviINFANT'));
+      setDelta('FinalBAGS', ldInt('PreviBAGS_OTHER')); setDelta('FinalPOIDS', ldInt('PreviPOIDS_OTHER'));
+      setDelta('FinalADULT', null);
+    }
+    // TOB FINAL comparé au TOB PRÉVI
+    const cmp = document.getElementById('ldFinalCmp');
+    if(cmp){
+      const pv = val(frrk ? 'PreviTOB_FRRK' : 'PreviTOB'), fv = val('FinalTOB');
+      if(!pv){ cmp.innerHTML = ''; }
+      else {
+        const a = parseInt(fv, 10), b = parseInt(pv, 10);
+        const d = (!isNaN(a) && !isNaN(b)) ? a - b : null;
+        cmp.innerHTML = 'Prévi <b>' + esc(pv) + '</b>' + (d == null ? '' : '<span class="ld-dl' + (d ? ' up' : '') + '">' + (d === 0 ? '=' : (d > 0 ? '+' + d : '−' + (-d))) + '</span>');
+      }
+    }
+    // Zones : total vs passagers, barre de répartition
+    const zIds = ['FinalOA','FinalOB','FinalOC','FinalOD'].filter(id => isShown(document.getElementById(id)?.closest('.ld-stat')));
+    const zSum = zIds.reduce((t, id) => t + (ldInt(id) || 0), 0);
+    const main = parseInt(val('FinalTOB'), 10);
+    const zs = document.getElementById('ldZonesSum');
+    if(zs){
+      if(!zSum && isNaN(main)) zs.innerHTML = '';
+      else { const ok = !isNaN(main) && zSum === main; zs.innerHTML = '<b class="' + (ok ? 'ok' : 'ko') + '">' + zSum + '</b> / ' + (isNaN(main) ? '–' : main) + ' pax'; }
+    }
+    zIds.forEach(id => { const t = document.getElementById(id).closest('.ld-stat'); t.style.setProperty('--zw', (zSum ? (ldInt(id) || 0) / zSum * 100 : 0).toFixed(1) + '%'); });
+    // Soutes : barre proportionnelle + total pièces / kg
+    const bar = document.getElementById('ldHoldBar');
+    if(bar){
+      const k = (typeof holdBagKg === 'function') ? holdBagKg() : null;
+      const hs = ['FinalH1','FinalH2','FinalH3','FinalH4'].map(id => document.getElementById(id)).filter(i => i && isShown(i.closest('.ld-stat')));
+      let pcs = 0;
+      const segs = hs.map(i => {
+        const n = parseInt(i.value, 10) || 0; pcs += n;
+        const lbl = i.closest('.ld-stat').querySelector('.ld-stat-label')?.textContent || '';
+        return { n, lbl };
+      });
+      const sig = segs.map(x => x.lbl + x.n).join('|');
+      if(bar.dataset.sig !== sig){
+        bar.dataset.sig = sig;
+        bar.innerHTML = segs.map(x => '<div class="' + (x.n ? '' : 'e') + '" style="flex:' + (x.n || Math.max(1, pcs * .08)) + '">' + esc(x.lbl) + (x.n ? ' <b>' + x.n + '</b>' : '') + '</div>').join('');
+      }
+      const hsum = document.getElementById('ldHoldSum');
+      const bags = ldInt('FinalBAGS');
+      if(hsum) hsum.innerHTML = pcs ? ('<b class="' + (bags != null && bags !== pcs ? 'ko' : '') + '">' + pcs + ' pcs</b>' + (k ? ' · ' + (k.approx ? '≈ ' : '') + fmtKg(pcs * k.kg) + ' kg' : '')) : '';
+    }
+    // Nombre de tuiles passagers visibles (2 à 4 par ligne)
+    const pr = document.getElementById('finalPaxRow');
+    if(pr){ const n = Math.max(2, [...pr.children].filter(c => c.classList.contains('ld-stat') && c.style.display !== 'none').length); pr.style.setProperty('--n', n); pr.dataset.n = n; }
+  }
+
   function init(){
-    syncHero(); setInterval(()=>{ syncHero(); syncEvents(); syncTabRings(); }, 1000);
+    syncHero(); setInterval(()=>{ syncHero(); syncEvents(); syncTabRings(); syncLoadUI(); }, 1000);
     initSwipe(); initLdmSwipe(); syncFollowBtn(); syncTabRings(); renderRecap(); setInterval(renderRecap, 15000);
     const tb = document.getElementById('tab-bar'); if(tb) new MutationObserver(()=>requestAnimationFrame(syncTabRings)).observe(tb, { childList:true }); setInterval(tlTick, 15000);
     document.addEventListener('click', e => { if(e.target.closest('.ev-x, .tw-zone')) setTimeout(syncEvents, 0); });
@@ -394,7 +476,7 @@
 
     // Le LOAD peut s'ouvrir / se fermer depuis app.js (changement de vol, etc.)
     const m = document.getElementById('ldmModal');
-    if(m) new MutationObserver(syncTabbar).observe(m, { attributes:true, attributeFilter:['style'] });
+    if(m){ new MutationObserver(()=>{ syncTabbar(); syncLoadUI(); }).observe(m, { attributes:true, attributeFilter:['style'] }); m.addEventListener('input', ()=>requestAnimationFrame(syncLoadUI)); m.addEventListener('click', ()=>setTimeout(syncLoadUI, 0)); }
 
     // Cases Load vides : un tiret montre où saisir
     document.querySelectorAll('#ldmModal .ld-stat input:not([readonly]), #ldmModal .ld-tob input').forEach(i=>{ if(!i.placeholder) i.placeholder = '–'; });
