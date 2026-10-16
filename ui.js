@@ -475,6 +475,45 @@
     if(pr){ const n = Math.max(2, [...pr.children].filter(c => c.classList.contains('ld-stat') && c.style.display !== 'none').length); pr.style.setProperty('--n', n); pr.dataset.n = n; }
   }
 
+
+  /* ===== Nouveautés : popup animé à la première connexion sur la nouvelle version ===== */
+  const WN_ID = 'refonte-2026-10';
+  const WN_ITEMS = [
+    ['i-grid',  '#3D6BE0', 'Nouveau design', 'Plus clair et plus lisible, en mode clair ou sombre.'],
+    ['i-list',  '#0B1E4F', 'Onglet Récap', 'Tous tes vols ouverts d\'un coup d\'œil : compte à rebours, prochaine action, statut bloc.'],
+    ['i-plane', '#FFAD00', 'Onglets de vol', 'Un anneau se remplit jusqu\'à l\'EOBT : bleu, jaune à EOBT −5, rouge en retard.'],
+    ['i-plus',  '#1F9D57', 'Événements', 'Push, soutes, échelles, chargement, déchargement… avec leur durée.'],
+    ['i-clock', '#7c3aed', 'Timeline', 'Vue Gantt épurée, ligne NOW qui se suit toute seule, tous les événements.'],
+    ['i-bag',   '#D93636', 'LOAD repensé', 'TOB en vedette, écarts avec le PRÉVI, zones et soutes avec le poids.'],
+    ['i-arrow', '#0d9488', 'Swipe', 'Glisse pour passer d\'Arrivée à Départ à Timeline, et entre ARR, PRÉVI, FINAL, FUEL.'],
+  ];
+  window.uiWhatsNew = function(){
+    let m = document.getElementById('wnModal');
+    if(!m){
+      m = document.createElement('div');
+      m.id = 'wnModal'; m.setAttribute('role', 'dialog'); m.setAttribute('aria-modal', 'true'); m.setAttribute('aria-label', 'Nouveautés');
+      m.innerHTML = '<div class="wn-card">'
+        + '<div class="wn-hero"><div class="wn-sky"><i></i><i></i><i></i></div>'
+        + '<div class="wn-plane"><svg class="ico"><use href="#i-plane"/></svg></div>'
+        + '<span class="wn-badge">Nouvelle version</span>'
+        + '<h2>Le nouveau Suivi Performance est arrivé&nbsp;!</h2>'
+        + '<p>Nouveau design, nouvelles fonctions. Voici l\'essentiel.</p></div>'
+        + '<ul class="wn-list">' + WN_ITEMS.map((x, i) => '<li style="--i:' + i + '"><span class="wn-ic" style="--c:' + x[1] + '"><svg class="ico"><use href="#' + x[0] + '"/></svg></span><span><b>' + x[2] + '</b><small>' + x[3] + '</small></span></li>').join('') + '</ul>'
+        + '<div class="wn-foot"><button type="button" class="btn btn-primary btn-block" id="wnGo">C\'est parti</button></div></div>';
+      document.body.appendChild(m);
+      const close = () => { m.classList.remove('is-on'); setTimeout(() => { m.style.display = 'none'; }, 250); try{ localStorage.setItem('whatsNewSeen', WN_ID); }catch(e){} };
+      m.querySelector('#wnGo').addEventListener('click', close);
+      m.addEventListener('click', e => { if(e.target === m) close(); });
+    }
+    m.style.display = 'flex';
+    m.classList.remove('is-on'); void m.offsetWidth; m.classList.add('is-on');
+  };
+  window.uiWhatsNewMaybe = function(){
+    let seen = null; try{ seen = localStorage.getItem('whatsNewSeen'); }catch(e){}
+    if(seen === WN_ID || !document.body.classList.contains('pv-authed')) return;
+    setTimeout(window.uiWhatsNew, 450);
+  };
+
   function init(){
     syncHero(); setInterval(()=>{ syncHero(); syncEvents(); syncTabRings(); syncLoadUI(); }, 1000);
     initSwipe(); initLdmSwipe(); syncFollowBtn(); syncTabRings(); renderRecap(); setInterval(renderRecap, 15000);
@@ -484,6 +523,7 @@
     try{ start = localStorage.getItem('uiPanel') || 'vol'; }catch(e){}
     showPanel(start);
     syncTabbar();
+    uiWhatsNewMaybe();
 
     // Le LOAD peut s'ouvrir / se fermer depuis app.js (changement de vol, etc.)
     const m = document.getElementById('ldmModal');
