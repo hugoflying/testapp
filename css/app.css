@@ -1205,3 +1205,6 @@ html.dark .cab-seg button.is-on{background:var(--accent);color:var(--accent-ink)
 .fh-hero .fh-id{flex:1}
 .fh-tz{appearance:none;font:inherit;flex:none;align-self:center;border:1.5px solid rgba(255,255,255,.55);background:transparent;color:#fff;border-radius:7px;padding:3px 7px;font-size:11.5px;font-weight:800;letter-spacing:.06em;line-height:1.2;cursor:pointer}
 .fh-tz.utc{background:#2DD4A8;border-color:#2DD4A8;color:#06302A}
+/* v2.42 : badge LT / UTC sur la ligne du haut, à côté de CD */
+.fh-hero .chip-cd .k.fh-cdk{display:flex;align-items:center;justify-content:flex-end;gap:8px}
+.fh-cdk .fh-tz{align-self:auto;font-size:11px;padding:2px 7px;border-radius:6px;text-transform:none}
