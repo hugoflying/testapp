@@ -1844,6 +1844,12 @@ function updateInfoStrip(){
 
   set('kvArrVol', arrFF || '—', '—');
   set('kvDepVol', depFF || '—', '—');
+  // v2.58 : vol créé à la main sans n° d'arrivée → on n'affiche que le n° de départ (et inversement)
+  const fnoEl = document.getElementById('kvArrVol')?.parentElement;
+  if(fnoEl){
+    fnoEl.classList.toggle('no-arr', !arrFF && !!depFF);
+    fnoEl.classList.toggle('no-dep', !depFF && !!arrFF);
+  }
 
   set('kvFrom', v('From') || '---', '---');
   set('kvTo',   v('To')   || '---', '---');
@@ -6827,7 +6833,7 @@ function checkAndDeleteIfEmpty(){
 /* ===== Service Worker — enregistrement ===== */
 if ('serviceWorker' in navigator) {
   const swCode = `
-const CACHE = 'suivi-perf-v66';
+const CACHE = 'suivi-perf-v67';
 const PRECACHE = [];   // fichiers à précacher (vide = online-only)
 
 self.addEventListener('install', e => {

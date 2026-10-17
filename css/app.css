@@ -1353,3 +1353,7 @@ html.dark .ct-chain span.on{color:#FFC94D}
 /* ===== v2.57 · suggestion To dans le champ ===== */
 #To.iv-has-sugg{border-style:dashed;border-color:var(--accent)}
 #To.iv-has-sugg::placeholder{color:var(--muted);opacity:1;font-size:inherit;font-weight:inherit}
+
+/* ===== v2.58 · n° de vol seul quand l'autre est inconnu ===== */
+.flight-id .fno.no-arr #kvArrVol,.flight-id .fno.no-arr small,
+.flight-id .fno.no-dep #kvDepVol,.flight-id .fno.no-dep small{display:none}
