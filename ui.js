@@ -733,9 +733,25 @@
     njSetTag(''); njRender(true);
   }
 
-  /* Vol (v2.37) : pastilles Compagnie / Parking de la feuille « Modifier le vol » */
+  /* Vol (v2.37) : pastilles Compagnie / Parking / Type de la feuille « Modifier le vol » */
+  // Types proposés selon la compagnie (Hugo) ; autre compagnie = toute la liste
+  const IV_TYPES_ALL = ['A319','A320','A321','A20N','A21N','A21NY','B734','B737','B738','B38M','BCS3','CL35'];
+  const IV_TYPES = { FR:['B737','B738','B38M','CL35'], RK:['B737','B738','B38M','CL35'],
+    W4:['A320','A321','A20N','A21N','A21NY'], W6:['A320','A321','A20N','A21N','A21NY'],
+    V7:['A319','A320'], H4:['A319','A320','A321','A21N'], H6:['A319','A320','A321','A21N'] };
+  function renderIvTypes(){
+    const box = document.getElementById('ivTypeChips'); if(!box) return;
+    const list = IV_TYPES[(document.getElementById('Cie')?.value || '').trim().toUpperCase()] || IV_TYPES_ALL;
+    const key = list.join(',');
+    if(box.dataset.k === key) return;
+    box.dataset.k = key;
+    box.querySelectorAll('button[data-v]').forEach(x => x.remove());
+    const other = box.querySelector('.iv-other');
+    list.forEach(t => { const x = document.createElement('button'); x.type = 'button'; x.dataset.v = t; x.textContent = t; box.insertBefore(x, other); });
+  }
   function syncIvChips(){
-    [['ivCieChips','Cie'],['ivParkChips','Parking']].forEach(([box, id]) => {
+    renderIvTypes();
+    [['ivCieChips','Cie'],['ivParkChips','Parking'],['ivTypeChips','TypeAvion']].forEach(([box, id]) => {
       const b = document.getElementById(box), v = (document.getElementById(id)?.value || '').trim().toUpperCase();
       if(!b) return;
       let hit = false;
@@ -745,7 +761,8 @@
   }
   window.syncIvChips = syncIvChips;
   function initIvChips(){
-    [['ivCieChips','Cie'],['ivParkChips','Parking']].forEach(([box, id]) => {
+    renderIvTypes();
+    [['ivCieChips','Cie'],['ivParkChips','Parking'],['ivTypeChips','TypeAvion']].forEach(([box, id]) => {
       const b = document.getElementById(box), inp = document.getElementById(id); if(!b || !inp) return;
       b.addEventListener('click', e => {
         const x = e.target.closest('button[data-v]'); if(!x) return;

@@ -22,7 +22,7 @@
 /* Mise a jour forcee : si version.json (lu sans cache) annonce une autre
    version que celle-ci, on vide les caches et on recharge la page.
    A chaque livraison : changer APP_VERSION ici, dans version.json et les ?v=. */
-window.APP_VERSION = '20261017r45';
+window.APP_VERSION = '20261017r46';
 (function(){
   function check(){
     fetch('./version.json?t=' + Date.now(), { cache: 'no-store' })
@@ -44,8 +44,8 @@ window.APP_VERSION = '20261017r45';
   document.addEventListener('visibilitychange', function(){ if(document.visibilityState === 'visible') check(); });
 })();
 </script>
-<link rel="stylesheet" href="./fonts/fonts.css?v=20261017r45" />
-<link rel="stylesheet" href="./css/app.css?v=20261017r45" />
+<link rel="stylesheet" href="./fonts/fonts.css?v=20261017r46" />
+<link rel="stylesheet" href="./css/app.css?v=20261017r46" />
 </head>
 <body>
 
@@ -678,14 +678,11 @@ function digitsOnly(el){ el.value = (el.value || '').replace(/[^0-9]/g, ''); }
         <span class="iv-arrow"><svg class="ico"><use href="#i-arrow"/></svg></span>
           <label class="iv-f"><small>To</small><input class="input uppercase" type="text" id="To" maxlength="3" oninput="updateTabLabelInstant();"></label>
       </div>
-      <div class="iv-two">
-          <label class="iv-f"><small>Immat</small><input class="input uppercase" type="text" id="Immat" maxlength="6"></label>
-          <label class="iv-f"><small>Type</small><input class="input uppercase" type="text" id="TypeAvion" list="typeAvionList" autocomplete="off" maxlength="6" placeholder="--"><datalist id="typeAvionList">
-              <option>A319</option><option>A320</option><option>A321</option>
-              <option>A20N</option><option>A21N</option><option>A21NY</option>
-              <option>B734</option><option>B737</option><option>B738</option>
-              <option>B38M</option><option>BCS3</option><option>CL35</option>
-            </datalist></label>
+      <label class="iv-f"><small>Immat</small><input class="input uppercase" type="text" id="Immat" maxlength="6"></label>
+      <!-- v2.38.1 : types en pastilles, filtrés selon la compagnie (ui.js IV_TYPES) -->
+      <div class="iv-k">Type avion</div>
+      <div class="iv-chips iv-types" id="ivTypeChips">
+        <span class="iv-other"><input class="input uppercase iv-chip-in" type="text" id="TypeAvion" autocomplete="off" maxlength="6" placeholder="Autre"></span>
       </div>
       <div class="iv-k">Parking</div>
       <div class="iv-park" id="ivParkChips">
@@ -908,7 +905,7 @@ function digitsOnly(el){ el.value = (el.value || '').replace(/[^0-9]/g, ''); }
 
 <!-- Cache-busting : incrementer ?v= a CHAQUE deploiement pour forcer
      les navigateurs (et iOS) a recharger app.js au lieu du cache. -->
-<script src="./app.js?v=20261017r45"></script>
-<script src="./ui.js?v=20261017r45"></script>
+<script src="./app.js?v=20261017r46"></script>
+<script src="./ui.js?v=20261017r46"></script>
 </body>
 </html>

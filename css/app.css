@@ -1180,3 +1180,5 @@ html.dark .iv-chips button.is-on,html.dark .iv-park button.is-on{background:var(
 .iv-other.dup:not(:focus-within) .input{color:transparent}
 .iv-other.dup:not(:focus-within)::after{content:"Autre";position:absolute;inset:0;display:grid;place-items:center;color:var(--faint);font-weight:600;font-size:14px;pointer-events:none}
 html.dark .iv-chip-in.input.is-on{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.iv-types button{min-width:58px}
+.iv-types .iv-other .iv-chip-in.input{width:84px}
