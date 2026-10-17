@@ -627,15 +627,19 @@
 
 
   /* ===== Nouveautés : popup animé à la première connexion sur la nouvelle version ===== */
-  const WN_ID = 'refonte-2026-10';
+  // v2.51 : contenu de la mise à jour du 17 octobre (changer WN_ID pour réafficher le popup une fois)
+  const WN_ID = 'maj-2026-10-17';
+  const WN_VER = 'Version 2.51';
   const WN_ITEMS = [
-    ['i-grid',  '#3D6BE0', 'Nouveau design', 'Plus clair et plus lisible, en mode clair ou sombre.'],
-    ['i-list',  '#0B1E4F', 'Onglet Récap', 'Tous tes vols ouverts d\'un coup d\'œil : compte à rebours, prochaine action, statut bloc.'],
-    ['i-plane', '#FFAD00', 'Onglets de vol', 'Un anneau se remplit jusqu\'à l\'EOBT : bleu, jaune à EOBT −5, rouge en retard.'],
-    ['i-plus',  '#1F9D57', 'Événements', 'Push, soutes, échelles, chargement, déchargement… avec leur durée.'],
-    ['i-clock', '#7c3aed', 'Timeline', 'Vue Gantt épurée, ligne NOW qui se suit toute seule, tous les événements.'],
-    ['i-bag',   '#D93636', 'LOAD repensé', 'TOB en vedette, écarts avec le PRÉVI, zones et soutes avec le poids.'],
-    ['i-arrow', '#0d9488', 'Swipe', 'Glisse pour passer d\'Arrivée à Départ à Timeline, et entre ARR, PRÉVI, FINAL, FUEL.'],
+    ['i-clock',  '#F59E0B', 'Fenêtre CTOT', 'Frise EOBT, push estimé et fenêtre de décollage −5 / +10, retard estimé, slots reçus.'],
+    ['i-search', '#3D6BE0', 'Liste des vols AK', 'Arrivée et départ sur une ligne, sections En cours / À venir, filtres et recherche.'],
+    ['i-globe',  '#2DD4A8', 'Badge LT / UTC', 'Dans le bandeau, à côté du compte à rebours. Un appui pour changer. Callsign AK affiché.'],
+    ['i-list',   '#7c3aed', 'Timeline', 'Repères SIBT, AIBT, SOBT, AOBT, CTOT. Zoom plus confortable, traits sous les barres.'],
+    ['i-plus',   '#0891b2', 'Nouveaux événements', 'Cleaning cabine, vidange, eau potable, dégivrage. Menu Infos escale avec les fréquences.'],
+    ['i-pen',    '#1F9D57', 'Notes', 'Bloc ligné au stylet et journal horodaté : SNY, BAGS OK, PMR, Bag manquant…'],
+    ['i-bag',    '#D93636', 'Load', 'Poids moyen par bagage et poids des soutes (13 kg pour FR/RK). Config Y180 / Y186.'],
+    ['i-delay',  '#E5484D', 'Retard', 'Répartition des codes en barre et « reste à justifier ».'],
+    ['i-arrow',  '#0d9488', 'Swipe partout', 'De Récap à Notes en glissant, en passant par Timing et Load.'],
   ];
   window.uiWhatsNew = function(){
     let m = document.getElementById('wnModal');
@@ -645,9 +649,9 @@
       m.innerHTML = '<div class="wn-card">'
         + '<div class="wn-hero"><div class="wn-sky"><i></i><i></i><i></i></div>'
         + '<div class="wn-plane"><svg class="ico"><use href="#i-plane"/></svg></div>'
-        + '<span class="wn-badge">Nouvelle version</span>'
-        + '<h2>Le nouveau Suivi Performance est arrivé&nbsp;!</h2>'
-        + '<p>Nouveau design, nouvelles fonctions. Voici l\'essentiel.</p></div>'
+        + '<span class="wn-badge">Mise à jour</span><span class="wn-ver">' + WN_VER + '</span>'
+        + '<h2>Quoi de neuf aujourd\'hui&nbsp;?</h2>'
+        + '<p>Voici ce qui a changé dans l\'app.</p></div>'
         + '<ul class="wn-list">' + WN_ITEMS.map((x, i) => '<li style="--i:' + i + '"><span class="wn-ic" style="--c:' + x[1] + '"><svg class="ico"><use href="#' + x[0] + '"/></svg></span><span><b>' + x[2] + '</b><small>' + x[3] + '</small></span></li>').join('') + '</ul>'
         + '<div class="wn-foot"><button type="button" class="btn btn-primary btn-block" id="wnGo">C\'est parti</button></div></div>';
       document.body.appendChild(m);
