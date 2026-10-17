@@ -4877,7 +4877,10 @@ function _renderAKListWithRza(pairs, list, akIdToRza){
     const fl = flow.toLowerCase();
     if(!f) return '<div class="akc-s akc-' + fl + ' akc-none"><span class="akc-tm">--:--</span><span class="akc-fn">' + (flow==='ARR' ? "Pas d'arrivée liée" : 'Pas de départ lié') + '</span></div>';
     const ff   = (f.fullFlightNumber||f.callsign||'').trim().toUpperCase();
-    const {time:t, suffix:sx} = pickBestTimeForList(f, flow);
+    // v2.60 : l'heure en gros est l'horaire programmé (SIBT / SOBT), l'écart réel/estimé reste à côté
+    const sched = toHM(flow==='ARR' ? f.sibt : f.sobt);
+    const best = sched ? null : pickBestTimeForList(f, flow);
+    const t = sched || best.time, sx = sched ? 'S' : best.suffix;
     const iata = flow==='ARR' ? (f.adepIata||f.adepIcao||'') : (f.adesIata||f.adesIcao||'');
     const dly  = delayMinFrom(flow==='ARR'?(f.sibt||''):(f.sobt||''), flow==='ARR'?actualArrIso(f):actualDepIso(f));
     const dCls = delayClass(dly);
@@ -6835,7 +6838,7 @@ function checkAndDeleteIfEmpty(){
 /* ===== Service Worker — enregistrement ===== */
 if ('serviceWorker' in navigator) {
   const swCode = `
-const CACHE = 'suivi-perf-v68';
+const CACHE = 'suivi-perf-v69';
 const PRECACHE = [];   // fichiers à précacher (vide = online-only)
 
 self.addEventListener('install', e => {
