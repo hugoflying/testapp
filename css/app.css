@@ -1357,3 +1357,10 @@ html.dark .ct-chain span.on{color:#FFC94D}
 /* ===== v2.58 · n° de vol seul quand l'autre est inconnu ===== */
 .flight-id .fno.no-arr #kvArrVol,.flight-id .fno.no-arr small,
 .flight-id .fno.no-dep #kvDepVol,.flight-id .fno.no-dep small{display:none}
+
+/* ===== v2.59 · Mode démo ===== */
+.demo-bar{display:flex;align-items:center;gap:8px;margin:0 calc(-1 * var(--pad-x));padding:6px var(--pad-x);background:repeating-linear-gradient(135deg,#FFAD00 0 12px,#FFB81F 12px 24px);color:#0B1E4F;font-size:12px;font-weight:700}
+.demo-bar[hidden]{display:none}
+.demo-bar .demo-tag{background:#0B1E4F;color:#FFAD00;border-radius:4px;padding:2px 6px;font-weight:800;letter-spacing:.08em;font-size:11px}
+.demo-bar .demo-tx{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.demo-bar button{appearance:none;border:0;background:#0B1E4F;color:#fff;font:inherit;font-size:12px;font-weight:700;border-radius:999px;padding:5px 12px;cursor:pointer}

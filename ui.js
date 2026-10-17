@@ -299,17 +299,29 @@
     ['W4','3233','3234','IAS','9HWAV','A320','10',35,''],
     ['W4','3027','3028','OTP','9HWXA','A21N','13',35,''],
   ];
-  window.uiDemoFlights = async function(){
-    if(typeof closeSettingsMenu === 'function') closeSettingsMenu();
-    const now = new Date();
+  // v2.59 : extra = vols présents seulement dans la liste AK (pas d'onglet ouvert)
+  const DEMO_EXTRA = [
+    ['FR','8338','8339','RAK','EIEFB','B738','6',25],
+    ['FR','6512','6513','NAP','EIIHD','B38M','3',25],
+    ['V7','2104','2105','BIA','EIFNH','A319','8',40],
+    ['W4','3381','3382','SKP','9HWNC','A321','12',35],
+    ['FR','4721','4722','FEZ','EIDPW','B738','1',25],
+    ['H4','2379','2380','AGA','9HHAB','A320','9',45],
+  ];
+  // Horaires d'un vol de démo, en minutes par rapport au début de la démo (T0)
+  function demoSched(i){
+    const tat = DEMO_FLIGHTS[i][7], sibt = -150 + i*17;
+    return { sibt, A: sibt - 2, D: sibt + tat, ctot: (i === 7 || i === 8) ? sibt + tat + 15 + (i === 7 ? 18 : 12) : null };
+  }
+  async function demoBuild(T0){
+    const now = new Date(T0);
     const hm = m => { const d = new Date(now.getTime() + m*60000); const h = isUTC ? d.getUTCHours() : d.getHours(), mi = isUTC ? d.getUTCMinutes() : d.getMinutes(); return String(h).padStart(2,'0') + ':' + String(mi).padStart(2,'0'); };
     const iso = new Date(now.getTime() - now.getTimezoneOffset()*60000).toISOString().slice(0,10);
     const set = (id, v) => { const e = document.getElementById(id); if(!e) return; e.value = v; e.dispatchEvent(new Event('input', {bubbles:true})); e.dispatchEvent(new Event('change', {bubbles:true})); };
     for(let i = 0; i < DEMO_FLIGHTS.length; i++){
       const [cie, arr, dep, ap, reg, type, park, tat, paf] = DEMO_FLIGHTS[i];
       createNewTab();
-      const sibt = -150 + i*17;                      // un vol toutes les 17 min : la plupart déjà partis ou en cours, les derniers à venir
-      const A = sibt - 2, D = sibt + tat;            // AIBT réel et SOBT, en minutes par rapport à maintenant
+      const { sibt, A, D } = demoSched(i);           // un vol toutes les 17 min : la plupart déjà partis ou en cours, les derniers à venir
       const isFR = cie === 'FR';
       set('Cie', cie); set('NVol', dep); set('Date', iso);
       set('From', ap); set('To', ap); set('Immat', reg); set('TypeAvion', type); set('Parking', park);
@@ -323,7 +335,7 @@
       if(i % 3 === 1) ev.push(['ArriveeLiftArr',A+1],['DepartLiftArr',A+11],['ArriveeLift',D-22],['DepartLift',D-9]);
       ev.forEach(([id, rel]) => past(id, rel));
       const withCtot = (i === 7 || i === 8);
-      if(withCtot){ const c = hm(D + 15 + (i === 7 ? 18 : 12)); set('CTOT', c); const tc = document.getElementById('timer-ctot'); if(tc) tc.textContent = c; }
+      if(withCtot){ const c = hm(demoSched(i).ctot); set('CTOT', c); const tc = document.getElementById('timer-ctot'); if(tc) tc.textContent = c; }
       else past('AOBT', D);
       // Load : arrivée et prévi pour tous, final une fois l'embarquement terminé
       const pax = 148 + (i * 13) % 41, inf = i % 3, bags = 38 + (i * 7) % 30, kg = isFR ? 13 : 15;
@@ -372,8 +384,91 @@
     }
     if(typeof updateInfoStrip === 'function') updateInfoStrip();
     if(typeof renderTabs === 'function') renderTabs();
-    if(typeof showPopup === 'function') showPopup(DEMO_FLIGHTS.length + ' vols de démo ajoutés', '#16a34a', 1800);
     uiTab('vols');
+  }
+
+  /* v2.59 · Mode démo : les vols réels sont mis de côté (renommés « demobk: »),
+     la démo travaille sur ses propres onglets, « Quitter » remet tout comme avant. */
+  const DEMO_BK = 'demobk:';
+  const isTabKey = k => /^(tab-|bnCanvas_|bnMode_)/.test(k) || k === 'flightTabs' || k === 'lastTabId';
+  const demoState = () => { try{ return localStorage.getItem('demoMode') || ''; }catch(e){ return ''; } };
+  window.demoActive = () => demoState() === '1';
+  window.uiDemoToggle = function(){
+    if(typeof closeSettingsMenu === 'function') closeSettingsMenu();
+    if(demoActive()) uiDemoExit(); else uiDemoEnter();
+  };
+  window.uiDemoEnter = function(){
+    if(demoActive()) return;
+    try{ if(currentTabId) saveCurrentTabData(); }catch(e){}
+    Object.keys(localStorage).filter(isTabKey).forEach(k => {
+      localStorage.setItem(DEMO_BK + k, localStorage.getItem(k)); localStorage.removeItem(k);
+    });
+    localStorage.setItem('demoMode', 'pending');
+    location.reload();
+  };
+  window.uiDemoExit = function(){
+    Object.keys(localStorage).filter(isTabKey).forEach(k => localStorage.removeItem(k));
+    Object.keys(localStorage).filter(k => k.startsWith(DEMO_BK)).forEach(k => {
+      localStorage.setItem(k.slice(DEMO_BK.length), localStorage.getItem(k)); localStorage.removeItem(k);
+    });
+    localStorage.removeItem('demoMode'); localStorage.removeItem('demoT0');
+    location.reload();
+  };
+  window.uiDemoFlights = window.uiDemoEnter;
+  function demoSync(){
+    const on = demoActive();
+    document.body.classList.toggle('is-demo', on);
+    const bar = document.getElementById('demoBar'); if(bar) bar.hidden = !on;
+    const btn = document.getElementById('demoFlightsBtn');
+    if(btn){
+      btn.querySelector('b').textContent = on ? 'Quitter le mode démo' : 'Mode démo';
+      btn.querySelector('small').textContent = on ? 'Retrouver tes vols réels' : 'Vols fictifs remplis, tes vols sont mis de côté';
+    }
+    try{ updateHeaderOffset(); }catch(e){}
+  }
+  async function demoBoot(){
+    if(demoState() === 'pending'){
+      const T0 = Date.now();
+      localStorage.setItem('demoT0', String(T0));
+      currentTabId = null;
+      await demoBuild(T0);
+      localStorage.setItem('demoMode', '1');
+      const first = (JSON.parse(localStorage.getItem('flightTabs') || '[]'))[0];
+      if(first) try{ switchTab(first); }catch(e){}
+      uiTab('vols');
+      if(typeof showPopup === 'function') showPopup('Mode démo : ' + DEMO_FLIGHTS.length + ' vols ouverts', '#B45309', 2200);
+    }
+    demoSync();
+  }
+
+  // Liste AK de démo (format de l'API Airport Keeper), cohérente avec les onglets de démo
+  window.akDemoData = function(flow){
+    const T0 = +(localStorage.getItem('demoT0') || Date.now()), now = Date.now();
+    const T = m => new Date(T0 + m*60000).toISOString();
+    const past = m => T0 + m*60000 <= now;
+    const cs = { FR:'RYR', W4:'WMT', V7:'VOE', H4:'HYS', RK:'RUK' };
+    const out = [];
+    const add = (row, i, sc, extra) => {
+      const [cie, arr, dep, ap, reg, type, park] = row;
+      if(flow === 'ARR'){
+        const f = { id:'demo-a' + i, linkedId:'demo-d' + i, fullFlightNumber:cie + arr, callsign:(cs[cie] || cie) + arr, reg, acTypeIcao:type, pkg:'P' + park, adepIata:ap, sibt:T(sc.sibt) };
+        if(past(sc.A)) f.aibt = T(sc.A); else f.eibt = T(sc.A + (extra && i % 2 ? 9 : 0));
+        f.status = past(sc.A) ? 'TERMINATED' : (past(sc.A - 120) ? 'IN_FLIGHT' : 'SCHEDULED');
+        out.push(f);
+      } else {
+        const f = { id:'demo-d' + i, linkedId:'demo-a' + i, fullFlightNumber:cie + dep, callsign:(cs[cie] || cie) + dep, reg, acTypeIcao:type, pkg:'P' + park, adesIata:ap, sobt:T(sc.D) };
+        if(sc.ctot != null){ f.ctot = T(sc.ctot); f.eobt = T(Math.max(sc.D, sc.ctot - 15)); }
+        if(sc.ctot == null && past(sc.D)){ f.aobt = T(sc.D); f.atot = T(sc.D + 8); f.status = 'IN_FLIGHT'; }
+        else f.status = 'SCHEDULED';
+        out.push(f);
+      }
+    };
+    DEMO_FLIGHTS.forEach((row, i) => add(row, i, demoSched(i), false));
+    DEMO_EXTRA.forEach((row, k) => {
+      const sibt = 25 + k*28, A = sibt - 2;
+      add(row, 100 + k, { sibt, A, D: sibt + row[7], ctot: null }, true);
+    });
+    return out;
   };
 
   window.uiTlFollow = function(){
@@ -935,7 +1030,7 @@
     syncTabbar();
     uiWhatsNewMaybe();
     const rp = document.querySelector('.panel-retard'); if(rp) rp.addEventListener('input', ()=>requestAnimationFrame(syncDelayUI)); syncDelayUI();
-    initNoteDock(); initNoteJournal(); initIvChips(); initIvRoute();
+    initNoteDock(); initNoteJournal(); initIvChips(); initIvRoute(); demoBoot();
     if(typeof window.bnSetTool === 'function'){ const st = window.bnSetTool; window.bnSetTool = function(t){ st(t); syncNoteDock(); }; }
 
     // Le LOAD peut s'ouvrir / se fermer depuis app.js (changement de vol, etc.)

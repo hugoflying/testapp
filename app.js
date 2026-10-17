@@ -4578,6 +4578,8 @@ function closeAKPicker(){
 }
 
 async function fetchAK(flow, from, to) {
+  // v2.59 : en mode démo, liste AK fictive (ui.js akDemoData)
+  if(window.demoActive && window.demoActive() && window.akDemoData) return window.akDemoData(flow);
   const url =
     `${AK_BASE}?airport=${encodeURIComponent(AK_AIRPORT)}` +
     `&flow=${encodeURIComponent(flow)}` +
@@ -6833,7 +6835,7 @@ function checkAndDeleteIfEmpty(){
 /* ===== Service Worker — enregistrement ===== */
 if ('serviceWorker' in navigator) {
   const swCode = `
-const CACHE = 'suivi-perf-v67';
+const CACHE = 'suivi-perf-v68';
 const PRECACHE = [];   // fichiers à précacher (vide = online-only)
 
 self.addEventListener('install', e => {
