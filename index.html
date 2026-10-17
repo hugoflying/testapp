@@ -22,7 +22,7 @@
 /* Mise a jour forcee : si version.json (lu sans cache) annonce une autre
    version que celle-ci, on vide les caches et on recharge la page.
    A chaque livraison : changer APP_VERSION ici, dans version.json et les ?v=. */
-window.APP_VERSION = '20261017r50';
+window.APP_VERSION = '20261017r51';
 (function(){
   function check(){
     fetch('./version.json?t=' + Date.now(), { cache: 'no-store' })
@@ -44,8 +44,8 @@ window.APP_VERSION = '20261017r50';
   document.addEventListener('visibilitychange', function(){ if(document.visibilityState === 'visible') check(); });
 })();
 </script>
-<link rel="stylesheet" href="./fonts/fonts.css?v=20261017r50" />
-<link rel="stylesheet" href="./css/app.css?v=20261017r50" />
+<link rel="stylesheet" href="./fonts/fonts.css?v=20261017r51" />
+<link rel="stylesheet" href="./css/app.css?v=20261017r51" />
 </head>
 <body>
 
@@ -138,6 +138,7 @@ function digitsOnly(el){ el.value = (el.value || '').replace(/[^0-9]/g, ''); }
   <symbol id="i-link" viewBox="0 0 24 24"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></symbol>
   <symbol id="i-unlink" viewBox="0 0 24 24"><path d="M15 12.5l3.5-3.5a3.5 3.5 0 0 0-5-5L11 6.5M9 11.5L5.5 15a3.5 3.5 0 0 0 5 5L13 17.5"/><path d="M4 4l3 3M17 17l3 3"/></symbol>
   <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M19.5 12a7.5 7.5 0 1 1-2.2-5.3M19.5 4.5v4h-4"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></symbol>
 </svg>
 
 <!-- ===== LDM (FULLSCREEN) ===== -->
@@ -804,10 +805,11 @@ function digitsOnly(el){ el.value = (el.value || '').replace(/[^0-9]/g, ''); }
 <div id="akPopover" role="dialog" aria-label="Choisir l'arrivée ou le départ">
   <div class="sh-grip"></div>
   <div class="sh-head ak-header">
-    <h3>Choisir l'arrivée ou le départ<span class="sub" id="akStatus">—</span></h3>
+    <h3>Choisir un vol<span class="sub" id="akStatus">—</span></h3>
     <button class="iconbtn" type="button" onclick="loadAKFlights()" aria-label="Actualiser"><svg class="ico"><use href="#i-refresh"/></svg></button>
     <button class="iconbtn" type="button" onclick="closeAKPicker()" aria-label="Fermer"><svg class="ico"><use href="#i-x"/></svg></button>
   </div>
+  <div id="akFilters" class="akc-filters"><div class="akc-chips"></div><input class="input uppercase akc-q" type="search" placeholder="Vol, immat, escale…" autocomplete="off" autocapitalize="characters" spellcheck="false" oninput="if(window._akPairs) renderAKList(window._akPairs)"></div>
   <div id="akList" class="pairs"></div>
   <div class="ak-legend tl-legend">
     <span><i style="background:var(--early)"></i>En avance</span>
@@ -915,7 +917,7 @@ function digitsOnly(el){ el.value = (el.value || '').replace(/[^0-9]/g, ''); }
 
 <!-- Cache-busting : incrementer ?v= a CHAQUE deploiement pour forcer
      les navigateurs (et iOS) a recharger app.js au lieu du cache. -->
-<script src="./app.js?v=20261017r50"></script>
-<script src="./ui.js?v=20261017r50"></script>
+<script src="./app.js?v=20261017r51"></script>
+<script src="./ui.js?v=20261017r51"></script>
 </body>
 </html>

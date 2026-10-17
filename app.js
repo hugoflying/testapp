@@ -4868,66 +4868,99 @@ function _renderAKListWithRza(pairs, list, akIdToRza){
     return '';
   }
 
-  function half(f, flow){
-    if(!f) return '<div class="ak-half ak-half-empty ak-half-' + flow.toLowerCase() + '"></div>';
-    const ff    = (f.fullFlightNumber||f.callsign||'').trim();
-    const reg   = (f.reg||'').trim();
-    const stand = (f.pkg||'').toString().replace(/^P/i,'');
-    const {time:t, suffix:tSuffix} = pickBestTimeForList(f, flow);
-    const status = getStatus(f, flow);
-    const iata  = flow==='ARR' ? (f.adepIata||f.adepIcao||'') : (f.adesIata||f.adesIcao||'');
-    const dly      = delayMinFrom(flow==='ARR'?(f.sibt||''):(f.sobt||''), flow==='ARR'?actualArrIso(f):actualDepIso(f));
-    const dCls     = delayClass(dly);
-    const done     = (flow==='ARR'&&status==='ARRIVÉ')||(flow==='DEP'&&status==='DÉCOLLÉ');
-    const suf      = tSuffix ? '<small> ('+tSuffix+')</small>' : '';
-    const timeStr  = t ? escapeHtml(t)+suf : '—';
+  const toHM = iso => {
+    const d = iso ? new Date(iso) : null;
+    if(!d || isNaN(d.getTime())) return '';
+    return String(isUTC ? d.getUTCHours() : d.getHours()).padStart(2,'0') + ':' + String(isUTC ? d.getUTCMinutes() : d.getMinutes()).padStart(2,'0');
+  };
 
-    // Heure estimée
-    let estimatedStr = '';
-    if(tSuffix === 'S'){
-      const toHHMM = (iso)=>{
-        const d = iso ? new Date(iso) : null;
-        if(!d || isNaN(d.getTime())) return '';
-        const hh = String(isUTC ? d.getUTCHours() : d.getHours()).padStart(2,'0');
-        const mm = String(isUTC ? d.getUTCMinutes() : d.getMinutes()).padStart(2,'0');
-        return `${hh}:${mm}`;
-      };
-      const est = flow==='DEP' ? toHHMM(f.eobt||f.etot||'') : toHHMM(f.eibt||f.eldt||'');
-      if(est && est !== t && dCls !== 'c-ok'){
-        estimatedStr = ' <span class="ak-est '+dCls+'">→ '+escapeHtml(est)+'<small> (E)</small></span>';
-      }
-    }
-
+  // v2.43 : une moitié de la rotation (arrivée à gauche, départ à droite)
+  function side(f, flow, done){
     const fl = flow.toLowerCase();
-    const cls = 'ak-half ak-half-' + fl + (done ? ' ak-half-done' : '');
-    const barHtml = dCls ? '<i class="ak-dbar '+dCls+'"></i>' : '';
-
-    // ── onclick : on passe uniquement l'ID et le flow ──────────────────────
+    if(!f) return '<div class="akc-s akc-' + fl + ' akc-none"><span class="akc-tm">--:--</span><span class="akc-fn">' + (flow==='ARR' ? "Pas d'arrivée liée" : 'Pas de départ lié') + '</span></div>';
+    const ff   = (f.fullFlightNumber||f.callsign||'').trim().toUpperCase();
+    const {time:t, suffix:sx} = pickBestTimeForList(f, flow);
+    const iata = flow==='ARR' ? (f.adepIata||f.adepIcao||'') : (f.adesIata||f.adesIcao||'');
+    const dly  = delayMinFrom(flow==='ARR'?(f.sibt||''):(f.sobt||''), flow==='ARR'?actualArrIso(f):actualDepIso(f));
+    const dCls = delayClass(dly);
+    const delta = (dly != null && dly !== 0) ? '<small class="akc-d ' + dCls + '">' + (dly > 0 ? '+' : '−') + Math.abs(dly) + '</small>' : '';
     const safeId = escapeHtml(String(f.id || f._id || ''));
-    const onclick = 'onclick="_akClickFlight(\'' + safeId + '\',\'' + flow + '\')"';
-
-    return '<button type="button" class="'+cls+'" '+onclick+'>'
-      + barHtml
-      + '<span class="ak-h1"><span class="dir '+fl+'">'+flow+'</span><b>'+escapeHtml(iata||'---')+'</b>'
-      + (ff ? '<span class="ak-cie">'+escapeHtml(ff.slice(0,2).toUpperCase())+'</span>' : '') + '</span>'
-      + '<span class="ak-h2">'+escapeHtml(ff||'—')+' · P'+escapeHtml(stand||'—')+' · '+escapeHtml(reg||'—')+'</span>'
-      + '<span class="ak-h3">'+timeStr+estimatedStr+'</span>'
-      + (status ? '<span class="ak-h4">'+escapeHtml(status)+'</span>' : '')
+    const lbl = sx === 'A' ? (flow==='ARR' ? 'AIBT' : 'AOBT') : (sx === 'S' ? (flow==='ARR' ? 'SIBT' : 'SOBT') : 'Estimé');
+    return '<button type="button" class="akc-s akc-' + fl + (done ? ' akc-done' : '') + '" onclick="_akClickFlight(\'' + safeId + '\',\'' + flow + '\')" title="' + lbl + '">'
+      + '<span class="akc-tm num">' + escapeHtml(t || '--:--') + delta + '</span>'
+      + '<span class="akc-ap">' + escapeHtml(iata || '---') + '</span>'
+      + '<span class="akc-fn">' + escapeHtml(ff || '—') + '</span>'
       + '</button>';
   }
 
-  if(!pairs.length){ list.innerHTML = '<p class="has-text-grey">Aucun vol.</p>'; return; }
+  window._akPairs = pairs;
+  const cieOf = p => (((p.arr||p.dep||{}).fullFlightNumber || (p.arr||p.dep||{}).callsign || '') + '').trim().slice(0,2).toUpperCase();
 
-  list.innerHTML = pairs.map(function(p){
+  // Filtres compagnie + recherche
+  const fbox = document.getElementById('akFilters');
+  const cies = [...new Set(pairs.map(cieOf).filter(Boolean))].sort();
+  const curCie = window._akCie && cies.includes(window._akCie) ? window._akCie : '';
+  const q = ((document.querySelector('.akc-q')||{}).value || '').trim().toUpperCase();
+  if(fbox){
+    const chips = fbox.querySelector('.akc-chips');
+    chips.innerHTML = ['', ...cies].map(c => '<button type="button" class="akc-chip' + (c===curCie ? ' on' : '') + '" onclick="akSetCie(\'' + c + '\')">' + (c || 'Tous') + '</button>').join('')
+      + '<button type="button" class="akc-chip akc-find' + (fbox.classList.contains('searching') ? ' on' : '') + '" onclick="akToggleSearch()" aria-label="Rechercher"><svg class="ico"><use href="#i-search"/></svg></button>';
+  }
+
+  const match = p => {
+    if(curCie && cieOf(p) !== curCie) return false;
+    if(!q) return true;
+    const hay = [p.arr, p.dep].filter(Boolean).map(f => [f.fullFlightNumber, f.callsign, f.reg, f.adepIata, f.adesIata, f.pkg].join(' ')).join(' ').toUpperCase().replace(/-/g,'');
+    return hay.includes(q.replace(/-/g,''));
+  };
+  const shown = pairs.filter(match);
+
+  if(!pairs.length){ list.innerHTML = '<p class="akc-empty">Aucun vol.</p>'; return; }
+  if(!shown.length){ list.innerHTML = '<p class="akc-empty">Aucun vol pour ce filtre.</p>'; return; }
+
+  const groups = { cur:[], next:[], done:[] };
+  shown.forEach(p => {
+    const aSt = p.arr ? getStatus(p.arr,'ARR') : '';
+    const dSt = p.dep ? getStatus(p.dep,'DEP') : '';
+    const ref = p.arr || p.dep;
+    let g = 'next', chip = ['Prévu','g'];
+    if(dSt === 'DÉCOLLÉ' || aSt === 'DÉCOLLÉ'){ g = 'done'; chip = ['Décollé','g']; }
+    else if(aSt === 'ARRIVÉ'){ g = 'cur'; chip = ['Au sol','ok']; }
+    else if(aSt === 'EN VOL'){ chip = ['En vol','w']; }
+    if(aSt === 'ANNULÉ' || dSt === 'ANNULÉ') chip = ['Annulé','c'];
+    else if(aSt === 'SUSPENDU' || dSt === 'SUSPENDU') chip = ['Suspendu','c'];
+    const arrDone = aSt === 'ARRIVÉ' || g === 'done';
+    const depDone = g === 'done';
+    const late = [[p.arr,'ARR',arrDone],[p.dep,'DEP',depDone]].some(([f,fl,dn]) => {
+      if(!f || dn) return false;
+      const d = delayMinFrom(fl==='ARR'?(f.sibt||''):(f.sobt||''), fl==='ARR'?actualArrIso(f):actualDepIso(f));
+      return d != null && d >= 15;
+    });
+    const stand = ((p.arr && p.arr.pkg) || (p.dep && p.dep.pkg) || '').toString().replace(/^P/i,'');
+    const reg  = ((p.dep && p.dep.reg) || (p.arr && p.arr.reg) || '').trim();
+    const type = (ref.acTypeIcao || ref.acTypeIata || (p.dep||{}).acTypeIcao || '').toUpperCase();
+    const cie  = cieOf(p);
     const linked = !!(p.arr && p.dep);
-    return '<div class="ak-pair-row">'
-      + half(p.arr,'ARR')
-      + '<span class="ak-pair-divider' + (linked ? '' : ' broken') + '" title="'
-      + (linked ? 'Rotation liée' : 'Pas de rotation liée') + '">'
-      + '<svg class="ico"><use href="#' + (linked ? 'i-link' : 'i-unlink') + '"/></svg></span>'
-      + half(p.dep,'DEP')
-      + '</div>';
-  }).join('');
+    groups[g].push('<div class="akc-row' + (late ? ' late' : '') + '">'
+      + side(p.arr, 'ARR', arrDone)
+      + '<div class="akc-mid' + (linked ? '' : ' broken') + '" title="' + (linked ? 'Rotation liée' : 'Pas de rotation liée') + '"><i></i><span class="num">' + (stand ? 'P' + escapeHtml(stand) : '—') + '</span><i></i></div>'
+      + side(p.dep, 'DEP', depDone)
+      + '<div class="akc-foot">' + (cie ? '<span class="ak-cie">' + escapeHtml(cie) + '</span>' : '')
+      + '<span class="akc-reg">' + escapeHtml([reg, type].filter(Boolean).join(' · ') || '—') + '</span>'
+      + '<span class="akc-st ' + chip[1] + '">' + chip[0] + '</span></div>'
+      + '</div>');
+  });
+  const sec = (t, arr) => arr.length ? '<div class="akc-sec">' + t + '<span>' + arr.length + '</span></div>' + arr.join('') : '';
+  list.innerHTML = sec('En cours', groups.cur) + sec('À venir', groups.next) + sec('Terminés', groups.done);
+}
+
+function akSetCie(c){ window._akCie = c; if(window._akPairs) renderAKList(window._akPairs); }
+function akToggleSearch(){
+  const box = document.getElementById('akFilters'); if(!box) return;
+  const on = box.classList.toggle('searching');
+  const inp = document.querySelector('.akc-q');
+  if(on){ inp.focus(); } else { inp.value = ''; if(window._akPairs) renderAKList(window._akPairs); }
+  const f = box.querySelector('.akc-find'); if(f) f.classList.toggle('on', on);
 }
 
 // ── Gestionnaire de clic AK — lookup par ID dans le cache ──────────────────
@@ -6786,7 +6819,7 @@ function checkAndDeleteIfEmpty(){
 /* ===== Service Worker — enregistrement ===== */
 if ('serviceWorker' in navigator) {
   const swCode = `
-const CACHE = 'suivi-perf-v49';
+const CACHE = 'suivi-perf-v50';
 const PRECACHE = [];   // fichiers à précacher (vide = online-only)
 
 self.addEventListener('install', e => {
