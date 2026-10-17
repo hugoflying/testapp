@@ -1052,7 +1052,7 @@ function showCtotRegulation(){
 
   const dly = (eobtR != null) ? pushR - eobtR : null;
   const dlyHtml = (dly == null) ? ''
-    : '<div class="ct-band ' + (dly > 0 ? 'late' : 'ok') + '"><span>Retard estimé · push est. − EOBT</span><b class="num">' + (dly > 0 ? '+' + dly + ' min' : 'Aucun') + '</b></div>';
+    : '<div class="ct-band ' + (dly > 0 ? 'late' : 'ok') + '"><span>Retard estimé</span><b class="num">' + (dly > 0 ? '+' + dly + ' min' : 'Aucun') + '</b></div>';
   const pushHtml = '<div class="ct-band push"><span>Push estimé · CTOT − 15</span><b class="num">' + fm(C + pushR) + '</b></div>';
 
   let regHtml;
@@ -6786,7 +6786,7 @@ function checkAndDeleteIfEmpty(){
 /* ===== Service Worker — enregistrement ===== */
 if ('serviceWorker' in navigator) {
   const swCode = `
-const CACHE = 'suivi-perf-v54';
+const CACHE = 'suivi-perf-v55';
 const PRECACHE = [];   // fichiers à précacher (vide = online-only)
 
 self.addEventListener('install', e => {
