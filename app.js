@@ -3602,6 +3602,8 @@ function setTimeModeUTC(enable, fromInit=false){
 
   const tzLabel = document.getElementById('tzLabel');
   if(tzLabel) tzLabel.textContent = enable ? 'UTC' : 'Local';
+  const tzB = document.getElementById('fhTz');
+  if(tzB){ tzB.textContent = enable ? 'UTC' : 'LT'; tzB.classList.toggle('utc', !!enable); tzB.title = enable ? 'Heures en UTC' : 'Heures locales'; }
   localStorage.setItem('modeUTC', enable ? '1' : '0');
 
   // ✅ Convertir les valeurs de temps dans TOUS les onglets en localStorage
@@ -5281,6 +5283,13 @@ function _doApplyAKFlight(f, flow, opts = {}){
       }
     }
 
+    // v2.41 : callsigns ATC (ex. RYR2VL) affichés dans le bandeau
+    const csOf = x => ((x && x.callsign) || '').toUpperCase().trim();
+    const arrCS = flow === 'ARR' ? csOf(f) : csOf(prevArrUsed);
+    const depCS = flow === 'DEP' ? csOf(f) : csOf(nextDepUsed);
+    if(arrCS) setValAK('CallsignArr', arrCS);
+    if(depCS) setValAK('CallsignDep', depCS);
+
     // ID du vol lié résolu par les fonctions de linking (plus fiable que f.linkedId)
     const resolvedLinkedId = flow === 'DEP'
       ? (prevArrUsed?.id || f.linkedId || '')
@@ -6777,7 +6786,7 @@ function checkAndDeleteIfEmpty(){
 /* ===== Service Worker — enregistrement ===== */
 if ('serviceWorker' in navigator) {
   const swCode = `
-const CACHE = 'suivi-perf-v47';
+const CACHE = 'suivi-perf-v48';
 const PRECACHE = [];   // fichiers à précacher (vide = online-only)
 
 self.addEventListener('install', e => {

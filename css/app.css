@@ -1198,3 +1198,10 @@ html.dark .cab-seg button.is-on{background:var(--accent);color:var(--accent-ink)
 .iv-sugg[hidden]{display:none}
 .iv-sugg b{font-family:var(--f-num);font-weight:800}
 .iv-f small{white-space:nowrap;right:10px;overflow:hidden;text-overflow:ellipsis}
+
+/* v2.41 : callsign AK et badge LT / UTC dans le bandeau */
+.fh-fno small.fh-cs{font-size:13px;font-weight:600;color:var(--on-navy-dim);margin-left:6px;letter-spacing:.02em;vertical-align:middle}
+.fh-cs[hidden]{display:none}
+.fh-hero .fh-id{flex:1}
+.fh-tz{appearance:none;font:inherit;flex:none;align-self:center;border:1.5px solid rgba(255,255,255,.55);background:transparent;color:#fff;border-radius:7px;padding:3px 7px;font-size:11.5px;font-weight:800;letter-spacing:.06em;line-height:1.2;cursor:pointer}
+.fh-tz.utc{background:#2DD4A8;border-color:#2DD4A8;color:#06302A}

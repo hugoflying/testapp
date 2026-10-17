@@ -74,6 +74,11 @@
     const fno = document.getElementById('fhFno'); if(!fno) return;
     const dep = txt('kvDepVol'), arr = txt('kvArrVol');
     fno.textContent = isSet(dep) ? dep : (isSet(arr) ? arr : '----');
+    // Callsign AK du vol affiché, s'il diffère du numéro de vol
+    const cs = isSet(dep) ? val('CallsignDep') : (isSet(arr) ? val('CallsignArr') : '');
+    const csEl = document.getElementById('fhCs');
+    const showCs = cs && cs.replace(/\s/g,'') !== fno.textContent.replace(/\s/g,'');
+    csEl.hidden = !showCs; csEl.textContent = showCs ? '(' + cs + ')' : '';
     const parts = [];
     const from = txt('kvFrom'), to = txt('kvTo');
     if(isSet(from) || isSet(to)) parts.push((isSet(from)?from:'---') + ' → ' + (isSet(to)?to:'---'));
