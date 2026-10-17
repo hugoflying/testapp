@@ -945,17 +945,6 @@ function updatePreviTOB_FRRK(){
   el.value = `${main} + ${inf}`;
 }
 
-// v2.61 : TOB PRÉVI saisissable. FR/RK : « 178 + 3 » (ou « 178 3 ») remplit PAX et + INF.
-// Autres compagnies : la saisie est gardée telle quelle tant qu'aucun MALE/FEMALE/CHILD/INFANT n'est rempli.
-function previTobTyped(el){
-  el.dataset.auto = '';
-  if(el.id !== 'PreviTOB_FRRK') return;
-  const m = (el.value || '').match(/^\s*(\d{1,3})\s*(?:[+\s]\s*(\d{0,2}))?\s*$/);
-  if(!m) return;
-  const set = (id, v) => { const e = document.getElementById(id); if(e) e.value = v; };
-  set('PreviPAX_MAIN', m[1]); set('PreviPAX_INF', m[2] || '');
-}
-
 function updatePreviTOB(){
   const n = (id)=>{
     const v = (document.getElementById(id)?.value || '').trim();
@@ -972,9 +961,7 @@ function updatePreviTOB(){
 
   const main = male + female + child;
   const el = document.getElementById('PreviTOB');
-  if(!el) return;
-  if(hasAny){ el.value = `${main} + ${infant}`; el.dataset.auto = '1'; }
-  else if(el.dataset.auto === '1'){ el.value = ''; }
+  if(el) el.value = hasAny ? `${main} + ${infant}` : '';
 }
 
 /* ===== COUNTDOWN (CD) ===== */
@@ -6851,7 +6838,7 @@ function checkAndDeleteIfEmpty(){
 /* ===== Service Worker — enregistrement ===== */
 if ('serviceWorker' in navigator) {
   const swCode = `
-const CACHE = 'suivi-perf-v70';
+const CACHE = 'suivi-perf-v71';
 const PRECACHE = [];   // fichiers à précacher (vide = online-only)
 
 self.addEventListener('install', e => {

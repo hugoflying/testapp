@@ -22,7 +22,7 @@
 /* Mise a jour forcee : si version.json (lu sans cache) annonce une autre
    version que celle-ci, on vide les caches et on recharge la page.
    A chaque livraison : changer APP_VERSION ici, dans version.json et les ?v=. */
-window.APP_VERSION = '20261017r71';
+window.APP_VERSION = '20261017r72';
 (function(){
   function check(){
     fetch('./version.json?t=' + Date.now(), { cache: 'no-store' })
@@ -44,8 +44,8 @@ window.APP_VERSION = '20261017r71';
   document.addEventListener('visibilitychange', function(){ if(document.visibilityState === 'visible') check(); });
 })();
 </script>
-<link rel="stylesheet" href="./fonts/fonts.css?v=20261017r71" />
-<link rel="stylesheet" href="./css/app.css?v=20261017r71" />
+<link rel="stylesheet" href="./fonts/fonts.css?v=20261017r72" />
+<link rel="stylesheet" href="./css/app.css?v=20261017r72" />
 </head>
 <body>
 
@@ -209,7 +209,7 @@ function digitsOnly(el){ el.value = (el.value || '').replace(/[^0-9]/g, ''); }
           </div>
           <div class="ld-tob ld-hero">
             <div class="ld-hero-top"><span class="ld-tob-label">TOB PRÉVI</span></div>
-            <input id="PreviTOB_FRRK" type="text" inputmode="numeric" autocomplete="off" placeholder="178 + 3" oninput="previTobTyped(this)" onblur="updatePreviTOB_FRRK()">
+            <input id="PreviTOB_FRRK" type="text" readonly>
           </div>
         </div>
 
@@ -223,7 +223,7 @@ function digitsOnly(el){ el.value = (el.value || '').replace(/[^0-9]/g, ''); }
           </div>
           <div class="ld-tob ld-hero">
             <div class="ld-hero-top"><span class="ld-tob-label">TOB PRÉVI</span></div>
-            <input id="PreviTOB" type="text" inputmode="numeric" autocomplete="off" placeholder="178 + 3" oninput="previTobTyped(this)">
+            <input id="PreviTOB" type="text" readonly>
           </div>
           <div class="ld-row-2">
             <div class="ld-stat"><span class="ld-stat-label">BAGS</span><input class="ldm-in" id="PreviBAGS_OTHER" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="4" oninput="digitsOnly(this)"></div>
@@ -958,7 +958,7 @@ function digitsOnly(el){ el.value = (el.value || '').replace(/[^0-9]/g, ''); }
 
 <!-- Cache-busting : incrementer ?v= a CHAQUE deploiement pour forcer
      les navigateurs (et iOS) a recharger app.js au lieu du cache. -->
-<script src="./app.js?v=20261017r71"></script>
-<script src="./ui.js?v=20261017r71"></script>
+<script src="./app.js?v=20261017r72"></script>
+<script src="./ui.js?v=20261017r72"></script>
 </body>
 </html>
