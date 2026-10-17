@@ -58,6 +58,8 @@
     if(ldmIsOpen() && typeof closeLDM === 'function') closeLDM();
     const same = document.body.dataset.panel === name;
     showPanel(name);
+    // v2.40 : vol avec changement d'équipage probable → Timing s'ouvre sur Départ
+    if(name === 'timing' && !same && typeof crewRouteRule === 'function' && crewRouteRule() && typeof switchTimingPanel === 'function') switchTimingPanel('dep');
     const wrap = document.getElementById('appWrap');
     if(wrap && !same) wrap.scrollTop = 0;
     syncTabbar();
@@ -776,6 +778,32 @@
     syncIvChips();
   }
 
+  /* v2.40 : feuille Vol — libellé N° de vol, suggestion To = From */
+  let ivSuggOff = '';
+  function syncIvRoute(){
+    const from = val('From').toUpperCase(), to = val('To').toUpperCase();
+    const lbl = document.getElementById('ivNVolLbl');
+    if(lbl) lbl.textContent = to === 'BVA' ? 'N° vol arrivée' : 'N° vol départ';
+    const sg = document.getElementById('ivToSugg'); if(!sg) return;
+    const show = /^[A-Z]{3}$/.test(from) && from !== 'BVA' && !to && ivSuggOff !== from;
+    sg.hidden = !show;
+    if(show) sg.innerHTML = 'Même destination ? <b>To = ' + from + '</b>';
+  }
+  function initIvRoute(){
+    const sg = document.getElementById('ivToSugg');
+    if(sg) sg.addEventListener('click', () => {
+      const to = document.getElementById('To'), from = val('From').toUpperCase(); if(!to) return;
+      to.value = from;
+      to.dispatchEvent(new Event('input', { bubbles:true })); to.dispatchEvent(new Event('change', { bubbles:true }));
+      syncIvRoute();
+    });
+    ['From','To'].forEach(id => document.getElementById(id)?.addEventListener('input', syncIvRoute));
+    // To vidé exprès après un From : on ne repropose pas pour ce même From
+    document.getElementById('To')?.addEventListener('input', e => { if(!e.target.value) ivSuggOff = val('From').toUpperCase(); });
+    syncIvRoute();
+  }
+  window.syncIvRoute = syncIvRoute;
+
   function init(){
     syncHero(); setInterval(()=>{ syncHero(); syncEvents(); syncTabRings(); syncLoadUI(); syncDelayUI(); njRender(); }, 1000);
     initSwipe(); initLdmSwipe(); syncFollowBtn(); syncTabRings(); renderRecap(); setInterval(renderRecap, 15000);
@@ -787,7 +815,7 @@
     syncTabbar();
     uiWhatsNewMaybe();
     const rp = document.querySelector('.panel-retard'); if(rp) rp.addEventListener('input', ()=>requestAnimationFrame(syncDelayUI)); syncDelayUI();
-    initNoteDock(); initNoteJournal(); initIvChips();
+    initNoteDock(); initNoteJournal(); initIvChips(); initIvRoute();
     if(typeof window.bnSetTool === 'function'){ const st = window.bnSetTool; window.bnSetTool = function(t){ st(t); syncNoteDock(); }; }
 
     // Le LOAD peut s'ouvrir / se fermer depuis app.js (changement de vol, etc.)

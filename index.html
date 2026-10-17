@@ -22,7 +22,7 @@
 /* Mise a jour forcee : si version.json (lu sans cache) annonce une autre
    version que celle-ci, on vide les caches et on recharge la page.
    A chaque livraison : changer APP_VERSION ici, dans version.json et les ?v=. */
-window.APP_VERSION = '20261017r47';
+window.APP_VERSION = '20261017r48';
 (function(){
   function check(){
     fetch('./version.json?t=' + Date.now(), { cache: 'no-store' })
@@ -44,8 +44,8 @@ window.APP_VERSION = '20261017r47';
   document.addEventListener('visibilitychange', function(){ if(document.visibilityState === 'visible') check(); });
 })();
 </script>
-<link rel="stylesheet" href="./fonts/fonts.css?v=20261017r47" />
-<link rel="stylesheet" href="./css/app.css?v=20261017r47" />
+<link rel="stylesheet" href="./fonts/fonts.css?v=20261017r48" />
+<link rel="stylesheet" href="./css/app.css?v=20261017r48" />
 </head>
 <body>
 
@@ -677,7 +677,7 @@ function digitsOnly(el){ el.value = (el.value || '').replace(/[^0-9]/g, ''); }
             </datalist>
       </div>
       <div class="iv-two">
-          <label class="iv-f"><small>N° de vol</small><input class="input uppercase" type="text" id="NVol" oninput="updateTabLabelInstant();"></label>
+          <label class="iv-f"><small id="ivNVolLbl">N° vol départ</small><input class="input uppercase" type="text" id="NVol" oninput="updateTabLabelInstant();"></label>
           <label class="iv-f"><small>Date</small><input class="input" type="date" id="Date"></label>
       </div>
       <div class="iv-rt">
@@ -686,6 +686,7 @@ function digitsOnly(el){ el.value = (el.value || '').replace(/[^0-9]/g, ''); }
         <span class="iv-arrow"><svg class="ico"><use href="#i-arrow"/></svg></span>
           <label class="iv-f"><small>To</small><input class="input uppercase" type="text" id="To" maxlength="3" oninput="updateTabLabelInstant();"></label>
       </div>
+      <button type="button" class="iv-sugg" id="ivToSugg" hidden></button>
       <label class="iv-f"><small>Immat</small><input class="input uppercase" type="text" id="Immat" maxlength="6"></label>
       <!-- v2.38.1 : types en pastilles, filtrés selon la compagnie (ui.js IV_TYPES) -->
       <div class="iv-k">Type avion</div>
@@ -913,7 +914,7 @@ function digitsOnly(el){ el.value = (el.value || '').replace(/[^0-9]/g, ''); }
 
 <!-- Cache-busting : incrementer ?v= a CHAQUE deploiement pour forcer
      les navigateurs (et iOS) a recharger app.js au lieu du cache. -->
-<script src="./app.js?v=20261017r47"></script>
-<script src="./ui.js?v=20261017r47"></script>
+<script src="./app.js?v=20261017r48"></script>
+<script src="./ui.js?v=20261017r48"></script>
 </body>
 </html>

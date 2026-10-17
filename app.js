@@ -244,7 +244,7 @@ document.addEventListener('input', (e)=>{
 ['input','change'].forEach(ev=>{
   document.addEventListener(ev, (e)=>{
     const id = e.target?.id;
-    if(id === 'Cie' || id === 'From' || id === 'AIBT' || id === 'AOBT'){
+    if(id === 'Cie' || id === 'From' || id === 'To' || id === 'AIBT' || id === 'AOBT'){
       autoOpenCrewIfNeeded();
     }
   }, true);
@@ -6453,7 +6453,16 @@ function openCrewPanel(){
 // Ouvre d'office le panneau Crew pour FR/RK quand :
 //   - départ de BVA (From = BVA), OU
 //   - turnaround AOBT − AIBT ≥ 35 min
+// v2.40 (Hugo) : From = BVA, ou From ≠ To → l'événement Crew s'affiche au Départ (toutes compagnies)
+function crewRouteRule(){
+  const from = (document.getElementById('From')?.value || '').toUpperCase().trim();
+  const to   = (document.getElementById('To')?.value || '').toUpperCase().trim();
+  // To = BVA : vol qui se termine ici, pas de départ → pas de Crew
+  if(to === 'BVA') return false;
+  return from === 'BVA' || (from.length === 3 && to.length === 3 && from !== to);
+}
 function autoOpenCrewIfNeeded(){
+  if(crewRouteRule()){ openCrewPanel(); return; }
   const cie    = (document.getElementById('Cie')?.value || '').toUpperCase().trim();
   const isFRRK = (cie === 'FR' || cie === 'RK');
   if(!isFRRK) return;
@@ -6498,6 +6507,7 @@ function toggleInfoVolEdit(){
   const open = edit.style.display === 'none' || edit.style.display === '';
   edit.style.display = open ? 'flex' : 'none';
   if(open && window.syncIvChips) window.syncIvChips();
+  if(open && window.syncIvRoute) window.syncIvRoute();
 }
 
 
@@ -6767,7 +6777,7 @@ function checkAndDeleteIfEmpty(){
 /* ===== Service Worker — enregistrement ===== */
 if ('serviceWorker' in navigator) {
   const swCode = `
-const CACHE = 'suivi-perf-v46';
+const CACHE = 'suivi-perf-v47';
 const PRECACHE = [];   // fichiers à précacher (vide = online-only)
 
 self.addEventListener('install', e => {
