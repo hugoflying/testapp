@@ -1035,25 +1035,40 @@ function showCtotRegulation(){
   const C = parseHHMM(ctot);
   const rel = m => (m == null) ? null : ((((m - C) % 1440) + 2160) % 1440) - 720;   // minutes relatives au CTOT
   const eobtR = rel(window._eobtRawMins ?? null);
-  const pushR = -15, wFrom = -5, wTo = 10;
-  const lo = Math.min(pushR, eobtR ?? pushR) - 6, hi = wTo + 6;
+  // Push estimé = CTOT − 15, mais jamais avant l'EOBT (slot trop proche : on pousse à l'EOBT)
+  const pushR = (eobtR != null) ? Math.max(-15, eobtR) : -15, wFrom = -5, wTo = 10;
+  const lo = Math.min(pushR, eobtR ?? pushR, wFrom) - 6, hi = Math.max(wTo, eobtR ?? wTo) + 6;
   const X = r => ((r - lo) / (hi - lo) * 100).toFixed(1) + '%';
-  const mk = (r, lbl, cls, low) => '<div class="ct-mk ' + cls + (low ? ' lo' : '') + '" style="left:' + X(r) + '"><span>' + lbl + '</span><b class="num">' + fm(C + r) + '</b><i></i></div>';
+  // Libellés sur deux rangées (haut / bas) sans chevauchement ; même minute = une seule étiquette
+  // Largeur estimée d'une étiquette, en % de la frise (texte du libellé ou de l'heure)
+  const wOf = lbl => Math.max(16, lbl.length * 2.6 + 6);
+  const mks = [];
+  const place = (r, lbl, cls, pref, optional) => {
+    const x = (r - lo) / (hi - lo) * 100;
+    const same = mks.find(m => m.r === r);
+    if(same){ same.lbl += ' · ' + lbl; return; }
+    const free = row => !mks.some(m => m.row === row && Math.abs(m.x - x) < (wOf(m.lbl) + wOf(lbl)) / 2);
+    let row = free(pref) ? pref : (free(1 - pref) ? 1 - pref : -1);
+    if(row < 0 && !optional) row = pref;
+    mks.push({ r, x, lbl, cls, row });                          // row −1 : trait seul, sans étiquette
+  };
+  place(0, 'CTOT', 'ctot', 0);
+  if(eobtR != null) place(eobtR, 'EOBT', 'eobt', 0);
+  place(pushR, 'PUSH EST.', 'push', 1);
+  place(wFrom, 'DÉCOL. −5', 'win', 1, true);
+  place(wTo, '+10', 'win', 1, true);
   const frise = '<div class="ct-track">'
     + '<div class="ct-axis"></div>'
     + ((eobtR != null && pushR > eobtR) ? '<div class="ct-gap" style="left:' + X(eobtR) + ';width:calc(' + X(pushR) + ' - ' + X(eobtR) + ')"></div>' : '')
     + '<div class="ct-win" style="left:' + X(wFrom) + ';width:calc(' + X(wTo) + ' - ' + X(wFrom) + ')"></div>'
-    + (eobtR != null ? mk(eobtR, 'EOBT', 'eobt', false) : '')
-    + mk(0, 'CTOT', 'ctot', false)
-    + mk(pushR, 'PUSH EST.', 'push', true)
-    + mk(wFrom, 'DÉCOL. −5', 'win', true)
-    + mk(wTo, '+10', 'win', true)
-    + '</div>';
+    + mks.map(m => '<div class="ct-mk ' + m.cls + (m.row === 1 ? ' lo' : '') + (m.row < 0 ? ' bare' : '') + '" style="left:' + m.x.toFixed(1) + '%"><span>' + m.lbl + '</span><b class="num">' + fm(C + m.r) + '</b><i></i></div>').join('')
+    + '</div>'
+    + '<div class="ct-cap num">Décollage entre <b>' + fm(C + wFrom) + '</b> et <b>' + fm(C + wTo) + '</b></div>';
 
   const dly = (eobtR != null) ? pushR - eobtR : null;
   const dlyHtml = (dly == null) ? ''
     : '<div class="ct-band ' + (dly > 0 ? 'late' : 'ok') + '"><span>Retard estimé</span><b class="num">' + (dly > 0 ? '+' + dly + ' min' : 'Aucun') + '</b></div>';
-  const pushHtml = '<div class="ct-band push"><span>Push estimé · CTOT − 15</span><b class="num">' + fm(C + pushR) + '</b></div>';
+  const pushHtml = '<div class="ct-band push"><span>Push estimé' + (pushR > -15 ? ' · à l\'EOBT' : '') + '</span><b class="num">' + fm(C + pushR) + '</b></div>';
 
   let regHtml;
   if(reg){
@@ -6786,7 +6801,7 @@ function checkAndDeleteIfEmpty(){
 /* ===== Service Worker — enregistrement ===== */
 if ('serviceWorker' in navigator) {
   const swCode = `
-const CACHE = 'suivi-perf-v56';
+const CACHE = 'suivi-perf-v57';
 const PRECACHE = [];   // fichiers à précacher (vide = online-only)
 
 self.addEventListener('install', e => {

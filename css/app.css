@@ -1295,3 +1295,7 @@ html.dark .ct-chain span.on{color:#FFC94D}
 .tl-gantt-row{z-index:3}
 .tl-now-line,.tl-eobt-line,.tl-ctot-line,.tl-tobt-line,.tl-sched-line,.tl-act-line,.tl-marker-line{z-index:1}
 .tl-dur{background:var(--surface);border-radius:3px;padding:0 2px}
+/* v2.49 : frise CTOT, trait sans étiquette quand la place manque + légende de la fenêtre */
+.ct-mk.bare{top:56px}.ct-mk.bare span,.ct-mk.bare b{display:none}.ct-mk.bare i{margin:0}
+.ct-cap{margin-top:4px;text-align:center;font-size:12.5px;font-weight:600;color:var(--muted)}
+.ct-cap b{color:var(--fg)}
