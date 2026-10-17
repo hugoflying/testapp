@@ -5397,7 +5397,7 @@ const PRESTATIONS_DEF = [
   { id:'eauPotable',   label:'Eau potable',            type:'yn' },
   { id:'vidange',      label:'Vidange toilettes',      type:'yn' },
   { id:'menageAssist', label:'Ménage Assist\'Air',     type:'yn' },
-  { id:'menageGSF',label:'Ménage GSF',         type:'choice', choices:['N','Tidy','Full'] },
+  { id:'menageGSF',label:'Ménage GSF',         type:'choice', choices:['N','S','DC','DI'] },
   { id:'collecte',     label:'Collecte ordures',       type:'yn', default:'Y' },
   { id:'echelle',      label:'Échelle supplémentaire', type:'yn' },
   { id:'degivrage',    label:'Dégivrage',              type:'yn' },
@@ -6827,7 +6827,7 @@ function checkAndDeleteIfEmpty(){
 /* ===== Service Worker — enregistrement ===== */
 if ('serviceWorker' in navigator) {
   const swCode = `
-const CACHE = 'suivi-perf-v63';
+const CACHE = 'suivi-perf-v64';
 const PRECACHE = [];   // fichiers à précacher (vide = online-only)
 
 self.addEventListener('install', e => {
