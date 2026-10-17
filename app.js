@@ -2716,6 +2716,46 @@ function generateTimingFields(){
         </div>
       </div>
     </div>
+
+    <!-- v2.36 : événements d'escale, affichés côté Arrivée ou Départ selon l'endroit où on les ajoute (champ EvCote) -->
+    <div id="panel-cleaning" class="card mb-3 ev-panel" data-ev="cleaning" style="display:none;">
+      <div class="ev-h"><i style="background:#0891b2"></i><b>Cleaning cabine</b><button type="button" class="ev-x" onclick="toggleDepExtra('cleaning')" aria-label="Masquer Cleaning cabine">×</button></div>
+      <div class="card-content">
+        <div class="grid-auto">
+          <div class="span-6">${fieldHTML('DebutCleaningCabine','Début cleaning cabine',false,false,'is-link')}</div>
+          <div class="span-6">${fieldHTML('FinCleaningCabine','Fin cleaning cabine',false,false,'is-link')}</div>
+        </div>
+      </div>
+    </div>
+    <div id="panel-vidange" class="card mb-3 ev-panel" data-ev="vidange" style="display:none;">
+      <div class="ev-h"><i style="background:#78716c"></i><b>Vidange toilettes</b><button type="button" class="ev-x" onclick="toggleDepExtra('vidange')" aria-label="Masquer Vidange toilettes">×</button></div>
+      <div class="card-content">
+        <div class="grid-auto">
+          <div class="span-6">${fieldHTML('DebutVidangeToilettes','Début vidange toilettes',false,false,'is-link')}</div>
+          <div class="span-6">${fieldHTML('FinVidangeToilettes','Fin vidange toilettes',false,false,'is-link')}</div>
+        </div>
+      </div>
+    </div>
+    <div id="panel-eau" class="card mb-3 ev-panel" data-ev="eau" style="display:none;">
+      <div class="ev-h"><i style="background:#2563eb"></i><b>Eau potable</b><button type="button" class="ev-x" onclick="toggleDepExtra('eau')" aria-label="Masquer Eau potable">×</button></div>
+      <div class="card-content">
+        <div class="grid-auto">
+          <div class="span-6">${fieldHTML('DebutEauPotable','Début eau potable',false,false,'is-link')}</div>
+          <div class="span-6">${fieldHTML('FinEauPotable','Fin eau potable',false,false,'is-link')}</div>
+        </div>
+      </div>
+    </div>
+    <div id="panel-degivrage" class="card mb-3 ev-panel" data-ev="degivrage" style="display:none;">
+      <div class="ev-h"><i style="background:#0ea5e9"></i><b>Dégivrage</b><button type="button" class="ev-x" onclick="toggleDepExtra('degivrage')" aria-label="Masquer Dégivrage">×</button></div>
+      <div class="card-content">
+        <div class="ev-info">ABAX Ecowing AD II Type II · 100 % ou 75/25 · pas d’eau chaude seule</div>
+        <div class="grid-auto">
+          <div class="span-6">${fieldHTML('DebutDegivrage','Début dégivrage',false,false,'is-link')}</div>
+          <div class="span-6">${fieldHTML('FinDegivrage','Fin dégivrage',false,false,'is-link')}</div>
+        </div>
+      </div>
+    </div>
+    <input id="EvCote" type="hidden">
     </div>
     <button type="button" class="ev-add" id="evAddBtn" onclick="uiEvOpen('dep')"><span>+</span> Ajouter un événement</button>
 `;
@@ -3812,6 +3852,10 @@ function collectTimelineData(){
     {label:'Comptage bagages', pair:getPairWindow('DebutComptageBagages','FinComptageBagages'), cls:'tl--std', color:'#0d9488'},
     {label:'Recherche bag', pair:getPairWindow('RechercheBagDebut','RechercheBagFin'), cls:'tl--std', color:'#ec4899'},
     {label:'Nayak', pair:getPairWindow('ArriveeNayak','DepartNayak'), cls:'tl--std', color:'#FFAD00'},
+    {label:'Cleaning cabine', pair:getPairWindow('DebutCleaningCabine','FinCleaningCabine'), cls:'tl--std', color:'#0891b2'},
+    {label:'Vidange toilettes', pair:getPairWindow('DebutVidangeToilettes','FinVidangeToilettes'), cls:'tl--std', color:'#78716c'},
+    {label:'Eau potable', pair:getPairWindow('DebutEauPotable','FinEauPotable'), cls:'tl--std', color:'#2563eb'},
+    {label:'Dégivrage', pair:getPairWindow('DebutDegivrage','FinDegivrage'), cls:'tl--std', color:'#0ea5e9'},
   ];
 
   const durations = rows
@@ -3989,6 +4033,10 @@ function renderTimeline(){
     ['Comptage bagages', 'DebutComptageBagages',     'FinComptageBagages'],
     ['Recherche bag',    'RechercheBagDebut',        'RechercheBagFin'],
     ['Nayak',            'ArriveeNayak',             'DepartNayak'],
+    ['Cleaning cabine',  'DebutCleaningCabine',      'FinCleaningCabine'],
+    ['Vidange toilettes','DebutVidangeToilettes',    'FinVidangeToilettes'],
+    ['Eau potable',      'DebutEauPotable',          'FinEauPotable'],
+    ['Dégivrage',        'DebutDegivrage',           'FinDegivrage'],
   ];
   const EV_POINTS = [
     ['MiseEnPlaceTapis','Tapis bagages'], ['ReouverturePorteAvion','Réouverture porte'],
@@ -5755,6 +5803,10 @@ function doValidate() {
     body += r('DECHARGEMENT', `${t('DebutDechargementBagages')||'--:--'} → ${t('FinDechargementBagages')||'--:--'}`);
   if(t('DebutRepositionnement') || t('FinRepositionnement'))
     body += r('REPOSITIONNEMENT', `${t('DebutRepositionnement')||'--:--'} → ${t('FinRepositionnement')||'--:--'}`);
+  [['CLEANING CABINE','DebutCleaningCabine','FinCleaningCabine'],['VIDANGE TOILETTES','DebutVidangeToilettes','FinVidangeToilettes'],
+   ['EAU POTABLE','DebutEauPotable','FinEauPotable'],['DEGIVRAGE','DebutDegivrage','FinDegivrage']].forEach(([lb,a,b])=>{
+    if(t(a) || t(b)) body += r(lb, `${t(a)||'--:--'} → ${t(b)||'--:--'}`);
+  });
 
   body += br();
   if(t('AvionPremierEmbarque')) { body += r('PREMIER EMBARQUE',  t('AvionPremierEmbarque')); }
@@ -6278,6 +6330,7 @@ function confirmClearFields(){
     'FermeturePorteAvion','RemiseLID','ConnexionAgentCasque','ArriveeINAD',
     'ArrPNT','ArrPNC','AnnonceINAD','AppelNayak','ArriveeNayak','DepartNayak','RechercheBagDebut','RechercheBagFin',
     'MiseEnPlaceTapis','DebutDechargementBagages','FinDechargementBagages','DebutRepositionnement','FinRepositionnement','DebutChargementBagages','FinChargementBagages',
+    'DebutCleaningCabine','FinCleaningCabine','DebutVidangeToilettes','FinVidangeToilettes','DebutEauPotable','FinEauPotable','DebutDegivrage','FinDegivrage','EvCote',
     'ConnexionPush','ChangementPush','FermetureSouteAV','FermetureSouteAR','RetraitEchelleAV','RetraitEchelleAR','ReouverturePorteAvion','DebutComptageBagages','FinComptageBagages',
     'CommChiffresPorte', 'CommChargementPiste',
     'ArrPAX_MAIN','ArrPAX_INF','ArrBAGS','ArrPOIDS','ArrSI',
@@ -6722,7 +6775,7 @@ function checkAndDeleteIfEmpty(){
 /* ===== Service Worker — enregistrement ===== */
 if ('serviceWorker' in navigator) {
   const swCode = `
-const CACHE = 'suivi-perf-v40';
+const CACHE = 'suivi-perf-v41';
 const PRECACHE = [];   // fichiers à précacher (vide = online-only)
 
 self.addEventListener('install', e => {

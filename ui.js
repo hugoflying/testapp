@@ -108,13 +108,38 @@
     { k:'chargement',    t:'Chargement bagages',d:'Début et fin du chargement',      c:'#15803d' },
     { k:'tapis',            side:'arr', t:'Tapis bagages',          d:'Mise en place du tapis',            c:'#0d9488' },
     { k:'dechargement',     side:'arr', t:'Déchargement bagages',   d:'Début et fin du déchargement',      c:'#15803d' },
-    { k:'repositionnement', side:'arr', t:'Repositionnement avion', d:'Début et fin du repositionnement',  c:'#3273dc' }
+    { k:'repositionnement', side:'arr', t:'Repositionnement avion', d:'Début et fin du repositionnement',  c:'#3273dc' },
+    { k:'cleaning',  side:'both', t:'Cleaning cabine',   d:'Début et fin du cleaning',        c:'#0891b2' },
+    { k:'vidange',   side:'both', t:'Vidange toilettes', d:'Début et fin de la vidange',      c:'#78716c' },
+    { k:'eau',       side:'both', t:'Eau potable',       d:'Début et fin du plein d’eau',     c:'#2563eb' },
+    { k:'degivrage', t:'Dégivrage', d:'Début et fin du dégivrage', c:'#0ea5e9' }
   ];
+  // v2.36 : un événement « both » s'affiche dans la zone (Arrivée / Départ) d'où on l'a ajouté.
+  // Le côté est gardé par vol dans le champ caché EvCote (« cleaning:arr,eau:dep »).
+  function evCoteMap(){
+    const m = {}; (document.getElementById('EvCote')?.value || '').split(',').forEach(x => { const [k, v] = x.split(':'); if(k && v) m[k] = v; });
+    return m;
+  }
+  function evSetCote(k, side){
+    const el = document.getElementById('EvCote'); if(!el) return;
+    const m = evCoteMap(); m[k] = side;
+    el.value = Object.keys(m).map(x => x + ':' + m[x]).join(',');
+    el.dispatchEvent(new Event('input', { bubbles:true })); el.dispatchEvent(new Event('change', { bubbles:true }));
+  }
+  function evPlace(){
+    const m = evCoteMap();
+    EVENTS.filter(e => e.side === 'both').forEach(e => {
+      const p = document.getElementById('panel-' + e.k);
+      const z = document.getElementById(m[e.k] === 'arr' ? 'evZoneArr' : 'evZone');
+      if(p && z && p.parentElement !== z) z.appendChild(p);
+    });
+  }
   function evShown(k){ const p = document.getElementById('panel-'+k); return !!p && p.style.display !== 'none'; }
   function evFilled(p){ return [...p.querySelectorAll('input')].some(i => i.value && !/^[-–—\s0]*$/.test(i.value)); }
 
   // Un bloc qui contient une heure reste toujours affiché, sans croix
   function syncEvents(){
+    evPlace();
     document.querySelectorAll('.ev-panel').forEach(p => {
       const f = evFilled(p);
       p.classList.toggle('has-val', f);
@@ -128,7 +153,9 @@
   const EV_PAIRS = {
     dechargement:['DebutDechargementBagages','FinDechargementBagages'], repositionnement:['DebutRepositionnement','FinRepositionnement'],
     chargement:['DebutChargementBagages','FinChargementBagages'], comptage:['DebutComptageBagages','FinComptageBagages'],
-    'recherche-bag':['RechercheBagDebut','RechercheBagFin'], gpu:['ArriveeNayak','DepartNayak']
+    'recherche-bag':['RechercheBagDebut','RechercheBagFin'], gpu:['ArriveeNayak','DepartNayak'],
+    cleaning:['DebutCleaningCabine','FinCleaningCabine'], vidange:['DebutVidangeToilettes','FinVidangeToilettes'],
+    eau:['DebutEauPotable','FinEauPotable'], degivrage:['DebutDegivrage','FinDegivrage']
   };
   function syncEvDurations(){
     const n = new Date(), nowM = n.getHours()*60 + n.getMinutes();
@@ -160,6 +187,7 @@
       if(!it || it.disabled) return;
       m.style.display = 'none';
       if(evShown(it.dataset.k)){ toggleDepExtra(it.dataset.k); syncEvents(); return; }   // re-toucher = retirer
+      if((EVENTS.find(e => e.k === it.dataset.k) || {}).side === 'both'){ evSetCote(it.dataset.k, m.dataset.side || 'dep'); evPlace(); }
       toggleDepExtra(it.dataset.k);
       const p = document.getElementById('panel-'+it.dataset.k);
       if(p){ p.scrollIntoView({ behavior:'smooth', block:'center' }); p.classList.add('ev-flash'); setTimeout(()=>p.classList.remove('ev-flash'), 900); }
@@ -171,7 +199,8 @@
   window.uiEvOpen = function(side){
     side = side === 'arr' ? 'arr' : 'dep';
     const m = evSheet();
-    m.querySelector('.ev-list').innerHTML = EVENTS.filter(e => (e.side || 'dep') === side).map(e => {
+    m.dataset.side = side;
+    m.querySelector('.ev-list').innerHTML = EVENTS.filter(e => (e.side || 'dep') === side || e.side === 'both').map(e => {
       const on = evShown(e.k);
       const p = document.getElementById('panel-'+e.k);
       const full = on && p && evFilled(p);
