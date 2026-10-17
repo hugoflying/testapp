@@ -253,7 +253,7 @@ document.addEventListener('input', (e)=>{
 /* Timeline */
 let timelineZoom = 1;
 const TL_ZOOM_MIN = 0.5;
-const TL_ZOOM_MAX = 8;
+const TL_ZOOM_MAX = 4;
 const TL_ZOOM_STEP = 0.25;
 window._timelineCurrentRange = null;
 
@@ -3858,7 +3858,9 @@ function renderTimeline(){
   const LEFT_PAD   = 10;
   const viewport   = scroller.clientWidth || 360;
   // v2.12 « Gantt épuré » : à 100 % toute l'escale tient dans la largeur, le zoom agrandit
-  const trackW     = Math.max(120, Math.round((viewport - LEFT_PAD - 12) * timelineZoom));
+  // v2.46 (Hugo) : le 100 % affiché correspond à l'ancien 200 % (50 % = toute l'escale dans la largeur)
+  const TL_BASE    = 2;
+  const trackW     = Math.max(120, Math.round((viewport - LEFT_PAD - 12) * timelineZoom * TL_BASE));
   canvas.style.width = (trackW + LEFT_PAD) + 'px';
 
   const PPM        = trackW / total;
@@ -6784,7 +6786,7 @@ function checkAndDeleteIfEmpty(){
 /* ===== Service Worker — enregistrement ===== */
 if ('serviceWorker' in navigator) {
   const swCode = `
-const CACHE = 'suivi-perf-v52';
+const CACHE = 'suivi-perf-v53';
 const PRECACHE = [];   // fichiers à précacher (vide = online-only)
 
 self.addEventListener('install', e => {
