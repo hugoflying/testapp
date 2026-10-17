@@ -533,6 +533,12 @@ function applyAircraftConfig(){
   const cfg = getAcConfig(immat);
   const setPH = (id, txt) => { const el = document.getElementById(id); if(el) el.placeholder = txt || ''; };
 
+  // v2.39 (Hugo) : immat non listée en Y186 = Y180
+  if(immat && !(cfg && /186/.test(cfg.config || '')) && getA320Ver() === '186'){
+    setA320Ver('180');
+    updateInfoStrip();
+  }
+
   if(!cfg){
     updateFinalPlaceholdersFRRK();
     return;
@@ -708,43 +714,30 @@ function toggleA320Ver(){
   updateInfoStrip();              // rafraîchit le badge
 }
 
-/* Badge ⚠ 180/186 à côté du type avion dans le bandeau (uniquement W4/W6 + A320) */
+/* v2.39 : ligne « Configuration cabine » Y180 / Y186 dans la carte Vol (W4/W6 + A320) */
+function setA320VerUI(v){
+  setA320Ver(v);
+  updateFinalPlaceholdersFRRK();  // met à jour les zones OA/OB/OC
+  updateInfoStrip();
+}
 function renderA320VerBadge(){
-  const kv = document.getElementById('kvType');
-  if(!kv) return;
+  const row = document.getElementById('ivCabRow');
+  if(!row) return;
   const cie  = (document.getElementById('Cie')?.value || '').toUpperCase().trim();
   const type = (document.getElementById('TypeAvion')?.value || '').toUpperCase().trim();
   const applies = (cie === 'W4' || cie === 'W6') && type === 'A320';
-
-  let badge = document.getElementById('kvTypeVerBadge');
-
-  if(!applies){
-    if(badge) badge.style.display = 'none';
-    return;
-  }
-
-  if(!badge){
-    badge = document.createElement('span');
-    badge.id = 'kvTypeVerBadge';
-    badge.style.cssText = 'display:inline-flex;align-items:center;gap:2px;margin-left:6px;padding:1px 6px;border-radius:8px;font-size:11px;font-weight:800;cursor:pointer;user-select:none;line-height:1.4;vertical-align:middle;';
-    badge.title = 'Version cabine A320 — cliquer pour basculer 180 / 186';
-    badge.addEventListener('click', toggleA320Ver);
-    kv.insertAdjacentElement('afterend', badge);
-  }
-
+  row.hidden = !applies;
+  if(!applies) return;
   const ver = getA320Ver();
-  badge.style.display = 'inline-flex';
-  if(ver === '186'){
-    badge.textContent = '⚠ 186';
-    badge.style.background = '#dbeafe';   // bleu clair — version confirmée
-    badge.style.color      = '#1e40af';
-    badge.style.border      = '1px solid #93c5fd';
-  } else {
-    badge.textContent = '⚠ 180';
-    badge.style.background = '#fef3c7';   // orange clair — défaut, à vérifier
-    badge.style.color      = '#92400e';
-    badge.style.border      = '1px solid #fcd34d';
-  }
+  const immat = (document.getElementById('Immat')?.value || '').trim().toUpperCase();
+  const cfg = getAcConfig(immat);
+  const known186 = !!(cfg && /186/.test(cfg.config || ''));
+  let why;
+  if(!immat) why = 'Immat non saisie';
+  else if(known186) why = ver === '186' ? 'Connue en Y186 pour ' + immat : 'Changé à la main (' + immat + ' est connue en Y186)';
+  else why = ver === '180' ? 'Immat non listée en Y186' : 'Changé à la main';
+  row.querySelector('.cab-why').textContent = why;
+  row.querySelectorAll('[data-ver]').forEach(b => b.classList.toggle('is-on', b.dataset.ver === ver));
 }
 
 /* ===== Mode LID FR/RK : 'ELID' (défaut, ADULT+CHILD groupés) / 'LID' (séparés) ===== */
@@ -6774,7 +6767,7 @@ function checkAndDeleteIfEmpty(){
 /* ===== Service Worker — enregistrement ===== */
 if ('serviceWorker' in navigator) {
   const swCode = `
-const CACHE = 'suivi-perf-v45';
+const CACHE = 'suivi-perf-v46';
 const PRECACHE = [];   // fichiers à précacher (vide = online-only)
 
 self.addEventListener('install', e => {

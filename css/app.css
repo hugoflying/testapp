@@ -1182,3 +1182,14 @@ html.dark .iv-chips button.is-on,html.dark .iv-park button.is-on{background:var(
 html.dark .iv-chip-in.input.is-on{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
 .iv-types button{min-width:58px}
 .iv-types .iv-other .iv-chip-in.input{width:84px}
+/* v2.39 : configuration cabine A320 W4/W6 (option C) */
+.iv-cab{display:flex;align-items:center;gap:10px;margin-top:12px;padding-top:12px;border-top:1px solid var(--line)}
+.iv-cab[hidden]{display:none}
+.cab-lbl{flex:1;min-width:0}
+.cab-lbl b{display:block;font-size:14.5px}
+.cab-lbl small{display:block;font-size:12px;color:var(--muted);font-weight:600;margin-top:1px}
+.cab-seg{display:flex;border:1px solid var(--line-strong);border-radius:10px;overflow:hidden;flex:none}
+.cab-seg button{appearance:none;border:0;background:var(--surface);color:var(--muted);font:inherit;font-family:var(--f-num);font-weight:800;font-size:14px;padding:9px 13px;cursor:pointer}
+.cab-seg button+button{border-left:1px solid var(--line)}
+.cab-seg button.is-on{background:var(--navy);color:#fff}
+html.dark .cab-seg button.is-on{background:var(--accent);color:var(--accent-ink)}
