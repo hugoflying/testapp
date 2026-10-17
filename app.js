@@ -2748,7 +2748,6 @@ function generateTimingFields(){
     <div id="panel-degivrage" class="card mb-3 ev-panel" data-ev="degivrage" style="display:none;">
       <div class="ev-h"><i style="background:#0ea5e9"></i><b>Dégivrage</b><button type="button" class="ev-x" onclick="toggleDepExtra('degivrage')" aria-label="Masquer Dégivrage">×</button></div>
       <div class="card-content">
-        <div class="ev-info">ABAX Ecowing AD II Type II · 100 % ou 75/25 · pas d’eau chaude seule</div>
         <div class="grid-auto">
           <div class="span-6">${fieldHTML('DebutDegivrage','Début dégivrage',false,false,'is-link')}</div>
           <div class="span-6">${fieldHTML('FinDegivrage','Fin dégivrage',false,false,'is-link')}</div>
@@ -6775,7 +6774,7 @@ function checkAndDeleteIfEmpty(){
 /* ===== Service Worker — enregistrement ===== */
 if ('serviceWorker' in navigator) {
   const swCode = `
-const CACHE = 'suivi-perf-v41';
+const CACHE = 'suivi-perf-v42';
 const PRECACHE = [];   // fichiers à précacher (vide = online-only)
 
 self.addEventListener('install', e => {
