@@ -2218,7 +2218,7 @@ function createNewTab(){
   // snapshot initial
   const data = {};
   document.querySelectorAll('input, select, textarea').forEach(el=>{
-    if(el.id === 'utcToggle' || el.id === 'darkToggle') return;
+    if(!el.id || el.id === 'utcToggle' || el.id === 'darkToggle') return;
     data[el.id] = (el.type === 'checkbox') ? (el.checked ? '1' : '0') : (el.value || '');
   });
   data.infovolOpen = '0';
@@ -5988,6 +5988,12 @@ function toggleLDM(mode=null){
   let _historyKey = null;
 
   function canvas(){ return document.getElementById('bnCanvas'); }
+  // v2.35 : feuille haute (option A) ; les traits sont en px CSS, donc les
+  // anciens dessins restent en place, la feuille est juste plus grande.
+  function bnCanvasH(w){
+    const area = document.getElementById('appWrap')?.clientHeight || (window.innerHeight || 700) - 300;
+    return Math.round(Math.max(w * 0.45, Math.min(w * 1.6, area - 96)));
+  }
   function ctx(){ const c=canvas(); return c ? c.getContext('2d') : null; }
 
   function bnInit(){
@@ -6008,7 +6014,7 @@ function toggleLDM(mode=null){
       const dpr = window.devicePixelRatio || 1;
       const parent = c.parentElement || c.closest('.card-content');
       const cw  = (parent?.clientWidth || c.offsetWidth || 300);
-      const h   = Math.round(cw * 0.45);
+      const h   = bnCanvasH(cw);
       const pw  = Math.round(cw * dpr);
       const ph  = Math.round(h * dpr);
       if(c.width !== pw || c.height !== ph){
@@ -6210,7 +6216,7 @@ function toggleLDM(mode=null){
         if(!c) return;
         const dpr = window.devicePixelRatio || 1;
         const w   = c.offsetWidth || c.parentElement?.offsetWidth || 300;
-        const h   = Math.round(w * 0.45);
+        const h   = bnCanvasH(w);
         // Forcer les dimensions même si inchangées
         c.width  = Math.round(w * dpr);
         c.height = Math.round(h * dpr);
@@ -6716,7 +6722,7 @@ function checkAndDeleteIfEmpty(){
 /* ===== Service Worker — enregistrement ===== */
 if ('serviceWorker' in navigator) {
   const swCode = `
-const CACHE = 'suivi-perf-v39';
+const CACHE = 'suivi-perf-v40';
 const PRECACHE = [];   // fichiers à précacher (vide = online-only)
 
 self.addEventListener('install', e => {

@@ -552,8 +552,139 @@
   }
   window.syncDelayUI = syncDelayUI;
 
+  /* Notes (v2.35) : barre flottante du stylet (A) + journal horodaté au clavier (B) */
+  function syncNoteDock(){
+    const dock = document.getElementById('bnDrawTools'); if(!dock) return;
+    const eraser = document.getElementById('bnEraserStroke')?.classList.contains('is-warning');
+    dock.querySelector('[data-nb-tool="pen"]')?.classList.toggle('is-on', !eraser);
+    document.getElementById('bnEraserStroke')?.classList.toggle('is-on', !!eraser);
+    const col = (document.getElementById('bnColor')?.value || '').toLowerCase();
+    dock.querySelectorAll('[data-nb-color]').forEach(b => b.classList.toggle('is-on', b.dataset.nbColor === col));
+    const sz = document.getElementById('bnSize')?.value;
+    dock.querySelectorAll('[data-nb-size]').forEach(b => b.classList.toggle('is-on', b.dataset.nbSize === sz));
+  }
+  function initNoteDock(){
+    const dock = document.getElementById('bnDrawTools'); if(!dock) return;
+    dock.addEventListener('click', e => {
+      const c = e.target.closest('[data-nb-color]'), z = e.target.closest('[data-nb-size]');
+      if(c){ const i = document.getElementById('bnColor'); i.value = c.dataset.nbColor; i.dispatchEvent(new Event('input', { bubbles:true })); if(typeof bnSetTool === 'function') bnSetTool('pen'); }
+      if(z){ const i = document.getElementById('bnSize'); i.value = z.dataset.nbSize; i.dispatchEvent(new Event('input', { bubbles:true })); if(typeof bnSetTool === 'function') bnSetTool('pen'); }
+      setTimeout(syncNoteDock, 0);
+    });
+    syncNoteDock();
+  }
+
+  const NJ_TAGS = ['SNY', 'PMR', 'Bag manquant', 'Pax en retard', 'Nettoyage', 'Fuel'];
+  const NJ_RE = /^(\d{1,2}:\d{2})\s*·\s*(.*)$/;
+  let njTag = '', njLast = null, njArm = -1;
+  const njEl = sel => document.querySelector('#bnTextMode ' + sel);
+  const njArea = () => document.getElementById('FaitsSaillants');
+  function njLines(){ return (njArea()?.value || '').split('\n').filter(l => l.trim()); }
+  function njWrite(lines){
+    const ta = njArea(); if(!ta) return;
+    ta.value = lines.join('\n');
+    ta.dispatchEvent(new Event('input', { bubbles:true }));
+    ta.dispatchEvent(new Event('change', { bubbles:true }));
+    njRender(true);
+  }
+  function njRender(force){
+    const ta = njArea(), log = njEl('.nj-log'), empty = njEl('.nj-empty');
+    if(!ta || !log) return;
+    if(!force && ta.value === njLast) return;
+    njLast = ta.value;
+    const lines = njLines();
+    log.innerHTML = lines.map((l, i) => {
+      const m = l.match(NJ_RE);
+      let time = '', rest = l;
+      if(m){ time = m[1]; rest = m[2]; }
+      const parts = rest.split(/\s*·\s*/);
+      let body;
+      if(parts.length > 1 && parts[0] === 'SNY') body = `<em>SNY</em> · ${parts.slice(1).join(' ').split(/\s+/).map(c => `<code class="nj-cc">${escapeHtml(c)}</code>`).join(' ')}`;
+      else if(parts.length > 1 && NJ_TAGS.includes(parts[0])) body = `<em>${escapeHtml(parts[0])}</em> · ${escapeHtml(parts.slice(1).join(' · '))}`;
+      else if(NJ_TAGS.includes(rest.trim())) body = `<em>${escapeHtml(rest.trim())}</em>`;
+      else body = escapeHtml(rest);
+      return `<div class="nj-ln${i === njArm ? ' arm' : ''}" data-i="${i}"><b class="num">${time}</b><span>${body}</span><button type="button" class="nj-x" aria-label="Supprimer">${i === njArm ? 'Supprimer ?' : '×'}</button></div>`;
+    }).join('');
+    log.hidden = !lines.length;
+    if(empty) empty.hidden = !!lines.length;
+  }
+  function njSetTag(tag){
+    njTag = tag || '';
+    const pill = njEl('.nj-tag'), inp = njEl('.nj-input');
+    if(!pill || !inp) return;
+    pill.hidden = !njTag; pill.querySelector('b').textContent = njTag;
+    document.querySelectorAll('#bnTextMode [data-nj-tag]').forEach(b => b.classList.toggle('is-on', b.dataset.njTag === njTag));
+    const sny = njTag === 'SNY';
+    // Crew code : majuscules, pas de correction automatique (sinon DERUHU devient un mot)
+    inp.setAttribute('autocapitalize', sny ? 'characters' : 'sentences');
+    inp.setAttribute('autocorrect', sny ? 'off' : 'on');
+    inp.spellcheck = !sny;
+    inp.placeholder = sny ? 'Crew code (6 lettres)' : njTag ? 'Détail (facultatif)' : 'Écrire une note…';
+    inp.classList.toggle('nj-code', sny);
+    njCheck();
+  }
+  function njCheck(){
+    const inp = njEl('.nj-input'), hint = njEl('.nj-hint');
+    if(!inp || !hint) return true;
+    let msg = '';
+    if(njTag === 'SNY'){
+      const codes = inp.value.trim().split(/[\s,;]+/).filter(Boolean);
+      const bad = codes.filter(c => !/^[A-Z]{6}$/.test(c));
+      if(!codes.length && inp.value) msg = 'Un crew code fait 6 lettres.';
+      else if(bad.length) msg = `Un crew code fait 6 lettres : ${bad.map(escapeHtml).join(', ')}`;
+    }
+    hint.hidden = !msg; hint.innerHTML = msg;
+    inp.classList.toggle('nj-bad', !!msg);
+    return !msg;
+  }
+  function njAdd(){
+    const inp = njEl('.nj-input'); if(!inp) return;
+    let txt = inp.value.trim();
+    if(njTag === 'SNY'){
+      if(!txt){ inp.focus(); return; }
+      if(!njCheck()) return;
+      txt = txt.split(/[\s,;]+/).filter(Boolean).join(' ');
+    }
+    if(!txt && !njTag) return;
+    const d = new Date(), hm = String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+    const line = [hm, njTag, txt].filter(Boolean).join(' · ');
+    njArm = -1;
+    njWrite(njLines().concat(line));
+    inp.value = ''; njSetTag(''); inp.focus();
+    const log = njEl('.nj-log'); if(log) log.lastElementChild?.scrollIntoView({ block:'nearest' });
+  }
+  function initNoteJournal(){
+    const box = document.getElementById('bnTextMode'), inp = njEl('.nj-input'); if(!box || !inp) return;
+    box.addEventListener('click', e => {
+      const t = e.target.closest('[data-nj-tag]');
+      if(t){ njSetTag(njTag === t.dataset.njTag ? '' : t.dataset.njTag); inp.focus(); return; }
+      if(e.target.closest('.nj-tag-x')){ njSetTag(''); inp.focus(); return; }
+      if(e.target.closest('.nj-go')){ njAdd(); return; }
+      const x = e.target.closest('.nj-x');
+      if(x){
+        const i = +x.closest('.nj-ln').dataset.i;
+        if(njArm === i){ const l = njLines(); l.splice(i, 1); njArm = -1; njWrite(l); }
+        else { njArm = i; njRender(true); }
+        return;
+      }
+      if(njArm >= 0){ njArm = -1; njRender(true); }
+      if(e.target.closest('.nj-raw-btn')){
+        const ta = njArea(), on = ta.hidden;
+        ta.hidden = !on; e.target.closest('.nj-raw-btn').textContent = on ? 'Fermer le texte' : 'Modifier le texte';
+        if(on) ta.focus();
+      }
+    });
+    inp.addEventListener('input', () => {
+      if(njTag === 'SNY'){ const p = inp.selectionStart; inp.value = inp.value.toUpperCase().replace(/[^A-Z ,;]/g, ''); try{ inp.setSelectionRange(p, p); }catch(_){} }
+      njCheck();
+    });
+    inp.addEventListener('keydown', e => { if(e.key === 'Enter'){ e.preventDefault(); njAdd(); } });
+    njArea()?.addEventListener('input', () => njRender());
+    njSetTag(''); njRender(true);
+  }
+
   function init(){
-    syncHero(); setInterval(()=>{ syncHero(); syncEvents(); syncTabRings(); syncLoadUI(); syncDelayUI(); }, 1000);
+    syncHero(); setInterval(()=>{ syncHero(); syncEvents(); syncTabRings(); syncLoadUI(); syncDelayUI(); njRender(); }, 1000);
     initSwipe(); initLdmSwipe(); syncFollowBtn(); syncTabRings(); renderRecap(); setInterval(renderRecap, 15000);
     const tb = document.getElementById('tab-bar'); if(tb) new MutationObserver(()=>requestAnimationFrame(syncTabRings)).observe(tb, { childList:true }); setInterval(tlTick, 15000);
     document.addEventListener('click', e => { if(e.target.closest('.ev-x, .tw-zone')) setTimeout(syncEvents, 0); });
@@ -563,6 +694,8 @@
     syncTabbar();
     uiWhatsNewMaybe();
     const rp = document.querySelector('.panel-retard'); if(rp) rp.addEventListener('input', ()=>requestAnimationFrame(syncDelayUI)); syncDelayUI();
+    initNoteDock(); initNoteJournal();
+    if(typeof window.bnSetTool === 'function'){ const st = window.bnSetTool; window.bnSetTool = function(t){ st(t); syncNoteDock(); }; }
 
     // Le LOAD peut s'ouvrir / se fermer depuis app.js (changement de vol, etc.)
     const m = document.getElementById('ldmModal');

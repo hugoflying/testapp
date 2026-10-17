@@ -22,7 +22,7 @@
 /* Mise a jour forcee : si version.json (lu sans cache) annonce une autre
    version que celle-ci, on vide les caches et on recharge la page.
    A chaque livraison : changer APP_VERSION ici, dans version.json et les ?v=. */
-window.APP_VERSION = '20261017r40';
+window.APP_VERSION = '20261017r41';
 (function(){
   function check(){
     fetch('./version.json?t=' + Date.now(), { cache: 'no-store' })
@@ -44,8 +44,8 @@ window.APP_VERSION = '20261017r40';
   document.addEventListener('visibilitychange', function(){ if(document.visibilityState === 'visible') check(); });
 })();
 </script>
-<link rel="stylesheet" href="./fonts/fonts.css?v=20261017r40" />
-<link rel="stylesheet" href="./css/app.css?v=20261017r40" />
+<link rel="stylesheet" href="./fonts/fonts.css?v=20261017r41" />
+<link rel="stylesheet" href="./css/app.css?v=20261017r41" />
 </head>
 <body>
 
@@ -636,28 +636,63 @@ function digitsOnly(el){ el.value = (el.value || '').replace(/[^0-9]/g, ''); }
       </ul>
     </div>
 
-    <div id="bnDrawTools" class="note-tools" style="display:none;">
-      <button id="bnEraserStroke" class="button is-small is-light" type="button" onclick="bnSetTool('eraser-stroke')" title="Gomme trait">
-        <svg class="ico"><use href="#i-erase"/></svg>Gomme
+    <!-- v2.35 : barre d'outils flottante (option A). Les contrôles d'origine
+         (bnSize, bnColor) restent dans le DOM, pilotés par les pastilles. -->
+    <div id="bnDrawTools" class="note-tools nb-dock" style="display:none;">
+      <button class="nb-tb is-on" type="button" data-nb-tool="pen" onclick="bnSetTool('pen')" title="Stylo" aria-label="Stylo">
+        <svg class="ico"><use href="#i-pen"/></svg>
       </button>
-      <!-- autocomplete=off : sinon le navigateur restaure l'ancienne valeur au
-           rechargement alors que l'etiquette affiche encore "3px" -->
-      <input id="bnSize" type="range" min="1" max="12" value="3" autocomplete="off"
-             oninput="this.dataset.userSet='1'; document.getElementById('bnSizeLbl').textContent=this.value+'px'"
-             title="Épaisseur" aria-label="Épaisseur">
-      <span id="bnSizeLbl" class="num">3px</span>
-      <input id="bnColor" type="color" value="#1e3a8a" title="Couleur" aria-label="Couleur">
-      <button id="bnEraserAll" class="iconbtn danger" type="button" onclick="bnClear()" title="Tout effacer" aria-label="Tout effacer">
+      <button id="bnEraserStroke" class="nb-tb is-light" type="button" onclick="bnSetTool('eraser-stroke')" title="Gomme trait" aria-label="Gomme">
+        <svg class="ico"><use href="#i-erase"/></svg>
+      </button>
+      <span class="nb-sep"></span>
+      <button class="nb-dot" type="button" data-nb-color="#1e3a8a" style="--c:#1e3a8a" aria-label="Bleu"></button>
+      <button class="nb-dot" type="button" data-nb-color="#d93636" style="--c:#d93636" aria-label="Rouge"></button>
+      <button class="nb-dot" type="button" data-nb-color="#1f9d57" style="--c:#1f9d57" aria-label="Vert"></button>
+      <span class="nb-sep"></span>
+      <button class="nb-sz" type="button" data-nb-size="2" aria-label="Fin"><i style="--d:5px"></i></button>
+      <button class="nb-sz" type="button" data-nb-size="3" aria-label="Moyen"><i style="--d:8px"></i></button>
+      <button class="nb-sz" type="button" data-nb-size="6" aria-label="Épais"><i style="--d:12px"></i></button>
+      <span class="nb-sep"></span>
+      <button id="bnEraserAll" class="nb-tb nb-del" type="button" onclick="bnClear()" title="Tout effacer" aria-label="Tout effacer">
         <svg class="ico"><use href="#i-trash"/></svg>
       </button>
+      <span class="nb-hidden">
+        <!-- autocomplete=off : sinon le navigateur restaure l'ancienne valeur au rechargement -->
+        <input id="bnSize" type="range" min="1" max="12" value="3" autocomplete="off" tabindex="-1"
+               oninput="this.dataset.userSet='1'; document.getElementById('bnSizeLbl').textContent=this.value+'px'"
+               aria-hidden="true">
+        <span id="bnSizeLbl" class="num">3px</span>
+        <input id="bnColor" type="color" value="#1e3a8a" tabindex="-1" aria-hidden="true">
+      </span>
     </div>
 
     <div id="bnDrawMode" style="display:none;">
       <canvas id="bnCanvas"></canvas>
     </div>
 
+    <!-- v2.35 : journal horodaté (option B). FaitsSaillants reste la source
+         (rapport + sauvegarde) : une ligne par note, « HH:MM · TAG · texte ». -->
     <div id="bnTextMode">
-      <textarea id="FaitsSaillants" class="textarea" rows="8" placeholder="Notes libres…"
+      <div class="nj-k">Ajout rapide</div>
+      <div class="nj-quick">
+        <button type="button" data-nj-tag="SNY">SNY</button>
+        <button type="button" data-nj-tag="PMR">PMR</button>
+        <button type="button" data-nj-tag="Bag manquant">Bag manquant</button>
+        <button type="button" data-nj-tag="Pax en retard">Pax en retard</button>
+        <button type="button" data-nj-tag="Nettoyage">Nettoyage</button>
+        <button type="button" data-nj-tag="Fuel">Fuel</button>
+      </div>
+      <div class="nj-log" hidden></div>
+      <div class="nj-empty">Aucune note pour ce vol.</div>
+      <form class="nj-in" onsubmit="return false">
+        <span class="nj-tag" hidden><b></b><button type="button" class="nj-tag-x" aria-label="Retirer">×</button></span>
+        <input class="nj-input" type="text" enterkeyhint="send" placeholder="Écrire une note…" autocomplete="off" aria-label="Nouvelle note">
+        <button type="submit" class="nj-go" aria-label="Ajouter"><svg class="ico"><use href="#i-arrow"/></svg></button>
+      </form>
+      <div class="nj-hint" hidden></div>
+      <button type="button" class="nj-raw-btn link">Modifier le texte</button>
+      <textarea id="FaitsSaillants" class="textarea nj-raw" rows="8" placeholder="Notes libres…" hidden
                 oninput="twSync('FaitsSaillants')"></textarea>
     </div>
 
@@ -857,7 +892,7 @@ function digitsOnly(el){ el.value = (el.value || '').replace(/[^0-9]/g, ''); }
 
 <!-- Cache-busting : incrementer ?v= a CHAQUE deploiement pour forcer
      les navigateurs (et iOS) a recharger app.js au lieu du cache. -->
-<script src="./app.js?v=20261017r40"></script>
-<script src="./ui.js?v=20261017r40"></script>
+<script src="./app.js?v=20261017r41"></script>
+<script src="./ui.js?v=20261017r41"></script>
 </body>
 </html>
