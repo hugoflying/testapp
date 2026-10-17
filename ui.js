@@ -712,6 +712,32 @@
     njSetTag(''); njRender(true);
   }
 
+  /* Vol (v2.37) : pastilles Compagnie / Parking de la feuille « Modifier le vol » */
+  function syncIvChips(){
+    [['ivCieChips','Cie'],['ivParkChips','Parking']].forEach(([box, id]) => {
+      const b = document.getElementById(box), v = (document.getElementById(id)?.value || '').trim().toUpperCase();
+      if(!b) return;
+      let hit = false;
+      b.querySelectorAll('button[data-v]').forEach(x => { const on = x.dataset.v === v; x.classList.toggle('is-on', on); hit = hit || on; });
+      const inp = document.getElementById(id); if(inp){ inp.classList.toggle('is-on', !!v && !hit); inp.parentElement.classList.toggle('dup', hit); }
+    });
+  }
+  window.syncIvChips = syncIvChips;
+  function initIvChips(){
+    [['ivCieChips','Cie'],['ivParkChips','Parking']].forEach(([box, id]) => {
+      const b = document.getElementById(box), inp = document.getElementById(id); if(!b || !inp) return;
+      b.addEventListener('click', e => {
+        const x = e.target.closest('button[data-v]'); if(!x) return;
+        inp.value = x.dataset.v;
+        inp.dispatchEvent(new Event('input', { bubbles:true })); inp.dispatchEvent(new Event('change', { bubbles:true }));
+        syncIvChips();
+      });
+      inp.addEventListener('input', syncIvChips);
+      inp.addEventListener('focus', () => { try{ inp.select(); }catch(_){} });
+    });
+    syncIvChips();
+  }
+
   function init(){
     syncHero(); setInterval(()=>{ syncHero(); syncEvents(); syncTabRings(); syncLoadUI(); syncDelayUI(); njRender(); }, 1000);
     initSwipe(); initLdmSwipe(); syncFollowBtn(); syncTabRings(); renderRecap(); setInterval(renderRecap, 15000);
@@ -723,7 +749,7 @@
     syncTabbar();
     uiWhatsNewMaybe();
     const rp = document.querySelector('.panel-retard'); if(rp) rp.addEventListener('input', ()=>requestAnimationFrame(syncDelayUI)); syncDelayUI();
-    initNoteDock(); initNoteJournal();
+    initNoteDock(); initNoteJournal(); initIvChips();
     if(typeof window.bnSetTool === 'function'){ const st = window.bnSetTool; window.bnSetTool = function(t){ st(t); syncNoteDock(); }; }
 
     // Le LOAD peut s'ouvrir / se fermer depuis app.js (changement de vol, etc.)

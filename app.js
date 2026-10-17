@@ -6499,12 +6499,12 @@ function toggleDepExtra(panel){
   }
 }
 
+// v2.37 : les infos du vol se modifient dans une feuille du bas
 function toggleInfoVolEdit(){
   const edit = document.getElementById('ivEdit');
-  const icon = document.getElementById('ivEditIcon');
   const open = edit.style.display === 'none' || edit.style.display === '';
-  edit.style.display = open ? 'grid' : 'none';
-  icon.textContent = open ? 'Terminé' : 'Modifier';
+  edit.style.display = open ? 'flex' : 'none';
+  if(open && window.syncIvChips) window.syncIvChips();
 }
 
 
@@ -6774,7 +6774,7 @@ function checkAndDeleteIfEmpty(){
 /* ===== Service Worker — enregistrement ===== */
 if ('serviceWorker' in navigator) {
   const swCode = `
-const CACHE = 'suivi-perf-v42';
+const CACHE = 'suivi-perf-v43';
 const PRECACHE = [];   // fichiers à précacher (vide = online-only)
 
 self.addEventListener('install', e => {

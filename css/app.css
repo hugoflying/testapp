@@ -1150,3 +1150,33 @@ html.dark .nj-go{background:var(--accent);color:var(--accent-ink)}
 .ie-warn::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--yellow);flex:none}
 html.dark .ie-warn{background:#3A2F12;color:#FFC94D}
 .ev-info{font-size:12.5px;font-weight:600;color:var(--muted);background:var(--surface-2);border-radius:8px;padding:6px 10px;margin-bottom:10px}
+/* v2.37 : feuille « Modifier le vol » (option B) */
+.iv-sheet .sh-head .link{font-weight:700}
+.iv-sheet .sh-body{gap:10px}
+.iv-k{font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-top:2px}
+.iv-chips{display:flex;gap:6px;overflow-x:auto;padding:2px 2px 4px;margin:0 -2px;scrollbar-width:none}
+.iv-chips::-webkit-scrollbar{display:none}
+.iv-chips button,.iv-park button{appearance:none;font:inherit;font-family:var(--f-num);font-weight:800;font-size:14px;color:var(--fg);background:var(--surface);border:1px solid var(--line-strong);cursor:pointer}
+.iv-chips button{flex:none;height:38px;min-width:46px;padding:0 12px;border-radius:999px}
+.iv-chips button.is-on,.iv-park button.is-on{background:var(--navy);border-color:var(--navy);color:#fff}
+html.dark .iv-chips button.is-on,html.dark .iv-park button.is-on{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.iv-chip-in.input{height:38px;border-radius:999px;flex:none;width:84px;text-align:center;font-family:var(--f-num);font-weight:800;font-size:14px;padding:0 8px}
+.iv-chip-in.input.is-on{border-color:var(--navy);box-shadow:inset 0 0 0 1px var(--navy)}
+.iv-chip-in.input::placeholder{font-weight:600;color:var(--faint)}
+.iv-park{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}
+.iv-park button{height:38px;border-radius:10px}
+.iv-park .iv-chip-in.input{grid-column:span 2;width:100%;border-radius:10px}
+.iv-two{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.iv-rt{display:grid;grid-template-columns:1fr 24px 1fr;gap:6px;align-items:center}
+.iv-arrow{display:grid;place-items:center;color:var(--muted)}.iv-arrow .ico{width:18px;height:18px}
+.iv-f{position:relative;display:block;margin:0}
+.iv-f small{position:absolute;left:13px;top:7px;font-size:10.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);pointer-events:none}
+.iv-f .input{height:58px;padding:20px 12px 0;font-size:17px;font-weight:700;font-family:var(--f-num)}
+.iv-f input[type=date].input{padding-top:18px}
+.iv-other{position:relative;flex:none;display:block}
+.iv-park .iv-other{grid-column:span 2}
+.iv-other .iv-chip-in.input{width:84px}
+.iv-park .iv-other .iv-chip-in.input{width:100%}
+.iv-other.dup:not(:focus-within) .input{color:transparent}
+.iv-other.dup:not(:focus-within)::after{content:"Autre";position:absolute;inset:0;display:grid;place-items:center;color:var(--faint);font-weight:600;font-size:14px;pointer-events:none}
+html.dark .iv-chip-in.input.is-on{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
