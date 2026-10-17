@@ -3293,6 +3293,7 @@ function updateRetardPanelState(){
   // Une erreur de validation affichée disparaît dès qu'elle est corrigée
   const box = document.getElementById('validateError');
   if(box && !box.hidden) showValidateError(checkValidateRules());
+  if(window.syncDelayUI) window.syncDelayUI();
 }
 
 /* Règles de validation du vol :
@@ -6715,7 +6716,7 @@ function checkAndDeleteIfEmpty(){
 /* ===== Service Worker — enregistrement ===== */
 if ('serviceWorker' in navigator) {
   const swCode = `
-const CACHE = 'suivi-perf-v38';
+const CACHE = 'suivi-perf-v39';
 const PRECACHE = [];   // fichiers à précacher (vide = online-only)
 
 self.addEventListener('install', e => {

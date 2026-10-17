@@ -515,8 +515,45 @@
     setTimeout(window.uiWhatsNew, 450);
   };
 
+  /* Retard (v2.34) : barre de répartition par code dans le bandeau + « reste à justifier » */
+  const DL_COLORS = ['#A78BFA', '#60A5FA', '#5EEAD4'];
+  function syncDelayUI(){
+    const stack = document.getElementById('dlStack'), leg = document.getElementById('dlLegend');
+    const todo = document.getElementById('dlRemain'), todoTxt = document.getElementById('dlRemainText');
+    if(!stack || !leg || !todo) return;
+    const total = typeof totalDelayMinutes === 'function' ? totalDelayMinutes() : null;
+    const val = id => (document.getElementById(id)?.value || '').trim();
+    // Une durée sans code (répartie automatiquement par l'app) compte comme « à justifier »
+    const segs = []; let sum = 0, coded = 0;
+    [1,2,3].forEach(i => {
+      const d = parseInt(val('DLduree' + i), 10) || 0, code = val('DLcode' + i).toUpperCase();
+      if(d > 0 && code){ segs.push({ code, d, c: DL_COLORS[i-1] }); coded += d; }
+      sum += d;
+    });
+    const on = total > 0;
+    const over = on ? Math.max(0, sum - total) : 0;
+    const rest = on ? Math.max(0, total - coded) : 0;
+    let sh = '', lh = '';
+    if(on){
+      const base = Math.max(total, coded);
+      segs.forEach(s => { sh += `<i style="flex:${s.d / base};background:${s.c}"></i>`; lh += `<span style="--c:${s.c}">${escapeHtml(s.code)} · ${s.d} min</span>`; });
+      if(rest > 0){ sh += `<i class="dl-rest" style="flex:${rest / base}"></i>`; lh += `<span>À justifier · ${rest} min</span>`; }
+    }
+    if(stack.innerHTML !== sh) stack.innerHTML = sh;
+    if(leg.innerHTML !== lh) leg.innerHTML = lh;
+    stack.hidden = leg.hidden = !on;
+    stack.classList.toggle('over', over > 0);
+    const msg = !on ? '' : over > 0 ? `${over} min de trop dans les codes` : rest > 0 ? `Reste ${rest} min à justifier` : '';
+    todo.hidden = !msg;
+    todo.classList.toggle('over', over > 0);
+    if(todoTxt.textContent !== msg) todoTxt.textContent = msg;
+    const btn = document.getElementById('validate');
+    if(btn) btn.classList.toggle('dl-pending', !!msg);
+  }
+  window.syncDelayUI = syncDelayUI;
+
   function init(){
-    syncHero(); setInterval(()=>{ syncHero(); syncEvents(); syncTabRings(); syncLoadUI(); }, 1000);
+    syncHero(); setInterval(()=>{ syncHero(); syncEvents(); syncTabRings(); syncLoadUI(); syncDelayUI(); }, 1000);
     initSwipe(); initLdmSwipe(); syncFollowBtn(); syncTabRings(); renderRecap(); setInterval(renderRecap, 15000);
     const tb = document.getElementById('tab-bar'); if(tb) new MutationObserver(()=>requestAnimationFrame(syncTabRings)).observe(tb, { childList:true }); setInterval(tlTick, 15000);
     document.addEventListener('click', e => { if(e.target.closest('.ev-x, .tw-zone')) setTimeout(syncEvents, 0); });
@@ -525,6 +562,7 @@
     showPanel(start);
     syncTabbar();
     uiWhatsNewMaybe();
+    const rp = document.querySelector('.panel-retard'); if(rp) rp.addEventListener('input', ()=>requestAnimationFrame(syncDelayUI)); syncDelayUI();
 
     // Le LOAD peut s'ouvrir / se fermer depuis app.js (changement de vol, etc.)
     const m = document.getElementById('ldmModal');

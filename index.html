@@ -22,7 +22,7 @@
 /* Mise a jour forcee : si version.json (lu sans cache) annonce une autre
    version que celle-ci, on vide les caches et on recharge la page.
    A chaque livraison : changer APP_VERSION ici, dans version.json et les ?v=. */
-window.APP_VERSION = '20261016r39';
+window.APP_VERSION = '20261017r40';
 (function(){
   function check(){
     fetch('./version.json?t=' + Date.now(), { cache: 'no-store' })
@@ -44,8 +44,8 @@ window.APP_VERSION = '20261016r39';
   document.addEventListener('visibilitychange', function(){ if(document.visibilityState === 'visible') check(); });
 })();
 </script>
-<link rel="stylesheet" href="./fonts/fonts.css?v=20261016r39" />
-<link rel="stylesheet" href="./css/app.css?v=20261016r39" />
+<link rel="stylesheet" href="./fonts/fonts.css?v=20261017r40" />
+<link rel="stylesheet" href="./css/app.css?v=20261017r40" />
 </head>
 <body>
 
@@ -574,6 +574,8 @@ function digitsOnly(el){ el.value = (el.value || '').replace(/[^0-9]/g, ''); }
         <span class="dl-badge-label k">Turnaround</span>
         <span class="dl-badge-value v" id="dlTurnBadgeValue">—</span>
       </div>
+      <div class="dl-stack" id="dlStack" hidden></div>
+      <div class="dl-legend" id="dlLegend" hidden></div>
     </div>
 
     <div class="card dl-card" id="dlCard">
@@ -593,21 +595,23 @@ function digitsOnly(el){ el.value = (el.value || '').replace(/[^0-9]/g, ''); }
       <div class="dl-wrap">
         <div class="dl-row" id="dlRow1">
           <div class="dl-n">1</div>
-          <div class="field"><label class="label" for="DLcode1">Code</label><div class="control"><input class="input uppercase" type="text" id="DLcode1"></div></div>
-          <div class="field"><label class="label" for="DLduree1">Durée (min)</label><div class="control"><input class="input" type="number" id="DLduree1" min="0" step="1" oninput="dldChanged(1)"></div></div>
+          <div class="field"><label class="label" for="DLcode1">Code</label><div class="control"><input class="input uppercase" type="text" id="DLcode1" placeholder="Code" autocomplete="off"></div></div>
+          <div class="field"><label class="label" for="DLduree1">Durée (min)</label><div class="control"><input class="input" type="number" id="DLduree1" placeholder="—" inputmode="numeric" min="0" step="1" oninput="dldChanged(1)"></div></div>
         </div>
         <div class="dl-row" id="dlRow2">
           <div class="dl-n">2</div>
-          <div class="field"><label class="label" for="DLcode2">Code</label><div class="control"><input class="input uppercase" type="text" id="DLcode2"></div></div>
-          <div class="field"><label class="label" for="DLduree2">Durée (min)</label><div class="control"><input class="input" type="number" id="DLduree2" min="0" step="1" oninput="dldChanged(2)"></div></div>
+          <div class="field"><label class="label" for="DLcode2">Code</label><div class="control"><input class="input uppercase" type="text" id="DLcode2" placeholder="Code" autocomplete="off"></div></div>
+          <div class="field"><label class="label" for="DLduree2">Durée (min)</label><div class="control"><input class="input" type="number" id="DLduree2" placeholder="—" inputmode="numeric" min="0" step="1" oninput="dldChanged(2)"></div></div>
         </div>
         <div class="dl-row" id="dlRow3">
           <div class="dl-n">3</div>
-          <div class="field"><label class="label" for="DLcode3">Code</label><div class="control"><input class="input uppercase" type="text" id="DLcode3"></div></div>
-          <div class="field"><label class="label" for="DLduree3">Durée (min)</label><div class="control"><input class="input" type="number" id="DLduree3" min="0" step="1" oninput="dldChanged(3)"></div></div>
+          <div class="field"><label class="label" for="DLcode3">Code</label><div class="control"><input class="input uppercase" type="text" id="DLcode3" placeholder="Code" autocomplete="off"></div></div>
+          <div class="field"><label class="label" for="DLduree3">Durée (min)</label><div class="control"><input class="input" type="number" id="DLduree3" placeholder="—" inputmode="numeric" min="0" step="1" oninput="dldChanged(3)"></div></div>
         </div>
       </div>
     </div>
+
+    <div class="dl-todo" id="dlRemain" hidden><i></i><span id="dlRemainText"></span></div>
 
     <div class="hint" id="dlNoDelayHint" hidden>
       <svg class="ico"><use href="#i-check"/></svg>
@@ -853,7 +857,7 @@ function digitsOnly(el){ el.value = (el.value || '').replace(/[^0-9]/g, ''); }
 
 <!-- Cache-busting : incrementer ?v= a CHAQUE deploiement pour forcer
      les navigateurs (et iOS) a recharger app.js au lieu du cache. -->
-<script src="./app.js?v=20261016r39"></script>
-<script src="./ui.js?v=20261016r39"></script>
+<script src="./app.js?v=20261017r40"></script>
+<script src="./ui.js?v=20261017r40"></script>
 </body>
 </html>
