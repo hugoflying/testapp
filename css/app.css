@@ -1349,3 +1349,7 @@ html.dark .ct-chain span.on{color:#FFC94D}
 .ac-miss{font-size:.8rem;font-weight:700;color:var(--crit);background:var(--crit-soft);border-radius:var(--r);padding:7px 10px}
 .ac-miss[hidden]{display:none}
 .ac-foot2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+
+/* ===== v2.57 · suggestion To dans le champ ===== */
+#To.iv-has-sugg{border-style:dashed;border-color:var(--accent)}
+#To.iv-has-sugg::placeholder{color:var(--muted);opacity:1;font-size:inherit;font-weight:inherit}

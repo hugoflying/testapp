@@ -885,18 +885,35 @@
     const from = val('From').toUpperCase(), to = val('To').toUpperCase();
     const lbl = document.getElementById('ivNVolLbl');
     if(lbl) lbl.textContent = to === 'BVA' ? 'N° vol arrivée' : 'N° vol départ';
-    const sg = document.getElementById('ivToSugg'); if(!sg) return;
+    // v2.57 : la suggestion s'affiche dans le champ To (un appui la valide)
+    const toEl = document.getElementById('To'); if(!toEl) return;
     const show = /^[A-Z]{3}$/.test(from) && from !== 'BVA' && !to && ivSuggOff !== from;
-    sg.hidden = !show;
-    if(show) sg.innerHTML = 'Même destination ? <b>To = ' + from + '</b>';
+    toEl.placeholder = show ? from : '';
+    toEl.classList.toggle('iv-has-sugg', show);
   }
   function initIvRoute(){
-    const sg = document.getElementById('ivToSugg');
-    if(sg) sg.addEventListener('click', () => {
-      const to = document.getElementById('To'), from = val('From').toUpperCase(); if(!to) return;
-      to.value = from;
+    const to = document.getElementById('To');
+    if(to) to.addEventListener('click', () => {
+      if(to.value || !to.classList.contains('iv-has-sugg')) return;
+      to.value = val('From').toUpperCase();
       to.dispatchEvent(new Event('input', { bubbles:true })); to.dispatchEvent(new Event('change', { bubbles:true }));
       syncIvRoute();
+      to.select();   // taper une autre destination remplace la suggestion
+    });
+    // v2.57 : « FR5595 » tapé dans le n° de vol → compagnie FR + n° 5595 (plus de FRFR5595)
+    const nv = document.getElementById('NVol');
+    if(nv) nv.addEventListener('input', () => {
+      const m = nv.value.toUpperCase().match(/^([A-Z][A-Z0-9]|[0-9][A-Z])\s*(\d{1,4}[A-Z]?)$/);
+      if(!m) return;
+      const known = [...document.querySelectorAll('#ivCieChips button[data-v]')].map(b => b.dataset.v);
+      const cieEl = document.getElementById('Cie'), cie = (cieEl?.value || '').toUpperCase();
+      if(m[1] !== cie && !known.includes(m[1])) return;
+      nv.value = m[2];
+      if(cieEl && m[1] !== cie){
+        cieEl.value = m[1];
+        cieEl.dispatchEvent(new Event('input', { bubbles:true })); cieEl.dispatchEvent(new Event('change', { bubbles:true }));
+      }
+      try{ updateTabLabelInstant(); }catch(e){}
     });
     ['From','To'].forEach(id => document.getElementById(id)?.addEventListener('input', syncIvRoute));
     // To vidé exprès après un From : on ne repropose pas pour ce même From
