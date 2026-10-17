@@ -1364,3 +1364,7 @@ html.dark .ct-chain span.on{color:#FFC94D}
 .demo-bar .demo-tag{background:#0B1E4F;color:#FFAD00;border-radius:4px;padding:2px 6px;font-weight:800;letter-spacing:.08em;font-size:11px}
 .demo-bar .demo-tx{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .demo-bar button{appearance:none;border:0;background:#0B1E4F;color:#fff;font:inherit;font-size:12px;font-weight:700;border-radius:999px;padding:5px 12px;cursor:pointer}
+
+/* ===== v2.63 · éditions (edition.js) ===== */
+html[data-edition="bva"] .tab-refresh,html[data-edition="bva"] .home-alt{display:none!important}
+#demoFlightsBtn[hidden]{display:none!important}

@@ -392,7 +392,8 @@
   const DEMO_BK = 'demobk:';
   const isTabKey = k => /^(tab-|bnCanvas_|bnMode_)/.test(k) || k === 'flightTabs' || k === 'lastTabId';
   const demoState = () => { try{ return localStorage.getItem('demoMode') || ''; }catch(e){ return ''; } };
-  window.demoActive = () => demoState() === '1';
+  const demoAllowed = () => (window.APP_EDITION || 'demo') === 'demo';
+  window.demoActive = () => demoAllowed() && demoState() === '1';
   window.uiDemoToggle = function(){
     if(typeof closeSettingsMenu === 'function') closeSettingsMenu();
     if(demoActive()) uiDemoExit(); else uiDemoEnter();
@@ -427,6 +428,11 @@
     try{ updateHeaderOffset(); }catch(e){}
   }
   async function demoBoot(){
+    const btn = document.getElementById('demoFlightsBtn'); if(btn) btn.hidden = !demoAllowed();
+    if(window.APP_EDITION === 'bva'){
+      const cta = document.querySelector('.home-cta'); if(cta) cta.lastChild.textContent = 'Créer un vol';
+    }
+    if(!demoAllowed()) return;
     if(demoState() === 'pending'){
       const T0 = Date.now();
       localStorage.setItem('demoT0', String(T0));

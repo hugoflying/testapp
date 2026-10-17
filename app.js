@@ -4550,6 +4550,13 @@ const AK_AIRPORT = "LFOB";
 
 // Ouvrir/Fermer
 function openAKPicker(){
+  // Édition sans Keeper (turnaround-bva) : le « + » crée un vol manuel et ouvre sa fiche
+  if(window.APP_EDITION === 'bva'){
+    createNewTab();
+    if(typeof uiTab === 'function') uiTab('vol');
+    if(typeof toggleInfoVolEdit === 'function') setTimeout(toggleInfoVolEdit, 50);
+    return;
+  }
   const b = document.getElementById('akBackdrop');
   const p = document.getElementById('akPopover');
   const flowSel = document.getElementById('akFlow');
@@ -6838,7 +6845,7 @@ function checkAndDeleteIfEmpty(){
 /* ===== Service Worker — enregistrement ===== */
 if ('serviceWorker' in navigator) {
   const swCode = `
-const CACHE = 'suivi-perf-v72';
+const CACHE = 'suivi-perf-v73';
 const PRECACHE = [];   // fichiers à précacher (vide = online-only)
 
 self.addEventListener('install', e => {
