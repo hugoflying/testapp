@@ -906,7 +906,7 @@
   window.syncIvRoute = syncIvRoute;
 
   function init(){
-    syncHero(); setInterval(()=>{ syncHero(); syncEvents(); syncTabRings(); syncLoadUI(); syncDelayUI(); njRender(); }, 1000);
+    syncHero(); setInterval(()=>{ syncHero(); syncEvents(); syncTabRings(); syncLoadUI(); syncDelayUI(); njRender(); acSyncRow(); }, 1000);
     initSwipe(); initLdmSwipe(); syncFollowBtn(); syncTabRings(); renderRecap(); setInterval(renderRecap, 15000);
     const tb = document.getElementById('tab-bar'); if(tb) new MutationObserver(()=>requestAnimationFrame(syncTabRings)).observe(tb, { childList:true }); setInterval(tlTick, 15000);
     document.addEventListener('click', e => { if(e.target.closest('.ev-x, .tw-zone')) setTimeout(syncEvents, 0); });
@@ -933,4 +933,296 @@
 
   if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
   else init();
+
+  /* ===================================================================
+     v2.55 · Auto-contrôle Ryanair (feuille papier BVA V1-04/2024)
+     FR/RK hors CL35 : à remplir avant la validation du vol.
+     Données du vol dans le champ caché AutoCtrl :
+     { c:[index cochés], n:"NOM Prénom", s:"data:image/png…", t:ISO signature }
+     =================================================================== */
+  const AC_GROUPS = [
+    { sec:'Préparation', doc:'LIR', items:['Type A/C LIR = OMS = AirDCS','Immatriculation = OMS','N° vol départ = OMS','EMA, Cargo, Co-mail signalés en SI'] },
+    { sec:'Préparation', doc:'LID', items:['Immatriculation = LIR','N° vol départ = LIR'] },
+    { sec:'Vérification', doc:'LIR', items:['Répartition bagages chargés conforme aux limitations','FGB et GB correctement remplis','Cargo/EMA/Co-mail correctement remplis','Toutes les cases du LIR sont remplies','Nom et signature du responsable chargement'] },
+    { sec:'Vérification', doc:'LID', items:['(Adult + Child + SNY) = (FWD + MID + AFT)','Calcul du TOB/THOB prenant en compte les particularités','Correspondance entre les répartitions bagage du LID et LIR','Poids forfaitaires entourés et lignes croisées','Case SI complétée','Nom et prénom en majuscule','Toutes les cases du LID sont remplies'],
+      note:'Après vérification, vous pouvez signer votre LID et le remettre au CdB.' },
+    { sec:'Post vol', doc:'Avant l’envoi du LDM', items:['PAX : LID = OMS = AirDCS','Bagages : LIR = LID = OMS'],
+      note:'En cas d’anomalie, contactez immédiatement le CdB ou le PCE pour correction.' }
+  ];
+  const AC_TOTAL = AC_GROUPS.reduce((n, g) => n + g.items.length, 0);
+  const acVal = id => (document.getElementById(id)?.value || '').trim().toUpperCase();
+
+  window.acNeeded = function(){
+    const cie = acVal('Cie');
+    return (cie === 'FR' || cie === 'RK') && acVal('TypeAvion') !== 'CL35' && acVal('To') !== 'BVA';
+  };
+  function acGet(){
+    try{ const o = JSON.parse(document.getElementById('AutoCtrl')?.value || '{}'); return { c:o.c || [], n:o.n || '', s:o.s || '', t:o.t || '' }; }
+    catch(e){ return { c:[], n:'', s:'', t:'' }; }
+  }
+  function acSet(o){
+    const el = document.getElementById('AutoCtrl'); if(!el) return;
+    el.value = JSON.stringify(o);
+    el.dispatchEvent(new Event('input', { bubbles:true })); el.dispatchEvent(new Event('change', { bubbles:true }));
+  }
+  // Heure de remise LID (Timing départ) en UTC, format HH:MMz
+  function acLidZ(){
+    const v = (document.getElementById('RemiseLID')?.value || '').trim();
+    const m = v.match(/^(\d{1,2}):(\d{2})/); if(!m) return '';
+    let min = (+m[1]) * 60 + (+m[2]);
+    if(typeof isUTC !== 'undefined' && !isUTC) min += new Date().getTimezoneOffset();
+    min = ((min % 1440) + 1440) % 1440;
+    return String(Math.floor(min / 60)).padStart(2, '0') + ':' + String(min % 60).padStart(2, '0') + 'z';
+  }
+  function acDate(){
+    const d = (document.getElementById('Date')?.value || '').split('-');
+    return d.length === 3 ? d[2] + '/' + d[1] + '/' + d[0] : '';
+  }
+  function acFlight(){ return acVal('Cie') + acVal('NVol'); }
+  window.acSummary = function(){
+    const o = acGet();
+    return { done:o.c.length, total:AC_TOTAL, lid:acLidZ(), nom:o.n, signe:!!o.s };
+  };
+  window.acSteps = function(on){
+    const p = document.querySelector('#prestationsModal .sh-head .sub');
+    const r = document.querySelector('#rzaModal .sh-head .sub');
+    if(p) p.textContent = on ? 'Étape 2 sur 3' : 'Étape 1 sur 2';
+    if(r) r.textContent = on ? 'Étape 3 sur 3' : 'Étape 2 sur 2';
+  };
+  function acMissing(o){
+    const out = [];
+    const left = AC_TOTAL - o.c.length;
+    if(left > 0) out.push(left + (left > 1 ? ' cases à cocher' : ' case à cocher'));
+    if(!o.n) out.push('nom du RZA');
+    if(!o.s) out.push('signature');
+    return out;
+  }
+
+  // Ligne d'état dans l'onglet Retard, au-dessus de « Valider le vol »
+  function acSyncRow(){
+    const row = document.getElementById('acRow'); if(!row) return;
+    const need = acNeeded();
+    row.hidden = !need; if(!need) return;
+    const o = acGet(), miss = acMissing(o), ok = !miss.length;
+    document.getElementById('acRowSub').textContent = o.c.length + '/' + AC_TOTAL + ' vérifiés · ' + (o.s ? 'signé' : 'non signé');
+    const st = document.getElementById('acRowSt');
+    st.textContent = ok ? 'Signé' : (o.c.length || o.s ? 'En cours' : 'À faire');
+    row.classList.toggle('is-ok', ok);
+  }
+  window.acSyncRow = acSyncRow;
+
+  let acNextCb = null;
+  window.uiAutoCtrlOpen = function(next){
+    acNextCb = typeof next === 'function' ? next : null;
+    document.getElementById('acStep').textContent = acNextCb ? 'Étape 1 sur 3' : (acFlight() || 'Vol') + ' · ' + acDate();
+    document.getElementById('acNext').textContent = acNextCb ? 'Continuer' : 'Enregistrer';
+    acRender();
+    document.getElementById('acModal').style.display = 'flex';
+    requestAnimationFrame(acSigInit);
+  };
+  window.uiAutoCtrlClose = function(){
+    document.getElementById('acModal').style.display = 'none';
+    acNextCb = null; acSyncRow();
+  };
+  window.uiAutoCtrlNext = function(){
+    const miss = acMissing(acGet());
+    const box = document.getElementById('acMiss');
+    if(miss.length && acNextCb){
+      box.hidden = false;
+      box.textContent = 'Il manque : ' + miss.join(', ') + '.';
+      return;
+    }
+    const cb = acNextCb;
+    uiAutoCtrlClose();
+    if(cb) cb();
+  };
+
+  function acRender(){
+    const o = acGet(), lid = acLidZ();
+    const body = document.getElementById('acBody');
+    let i = 0, h = '';
+    h += '<div class="ac-head">'
+       + '<div><small>Vol</small><b>' + (acFlight() || '—') + '</b></div>'
+       + '<div><small>Date</small><b>' + (acDate() || '—') + '</b></div>'
+       + '<div class="' + (lid ? '' : 'is-miss') + '"><small>Remise LID</small><b>' + (lid || 'à saisir') + '</b></div>'
+       + '</div>';
+    if(!lid) h += '<div class="ac-hint">Heure de remise LID pas encore saisie dans Timing › Départ.</div>';
+    h += '<div class="ac-prog"><i id="acBar"></i></div>';
+    let lastSec = '';
+    AC_GROUPS.forEach((g, gi) => {
+      if(g.sec !== lastSec){ h += '<div class="ac-sec">' + g.sec + '</div>'; lastSec = g.sec; }
+      h += '<div class="ac-card" data-g="' + gi + '"><div class="ac-gh"><span>' + g.doc + '</span><button type="button" class="ac-all" data-g="' + gi + '">Tout cocher</button></div>';
+      g.items.forEach(txt => {
+        const on = o.c.includes(i);
+        h += '<label class="ac-it' + (on ? ' on' : '') + '"><input type="checkbox" data-i="' + i + '"' + (on ? ' checked' : '') + '><span class="ac-box"><svg class="ico"><use href="#i-check"/></svg></span><span>' + txt + '</span></label>';
+        i++;
+      });
+      h += '</div>';
+      if(g.note) h += '<div class="ac-note">' + g.note + '</div>';
+    });
+    h += '<div class="ac-sec">Responsable</div>'
+       + '<div class="ac-card ac-sign">'
+       + '<div class="field"><label class="label">Nom &amp; prénom du RZA</label><input class="input ac-nom" type="text" autocomplete="off" placeholder="DUPONT Jean" value="' + (o.n || acDefNom()).replace(/"/g, '&quot;') + '"></div>'
+       + '<div class="ac-sig-h"><span class="label">Signature</span><button type="button" class="ac-all" id="acSigClear">Effacer</button></div>'
+       + '<div class="ac-sig-wrap"><canvas id="acSig"></canvas><span class="ac-sig-ph" id="acSigPh">Signe ici avec le doigt</span></div>'
+       + '</div>';
+    body.innerHTML = h;
+    document.getElementById('acMiss').hidden = true;
+    acProgress();
+
+    body.querySelectorAll('input[type=checkbox]').forEach(cb => cb.addEventListener('change', () => {
+      const o2 = acGet(), n = +cb.dataset.i;
+      o2.c = o2.c.filter(x => x !== n); if(cb.checked) o2.c.push(n);
+      o2.c.sort((a, b) => a - b);
+      cb.closest('.ac-it').classList.toggle('on', cb.checked);
+      acSet(o2); acProgress();
+    }));
+    body.querySelectorAll('.ac-all[data-g]').forEach(b => b.addEventListener('click', () => {
+      const boxes = [...body.querySelectorAll('.ac-card[data-g="' + b.dataset.g + '"] input[type=checkbox]')];
+      const all = boxes.every(x => x.checked);
+      boxes.forEach(x => { if(x.checked === all){ x.checked = !all; x.dispatchEvent(new Event('change')); } });
+    }));
+    const nom = body.querySelector('.ac-nom');
+    const saveNom = () => {
+      const o2 = acGet(); o2.n = nom.value.trim(); acSet(o2); acProgress();
+      try{ if(o2.n) localStorage.setItem('acNom', o2.n); }catch(e){}
+    };
+    nom.addEventListener('input', saveNom);
+    if(!o.n && nom.value) saveNom();
+    document.getElementById('acSigClear').addEventListener('click', () => {
+      const o2 = acGet(); o2.s = ''; o2.t = ''; acSet(o2); acSigInit(); acProgress();
+    });
+  }
+  function acDefNom(){ try{ return localStorage.getItem('acNom') || ''; }catch(e){ return ''; } }
+  function acProgress(){
+    const o = acGet(), bar = document.getElementById('acBar');
+    if(bar) bar.style.width = (o.c.length / AC_TOTAL * 100) + '%';
+    const ok = !acMissing(o).length;
+    const box = document.getElementById('acMiss'); if(box && ok) box.hidden = true;
+    const ph = document.getElementById('acSigPh'); if(ph) ph.hidden = !!o.s;
+    document.querySelectorAll('#acBody .ac-card[data-g]').forEach(c => {
+      const bx = c.querySelectorAll('input[type=checkbox]');
+      c.classList.toggle('done', [...bx].every(x => x.checked));
+      const b = c.querySelector('.ac-all'); if(b) b.textContent = [...bx].every(x => x.checked) ? 'Tout décocher' : 'Tout cocher';
+    });
+  }
+
+  // Signature au doigt : canvas à la densité de l'écran, enregistrée en PNG léger (1x)
+  function acSigInit(){
+    const cv = document.getElementById('acSig'); if(!cv) return;
+    const dpr = window.devicePixelRatio || 1, w = cv.clientWidth, h = cv.clientHeight;
+    if(!w) return;
+    cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr);
+    const ctx = cv.getContext('2d');
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.lineWidth = 2.4;
+    ctx.strokeStyle = getComputedStyle(cv).color || '#0B1E4F';
+    const o = acGet();
+    if(o.s){
+      const img = new Image();
+      img.onload = () => {   // signature stockée en marine : repeinte à la couleur du thème
+        ctx.drawImage(img, 0, 0, w, h);
+        ctx.save(); ctx.globalCompositeOperation = 'source-in'; ctx.fillStyle = ctx.strokeStyle; ctx.fillRect(0, 0, w, h); ctx.restore();
+      };
+      img.src = o.s;
+    }
+    if(cv.dataset.bound) return;
+    cv.dataset.bound = '1';
+    let drawing = false, last = null, inked = false;
+    const pt = e => { const r = cv.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; };
+    cv.addEventListener('pointerdown', e => {
+      e.preventDefault(); cv.setPointerCapture?.(e.pointerId);
+      drawing = true; last = pt(e); inked = false;
+      const c = cv.getContext('2d'); c.beginPath(); c.arc(last[0], last[1], 1.1, 0, 7); c.fillStyle = c.strokeStyle; c.fill();
+      const ph = document.getElementById('acSigPh'); if(ph) ph.hidden = true;
+    });
+    cv.addEventListener('pointermove', e => {
+      if(!drawing) return; e.preventDefault();
+      const p = pt(e), c = cv.getContext('2d');
+      c.beginPath(); c.moveTo(last[0], last[1]); c.lineTo(p[0], p[1]); c.stroke();
+      last = p; inked = true;
+    });
+    const end = () => {
+      if(!drawing) return; drawing = false;
+      // copie 1x, plus légère pour la sauvegarde du vol
+      const w1 = cv.clientWidth, h1 = cv.clientHeight, t = document.createElement('canvas');
+      t.width = w1; t.height = h1;
+      const tc = t.getContext('2d'); tc.drawImage(cv, 0, 0, w1, h1);
+      tc.globalCompositeOperation = 'source-in'; tc.fillStyle = '#0B1E4F'; tc.fillRect(0, 0, w1, h1);
+      const o2 = acGet(); o2.s = t.toDataURL('image/png'); o2.t = new Date().toISOString();
+      acSet(o2); acProgress();
+    };
+    cv.addEventListener('pointerup', end); cv.addEventListener('pointercancel', end); cv.addEventListener('pointerleave', end);
+  }
+
+  // Feuille remplie en image (même mise en page que le papier) : partage ou téléchargement
+  function acSheetCanvas(){
+    const o = acGet();
+    const W = 1000, PAD = 50, ROW = 34;
+    const rows = AC_GROUPS.reduce((n, g) => n + g.items.length + 1 + (g.note ? 1 : 0), 0);
+    const H = 300 + rows * ROW + 260;
+    const cv = document.createElement('canvas'); cv.width = W; cv.height = H;
+    const c = cv.getContext('2d');
+    c.fillStyle = '#fff'; c.fillRect(0, 0, W, H);
+    c.fillStyle = '#0B1E4F'; c.textBaseline = 'middle';
+    c.font = '700 30px Manrope, sans-serif'; c.fillText('Auto-contrôle vol RYANAIR', PAD, 60);
+    c.font = '500 18px Manrope, sans-serif'; c.fillStyle = '#56687b'; c.fillText('Aéroport Paris-Beauvais · V1-04/2024', PAD, 95);
+    const info = [['N° de vol', acFlight() || '—'], ['Date', acDate() || '—'], ['Heure de remise du LID', acLidZ() || '--:--z']];
+    info.forEach((kv, k) => {
+      const x = PAD + k * 300;
+      c.fillStyle = '#8A93A6'; c.font = '700 15px Manrope, sans-serif'; c.fillText(kv[0].toUpperCase(), x, 145);
+      c.fillStyle = '#0B1E4F'; c.font = '700 26px Manrope, sans-serif'; c.fillText(kv[1], x, 178);
+    });
+    let y = 230, i = 0;
+    AC_GROUPS.forEach(g => {
+      c.fillStyle = '#E9EDF3'; c.fillRect(PAD, y, W - 2 * PAD, ROW);
+      c.fillStyle = '#0B1E4F'; c.font = '800 16px Manrope, sans-serif'; c.fillText(g.sec.toUpperCase() + ' · ' + g.doc, PAD + 12, y + ROW / 2);
+      c.fillText('Vérifié', W - PAD - 80, y + ROW / 2);
+      y += ROW;
+      g.items.forEach(txt => {
+        c.strokeStyle = '#d5dde7'; c.lineWidth = 1; c.strokeRect(PAD, y, W - 2 * PAD, ROW);
+        c.fillStyle = '#0f1723'; c.font = '500 17px Manrope, sans-serif'; c.fillText(txt, PAD + 12, y + ROW / 2);
+        const on = o.c.includes(i);
+        c.strokeStyle = on ? '#1F9D57' : '#aebccc'; c.lineWidth = 2; c.strokeRect(W - PAD - 62, y + 7, 20, 20);
+        if(on){ c.beginPath(); c.moveTo(W - PAD - 58, y + 17); c.lineTo(W - PAD - 53, y + 23); c.lineTo(W - PAD - 45, y + 11); c.stroke(); }
+        y += ROW; i++;
+      });
+      if(g.note){ c.fillStyle = '#56687b'; c.font = 'italic 600 15px Manrope, sans-serif'; c.fillText(g.note, PAD + 4, y + ROW / 2); y += ROW; }
+    });
+    y += 20;
+    c.fillStyle = '#8A93A6'; c.font = '700 15px Manrope, sans-serif'; c.fillText('NOM & PRÉNOM DU RZA', PAD, y);
+    c.fillText('SIGNATURE', W / 2, y);
+    c.fillStyle = '#0B1E4F'; c.font = '700 24px Manrope, sans-serif'; c.fillText(o.n || '—', PAD, y + 36);
+    if(o.t){
+      const d = new Date(o.t);
+      c.fillStyle = '#56687b'; c.font = '500 15px Manrope, sans-serif';
+      c.fillText('Signé à ' + String(d.getUTCHours()).padStart(2, '0') + ':' + String(d.getUTCMinutes()).padStart(2, '0') + 'z', PAD, y + 70);
+    }
+    c.strokeStyle = '#d5dde7'; c.lineWidth = 1; c.strokeRect(W / 2, y + 14, W / 2 - PAD, 150);
+    return new Promise(res => {
+      if(!o.s) return res(cv);
+      const img = new Image();
+      img.onload = () => {
+        const bw = W / 2 - PAD - 20, bh = 130, k = Math.min(bw / img.width, bh / img.height);
+        c.drawImage(img, W / 2 + 10, y + 24, img.width * k, img.height * k); res(cv);
+      };
+      img.onerror = () => res(cv);
+      img.src = o.s;
+    });
+  }
+  window.acSheetCanvas = acSheetCanvas;
+  window.uiAutoCtrlShare = async function(){
+    const cv = await acSheetCanvas();
+    const name = 'autocontrole-' + (acFlight() || 'vol') + '-' + (acDate().replace(/\//g, '') || 'date') + '.png';
+    const blob = await new Promise(r => cv.toBlob(r, 'image/png'));
+    try{
+      const file = new File([blob], name, { type:'image/png' });
+      if(navigator.canShare && navigator.canShare({ files:[file] })){ await navigator.share({ files:[file], title:'Auto-contrôle ' + acFlight() }); return; }
+    }catch(e){ if(e && e.name === 'AbortError') return; }
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob); a.download = name;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+  };
+
 })();

@@ -22,7 +22,7 @@
 /* Mise a jour forcee : si version.json (lu sans cache) annonce une autre
    version que celle-ci, on vide les caches et on recharge la page.
    A chaque livraison : changer APP_VERSION ici, dans version.json et les ?v=. */
-window.APP_VERSION = '20261017r63';
+window.APP_VERSION = '20261017r64';
 (function(){
   function check(){
     fetch('./version.json?t=' + Date.now(), { cache: 'no-store' })
@@ -44,8 +44,8 @@ window.APP_VERSION = '20261017r63';
   document.addEventListener('visibilitychange', function(){ if(document.visibilityState === 'visible') check(); });
 })();
 </script>
-<link rel="stylesheet" href="./fonts/fonts.css?v=20261017r63" />
-<link rel="stylesheet" href="./css/app.css?v=20261017r63" />
+<link rel="stylesheet" href="./fonts/fonts.css?v=20261017r64" />
+<link rel="stylesheet" href="./css/app.css?v=20261017r64" />
 </head>
 <body>
 
@@ -585,6 +585,12 @@ function digitsOnly(el){ el.value = (el.value || '').replace(/[^0-9]/g, ''); }
       <div id="validateErrorText"></div>
     </div>
 
+    <input type="hidden" id="AutoCtrl">
+    <button class="ac-row" id="acRow" type="button" onclick="uiAutoCtrlOpen()" hidden>
+      <span class="ac-ic"><svg class="ico"><use href="#i-list"/></svg></span>
+      <span class="ac-tx"><b>Auto-contrôle Ryanair</b><small id="acRowSub">0/20 vérifiés · non signé</small></span>
+      <span class="ac-st" id="acRowSt">À faire</span>
+    </button>
     <button class="btn btn-primary btn-block" id="validate" type="button" onclick="validateForm()">
       <svg class="ico"><use href="#i-check"/></svg>Valider le vol
     </button>
@@ -899,6 +905,22 @@ function digitsOnly(el){ el.value = (el.value || '').replace(/[^0-9]/g, ''); }
   </div>
 </div>
 
+<!-- ══════════════ AUTO-CONTRÔLE RYANAIR (v2.55) ══════════════ -->
+<div id="acModal" class="sheet-modal sheet-tall" style="display:none;">
+  <div class="sheet-card ac-sheet">
+    <div class="sh-head"><h3>Auto-contrôle Ryanair<span class="sub" id="acStep">Étape 1 sur 3</span></h3></div>
+    <div class="sh-body" id="acBody"></div>
+    <div class="sh-foot">
+      <div class="ac-miss" id="acMiss" hidden></div>
+      <button class="btn btn-primary" type="button" id="acNext" onclick="uiAutoCtrlNext()">Continuer</button>
+      <div class="ac-foot2">
+        <button class="btn btn-ghost" type="button" id="acShare" onclick="uiAutoCtrlShare()"><svg class="ico"><use href="#i-img"/></svg>Feuille</button>
+        <button class="btn btn-ghost" type="button" onclick="uiAutoCtrlClose()">Fermer</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- ══════════════ RZA + RÉSUMÉ ══════════════ -->
 <div id="rzaModal" class="sheet-modal sheet-tall" style="display:none;">
   <div class="sheet-card">
@@ -932,7 +954,7 @@ function digitsOnly(el){ el.value = (el.value || '').replace(/[^0-9]/g, ''); }
 
 <!-- Cache-busting : incrementer ?v= a CHAQUE deploiement pour forcer
      les navigateurs (et iOS) a recharger app.js au lieu du cache. -->
-<script src="./app.js?v=20261017r63"></script>
-<script src="./ui.js?v=20261017r63"></script>
+<script src="./app.js?v=20261017r64"></script>
+<script src="./ui.js?v=20261017r64"></script>
 </body>
 </html>

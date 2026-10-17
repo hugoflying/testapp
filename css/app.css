@@ -1308,3 +1308,44 @@ html.dark .ct-chain span.on{color:#FFC94D}
 @keyframes wnIc{from{transform:scale(.4) rotate(-20deg)}to{transform:none}}
 @media (prefers-reduced-motion:reduce){#wnModal.is-on .wn-list li .wn-ic,#wnModal.is-on .wn-badge{animation:none;opacity:1;transform:none}}
 .wn-hero{flex:none}
+
+/* ===== v2.55 · Auto-contrôle Ryanair ===== */
+.ac-row{display:flex;align-items:center;gap:12px;width:100%;margin:0 0 10px;padding:12px 14px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:var(--tile-shadow);color:var(--fg);font:inherit;text-align:left;cursor:pointer}
+.ac-row[hidden]{display:none}
+.ac-row .ac-ic{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;background:var(--warn-soft);color:var(--warn);flex:none}
+.ac-row .ac-tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.ac-row .ac-tx b{font-size:.95rem;font-weight:700}
+.ac-row .ac-tx small{font-size:.78rem;color:var(--muted);font-weight:600}
+.ac-row .ac-st{font-size:.72rem;font-weight:800;letter-spacing:.04em;text-transform:uppercase;padding:4px 9px;border-radius:999px;background:var(--warn-soft);color:var(--warn)}
+.ac-row.is-ok .ac-ic,.ac-row.is-ok .ac-st{background:var(--ok-soft);color:var(--ok)}
+.ac-sheet .sh-body{gap:8px}
+.ac-sheet .sh-body > *{flex:none}
+.ac-head{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;background:var(--navy);color:#fff;border-radius:var(--r-lg);padding:10px 12px}
+.ac-head small{display:block;font-size:.66rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--on-navy-dim)}
+.ac-head b{font-size:1.05rem;font-weight:700;font-variant-numeric:tabular-nums}
+.ac-head .is-miss b{color:var(--yellow)}
+.ac-hint{font-size:.78rem;font-weight:600;color:var(--warn);background:var(--warn-soft);border-radius:var(--r);padding:6px 10px}
+.ac-prog{height:4px;border-radius:4px;background:var(--surface-3);overflow:hidden;margin:2px 0}
+.ac-prog i{display:block;height:100%;width:0;background:var(--ok);transition:width .25s}
+.ac-sec{font-size:.7rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:8px 2px 0}
+.ac-card{border:1px solid var(--line);border-radius:var(--r-lg);background:var(--surface);overflow:hidden}
+.ac-card.done{border-color:var(--ok)}
+.ac-gh{display:flex;align-items:center;justify-content:space-between;padding:7px 12px;background:var(--surface-2);font-size:.8rem;font-weight:800;color:var(--fg)}
+.ac-card.done .ac-gh{background:var(--ok-soft);color:var(--ok)}
+.ac-all{border:0;background:none;color:var(--accent);font:inherit;font-size:.75rem;font-weight:700;padding:2px 0;cursor:pointer}
+.ac-it{display:flex;align-items:center;gap:10px;padding:10px 12px;border-top:1px solid var(--line);font-size:.86rem;font-weight:600;color:var(--fg);cursor:pointer;min-height:44px;-webkit-tap-highlight-color:transparent}
+.ac-it input{position:absolute;opacity:0;pointer-events:none}
+.ac-box{width:22px;height:22px;border-radius:6px;border:2px solid var(--line-strong);display:grid;place-items:center;flex:none;color:transparent;transition:background .15s,border-color .15s}
+.ac-box .ico{width:16px;height:16px;stroke-width:3}
+.ac-it.on .ac-box{background:var(--ok);border-color:var(--ok);color:#fff}
+.ac-it.on{color:var(--muted)}
+.ac-note{font-size:.75rem;font-weight:600;color:var(--muted);font-style:italic;padding:0 4px}
+.ac-sign{padding:10px 12px;display:flex;flex-direction:column;gap:8px}
+.ac-sig-h{display:flex;justify-content:space-between;align-items:center}
+.ac-sig-wrap{position:relative;border:1.5px dashed var(--line-strong);border-radius:var(--r-lg);background:var(--surface-2)}
+#acSig{display:block;width:100%;height:150px;touch-action:none;color:var(--fg)}
+.ac-sig-ph{position:absolute;inset:0;display:grid;place-items:center;color:var(--faint);font-size:.85rem;font-weight:600;pointer-events:none}
+.ac-sig-ph[hidden]{display:none}
+.ac-miss{font-size:.8rem;font-weight:700;color:var(--crit);background:var(--crit-soft);border-radius:var(--r);padding:7px 10px}
+.ac-miss[hidden]{display:none}
+.ac-foot2{display:grid;grid-template-columns:1fr 1fr;gap:8px}

@@ -5743,6 +5743,13 @@ function validateForm() {
     showPopup(err.popup, '#ef4444', 2500);
     return;
   }
+  // v2.55 : FR/RK (hors CL35) passent d'abord par l'auto-contrôle Ryanair
+  if(typeof acNeeded === 'function' && acNeeded()){
+    acSteps(true);
+    uiAutoCtrlOpen(() => openPrestationsModal(doValidate));
+    return;
+  }
+  if(typeof acSteps === 'function') acSteps(false);
   openPrestationsModal(doValidate);
 }
 
@@ -5960,6 +5967,17 @@ function doValidate() {
       const n = parseInt(_assistancesData['assist_'+t]||0);
       if(n > 0) body += `${t} : ${n}\n`;
     });
+  }
+
+  // ── AUTO-CONTRÔLE RYANAIR ─────────────────────────────────────────────────
+  if(typeof acNeeded === 'function' && acNeeded()){
+    const ac = acSummary();
+    body += s();
+    body += '[ AUTO-CONTROLE RYANAIR ]\n\n';
+    body += `VERIFIE : ${ac.done}/${ac.total}\n`;
+    body += r('REMISE LID', ac.lid);
+    body += r('RZA', ac.nom);
+    body += `SIGNATURE : ${ac.signe ? 'OUI' : 'NON'}\n`;
   }
 
   // ── BLOC NOTE ─────────────────────────────────────────────────────────────
@@ -6365,7 +6383,7 @@ function confirmClearFields(){
     'FinalBAGS','FinalPOIDS','FinalGB','FinalH1','FinalH2','FinalH3','FinalH4','FinalSI',
     'BlockFuel','TripFuel','TaxiFuel','FuelUplift',
     'DLcode1','DLcode2','DLcode3','DLduree1','DLduree2','DLduree3',
-    'FaitsSaillants'
+    'FaitsSaillants','AutoCtrl'
   ];
   try {
     timingIds.forEach(id => {
@@ -6809,7 +6827,7 @@ function checkAndDeleteIfEmpty(){
 /* ===== Service Worker — enregistrement ===== */
 if ('serviceWorker' in navigator) {
   const swCode = `
-const CACHE = 'suivi-perf-v62';
+const CACHE = 'suivi-perf-v63';
 const PRECACHE = [];   // fichiers à précacher (vide = online-only)
 
 self.addEventListener('install', e => {
