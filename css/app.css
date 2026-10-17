@@ -1248,3 +1248,7 @@ button.akc-s:active,button.akc-s:hover{background:var(--surface-2)}
 .akc-st.w{background:color-mix(in srgb,var(--warn) 14%,transparent);color:var(--warn)}
 .akc-st.c{background:color-mix(in srgb,var(--crit) 14%,transparent);color:var(--crit)}
 .akc-st.g{background:var(--surface-2);color:var(--muted)}
+
+/* v2.44 : repères SIBT / SOBT (prévu, pointillé gris) et AIBT / AOBT (réel, vert) sur la timeline */
+.tl-sched-line{position:absolute;width:0;border-left:1.5px dotted var(--muted);z-index:4;pointer-events:none;opacity:.8}
+.tl-act-line{position:absolute;width:0;border-left:2px solid var(--ok);z-index:6;pointer-events:none;opacity:.75}

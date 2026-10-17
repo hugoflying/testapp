@@ -631,7 +631,7 @@
     syncNoteDock();
   }
 
-  const NJ_TAGS = ['SNY', 'PMR', 'Bag manquant', 'Pax en retard', 'Nettoyage', 'Fuel'];
+  const NJ_TAGS = ['SNY', 'BAGS OK', 'PMR', 'Bag manquant', 'Pax en retard', 'Nettoyage', 'Fuel'];
   const NJ_RE = /^(\d{1,2}:\d{2})\s*·\s*(.*)$/;
   let njTag = '', njLast = null, njArm = -1;
   const njEl = sel => document.querySelector('#bnTextMode ' + sel);

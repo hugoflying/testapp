@@ -3887,11 +3887,11 @@ function renderTimeline(){
   canvas.style.width = (trackW + LEFT_PAD) + 'px';
 
   const PPM        = trackW / total;
-  const AXIS_H     = 40;
+  let   AXIS_H     = 40;
   const ROW_H      = 38;
   const BAR_H      = 12;
   const BAR_PAD    = (ROW_H - BAR_H) / 2;
-  const CONTENT_TOP = AXIS_H;
+  let   CONTENT_TOP = AXIS_H;
 
   const toPx = t => LEFT_PAD + ((toExtended(t, min, max) - min) / total) * trackW;
 
@@ -4121,6 +4121,68 @@ function renderTimeline(){
   }
 
   rows = rows.concat(eventRows());
+
+  // v2.44 : repères verticaux (SIBT, AIBT, SOBT, AOBT, EOBT, CTOT, TOBT, NOW) calculés avant le dessin,
+  // pour réserver autant de rangées de puces que nécessaire au-dessus de l'axe
+  const _nowD   = new Date();
+  const _nowExt = toExtended(isUTC ? _nowD.getUTCHours()*60 + _nowD.getUTCMinutes() : _nowD.getHours()*60 + _nowD.getMinutes(), min, max);
+  const rawMarkers = [];
+  const ptOf = l => fixedPoints.find(p => p.label === l);
+  const MK = {
+    SIBT:{ bg:'var(--surface-2)', color:'var(--muted)', lineClass:'tl-sched-line', pr:1 },
+    SOBT:{ bg:'var(--surface-2)', color:'var(--muted)', lineClass:'tl-sched-line', pr:1 },
+    AIBT:{ bg:'var(--ok)',        color:'#fff',         lineClass:'tl-act-line',   pr:2 },
+    AOBT:{ bg:'var(--ok)',        color:'#fff',         lineClass:'tl-act-line',   pr:2 },
+    EOBT:{ bg:'var(--tl-eobt)',   color:'var(--surface)', lineClass:'tl-eobt-line', pr:3 },
+    CTOT:{ bg:'#f59e0b',          color:'#000',         lineClass:'tl-ctot-line',  pr:4 },
+  };
+  ['SIBT','AIBT','SOBT','AOBT','EOBT','CTOT'].forEach(l => {
+    const pt = ptOf(l); if(!pt) return;
+    const e = toExtended(pt.t, min, max);
+    if(e < min || e > max) return;
+    rawMarkers.push({ x: toPx(pt.t), label: l, ...MK[l] });
+  });
+  const ctotP = ptOf('CTOT');
+  if(ctotP){
+    const tobtT = toExtended(ctotP.t - 15, min, max);
+    if(tobtT >= min && tobtT <= max) rawMarkers.push({ x: toPx(tobtT), label:'TOBT', bg:'#fb923c', color:'#fff', lineClass:'tl-tobt-line', pr:3 });
+  }
+  if(_nowExt >= min && _nowExt <= max)
+    rawMarkers.push({ x: LEFT_PAD + ((_nowExt - min)/total)*trackW, label:'NOW', bg:'var(--yellow)', color:'#1b1b1b', lineClass:'tl-now-line', pr:5 });
+  // Repères à la même minute : une seule puce « SOBT · EOBT », la ligne la plus importante gagne
+  const allMarkers = [];
+  rawMarkers.sort((a, b) => a.x - b.x).forEach(m => {
+    const same = allMarkers.find(o => Math.abs(o.x - m.x) < 1 && o.label !== 'NOW' && m.label !== 'NOW');
+    if(!same){ allMarkers.push({ ...m, labels:[m.label] }); return; }
+    same.labels.push(m.label);
+    if(m.pr > same.pr){ Object.assign(same, { bg:m.bg, color:m.color, lineClass:m.lineClass, pr:m.pr }); }
+  });
+  const CHIP_H = 20, CHIP_GAP = 3;
+  const chipRows = [];
+  allMarkers.forEach(m => {
+    m.text = m.labels.join(' · ');
+    const w = m.text.length * 6.2 + 12;
+    // Puce gardée dans le cadre aux deux bords
+    const cx = Math.min(Math.max(m.x, w/2 + 2), trackW + LEFT_PAD - w/2 - 2);
+    if(cx !== m.x) m.cx = cx;
+    m.xStart = cx - w/2; m.xEnd = cx + w/2;
+    // 2 rangées au maximum : sinon la puce se décale à droite dans la rangée la moins chargée
+    const MAX_ROWS = 2;
+    const fits = r => !(chipRows[r] || []).some(o => m.xStart < o.xEnd + CHIP_GAP && m.xEnd + CHIP_GAP > o.xStart);
+    let r = 0;
+    while(r < MAX_ROWS && !fits(r)) r++;
+    if(r === MAX_ROWS){
+      const lastEnd = k => Math.max(...chipRows[k].map(o => o.xEnd));
+      r = lastEnd(0) <= lastEnd(1) ? 0 : 1;
+      const dx = lastEnd(r) + CHIP_GAP - m.xStart;
+      m.xStart += dx; m.xEnd += dx; m.cx = (m.cx ?? m.x) + dx;
+    }
+    (chipRows[r] = chipRows[r] || []).push(m);
+    m.row = r;
+  });
+  const nChipRows = Math.max(1, chipRows.length);
+  AXIS_H = Math.max(40, 18 + nChipRows * (CHIP_H + CHIP_GAP));
+  CONTENT_TOP = AXIS_H;
 
   // ── Hauteur totale (min 140px même sans actions) ──────────────
   const contentH = Math.max(140, CONTENT_TOP + Math.max(rows.length, 1) * ROW_H);
@@ -4381,92 +4443,20 @@ function renderTimeline(){
     canvas.appendChild(empty);
   }
 
-  // 4. Lignes verticales + chips en haut
+  // 4. Lignes verticales + puces en haut (calculées plus haut, v2.44)
   const overlayTop = AXIS_H;
   const overlayH   = contentH - AXIS_H;
-
-  // Collecte tous les marqueurs
-  const allMarkers = [];
-
-
-  if(nowExt >= min && nowExt <= max){
-    const x = LEFT_PAD + ((nowExt - min)/total)*trackW;
-    allMarkers.push({ x, label: 'NOW', bg: 'var(--yellow)', color: '#1b1b1b', lineClass: 'tl-now-line', lineStyle: '' });
-  }
-
-  const eobtPt = fixedPoints.find(p => p.label === 'EOBT');
-  if(eobtPt){
-    allMarkers.push({ x: toPx(eobtPt.t), label: 'EOBT', bg: 'var(--tl-eobt)', color: 'var(--surface)', lineClass: 'tl-eobt-line', lineStyle: '' });
-  }
-
-  const ctotPt = fixedPoints.find(p => p.label === 'CTOT');
-  if(ctotPt){
-    allMarkers.push({ x: toPx(ctotPt.t), label: 'CTOT', bg: '#f59e0b', color: '#000', lineClass: 'tl-ctot-line', lineStyle: '' });
-    // TOBT = CTOT - 15min
-    const tobtT = toExtended(ctotPt.t - 15, min, max);
-    if(tobtT >= min && tobtT <= max){
-      allMarkers.push({ x: toPx(tobtT), label: 'TOBT', bg: '#fb923c', color: '#fff', lineClass: 'tl-tobt-line', lineStyle: '' });
-    }
-  }
-
-  // Lignes verticales
   allMarkers.forEach(m => {
     const line = document.createElement('div');
     line.className = m.lineClass;
-    line.style.cssText = `left:${m.x}px; top:${overlayTop}px; height:${overlayH}px; ${m.lineStyle}`;
+    line.style.cssText = `left:${m.x}px; top:${overlayTop}px; height:${overlayH}px;`;
     canvas.appendChild(line);
   });
-
-  // ── Placement dynamique des chips — anti-collision ────────────
-  const CHIP_H = 22;
-  const CHIP_W = 42;
-
-  // Définit le côté de chaque chip (gauche = avant la ligne, droite = après)
-  const LEFT_CHIPS = new Set(['AIBT','SIBT']);
-  const RIGHT_CHIPS = new Set(['SOBT','AOBT','EOBT','CTOT','NOW']);
-
-  const chipDefs = allMarkers.map(m => {
-    const isLeft = LEFT_CHIPS.has(m.label);
-    return {
-      ...m,
-      isLeft,
-      xStart: m.x - CHIP_W / 2,
-      xEnd:   m.x + CHIP_W / 2,
-    };
-  });
-
-  // Trie par x pour un placement gauche→droite
-  chipDefs.sort((a, b) => a.x - b.x);
-
-  const placed = [];
-
-  // v2.12 : une seule rangée de puces au-dessus de l'axe ; en cas de chevauchement on décale à droite
-  let lastEnd = -Infinity;
-  chipDefs.forEach(chip => {
-    if(chip.xStart < lastEnd + 3){ const dx = lastEnd + 3 - chip.xStart; chip.x += dx; chip.xStart += dx; chip.xEnd += dx; }
-    lastEnd = chip.xEnd;
-  });
-  chipDefs.forEach(chip => {
-    let y = 1;
-    let tries = 0;
-    while(tries < 10){
-      const collision = placed.some(p => {
-        const xOk = chip.xStart < p.xEnd && chip.xEnd > p.xStart;
-        const yOk = y < p.y + CHIP_H + 4 && y + CHIP_H > p.y;
-        return xOk && yOk;
-      });
-      if(!collision) break;
-      y += CHIP_H + 4;
-      tries++;
-    }
-    chip.y = y;
-    placed.push({ xStart: chip.xStart, xEnd: chip.xEnd, y });
-
+  allMarkers.forEach(m => {
     const el = document.createElement('div');
     el.className = 'tl-marker-chip';
-    el.textContent = chip.label;
-    const t = 'transform:translateX(-50%);';
-    el.style.cssText = `left:${chip.x}px; top:${y}px; background:${chip.bg}; color:${chip.color}; ${t} z-index:20;`;
+    el.textContent = m.text;
+    el.style.cssText = `left:${m.cx ?? m.x}px; top:${1 + m.row * (CHIP_H + CHIP_GAP)}px; background:${m.bg}; color:${m.color}; transform:translateX(-50%); z-index:20;`;
     canvas.appendChild(el);
   });
 
@@ -6819,7 +6809,7 @@ function checkAndDeleteIfEmpty(){
 /* ===== Service Worker — enregistrement ===== */
 if ('serviceWorker' in navigator) {
   const swCode = `
-const CACHE = 'suivi-perf-v50';
+const CACHE = 'suivi-perf-v51';
 const PRECACHE = [];   // fichiers à précacher (vide = online-only)
 
 self.addEventListener('install', e => {
