@@ -1252,3 +1252,42 @@ button.akc-s:active,button.akc-s:hover{background:var(--surface-2)}
 /* v2.44 : repères SIBT / SOBT (prévu, pointillé gris) et AIBT / AOBT (réel, vert) sur la timeline */
 .tl-sched-line{position:absolute;width:0;border-left:1.5px dotted var(--muted);z-index:4;pointer-events:none;opacity:.8}
 .tl-act-line{position:absolute;width:0;border-left:2px solid var(--ok);z-index:6;pointer-events:none;opacity:.75}
+
+/* v2.45 : fenêtre CTOT (Hugo : C, frise du créneau) */
+#ctotRegHeure small{font-size:13px;color:var(--muted);font-weight:700}
+.ct-body{display:flex;flex-direction:column;gap:12px}
+.ct-k{font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.ct-none{color:var(--muted);margin:0}
+.ct-track{position:relative;height:112px;margin:2px 18px 0}
+.ct-axis{position:absolute;left:-12px;right:-12px;top:50px;height:2px;background:var(--line)}
+.ct-win{position:absolute;top:42px;height:18px;border-radius:9px;background:color-mix(in srgb,#F59E0B 18%,transparent);border:1.5px solid #F59E0B}
+.ct-gap{position:absolute;top:47px;height:8px;border-top:2px dashed var(--crit)}
+.ct-mk{position:absolute;top:0;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10.5px;font-weight:800;white-space:nowrap}
+.ct-mk b{font-size:14px}
+.ct-mk i{width:2px;height:22px;background:currentColor;margin-top:2px}
+.ct-mk.lo{top:56px;flex-direction:column-reverse}.ct-mk.lo i{margin:0 0 2px}
+.ct-mk.eobt{color:var(--fg)}.ct-mk.ctot{color:#B45309}.ct-mk.push{color:#F97316}.ct-mk.win{color:var(--muted)}
+html.dark .ct-mk.ctot{color:#FFC94D}
+.ct-band{display:flex;align-items:center;justify-content:space-between;gap:10px;border-radius:12px;padding:10px 12px;font-weight:800;font-size:14px}
+.ct-band b{font-size:16px;white-space:nowrap}
+.ct-band.late{background:color-mix(in srgb,var(--crit) 12%,transparent);color:var(--crit)}
+.ct-band.ok{background:color-mix(in srgb,var(--ok) 12%,transparent);color:var(--ok)}
+.ct-band.push{background:color-mix(in srgb,#F59E0B 16%,transparent);color:#7A5200}
+.ct-band.push b{font-size:19px}
+html.dark .ct-band.push{color:#FFC94D}
+.ct-reg{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.ct-reg b{font-size:16px;font-weight:800;letter-spacing:.02em}
+.ct-tag{border:1px solid var(--line);border-radius:999px;padding:4px 10px;font-size:12px;font-weight:800}
+.ct-tag.am{border-color:transparent;background:color-mix(in srgb,#F59E0B 16%,transparent);color:#7A5200}
+html.dark .ct-tag.am{color:#FFC94D}
+.ct-box{background:var(--surface-2);border-radius:12px;padding:10px 12px;font-size:13.5px;font-weight:600;line-height:1.4}
+.ct-box small{display:block;font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:3px}
+.ct-chain{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.ct-chain span{border:1px solid var(--line);border-radius:8px;padding:4px 8px;font-size:13px;font-weight:700;color:var(--muted)}
+.ct-chain span.on{border-color:#F59E0B;background:color-mix(in srgb,#F59E0B 16%,transparent);color:#7A5200}
+html.dark .ct-chain span.on{color:#FFC94D}
+.ct-chain i{color:var(--faint);font-style:normal}
+.ct-edit{display:flex;gap:8px;align-items:center;border-top:1px solid var(--line);padding-top:12px}
+.ct-edit input{width:92px;flex:none;text-align:center;font-weight:800;font-size:17px}
+.ct-edit .btn-primary{flex:1}
+.ct-edit .ct-del{background:transparent;border:1px solid var(--crit);color:var(--crit)}

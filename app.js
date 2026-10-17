@@ -1008,30 +1008,22 @@ function showCtotRegulation(){
   const hEl   = document.getElementById('ctotRegHeure');
   if(!modal || !body) return;
 
-  // Bloc d'edition manuelle du CTOT (present dans tous les cas)
-  const _tzLbl = isUTC ? 'Z' : 'LT';
-  const editHtml =
-      '<div style="margin-top:14px; padding-top:12px; border-top:1px solid var(--field-border);">'
-    + '<div style="font-weight:800; color:var(--muted); font-size:.8rem; margin-bottom:6px;">Modifier le CTOT (' + _tzLbl + ')</div>'
-    + '<div style="display:flex; gap:8px; align-items:center;">'
-    + '<input id="ctotManualInput" type="text" inputmode="numeric" maxlength="5" placeholder="HH:MM" value="' + escapeHtml(ctot) + '" '
-    + 'style="width:96px; padding:8px 10px; border:1.5px solid var(--field-border); border-radius:8px; background:var(--field); color:var(--text); font-size:1rem; font-weight:800; text-align:center; letter-spacing:.05em;">'
-    + '<button type="button" onclick="applyManualCtot()" style="flex:1; padding:9px 14px; border:none; border-radius:8px; background:#2563eb; color:#fff; font-weight:800; cursor:pointer;">Appliquer</button>'
-    + (ctot ? '<button type="button" onclick="clearManualCtot()" style="padding:9px 14px; border:none; border-radius:8px; background:#ef4444; color:#fff; font-weight:800; cursor:pointer;">Supprimer</button>' : '')
-    + '</div></div>';
+  // v2.45 (Hugo : C) : frise EOBT / push estimé / fenêtre de décollage, régulation, slots reçus
+  const tzSuf = isUTC ? 'Z' : 'LT';
+  const editHtml = '<div class="ct-edit">'
+    + '<input id="ctotManualInput" class="input num" type="text" inputmode="numeric" maxlength="5" placeholder="HH:MM" value="' + escapeHtml(ctot) + '" aria-label="CTOT (' + tzSuf + ')">'
+    + '<button type="button" class="btn btn-primary" onclick="applyManualCtot()">Appliquer</button>'
+    + (ctot ? '<button type="button" class="btn ct-del" onclick="clearManualCtot()">Suppr.</button>' : '')
+    + '</div>';
 
-  // Pas de CTOT du tout : rien a montrer
   if(!ctot){
-    body.innerHTML = '<p style="color:var(--muted);">Aucun CTOT actif sur ce vol.</p>' + editHtml;
+    body.innerHTML = '<p class="ct-none">Aucun CTOT actif sur ce vol. Tu peux en saisir un à la main.</p>' + editHtml;
     if(hEl) hEl.textContent = '';
     modal.style.display = 'flex';
     return;
   }
-  // Suffixe de fuseau : "Z" en mode UTC, "LT" en mode heure locale.
-  const tzSuf = isUTC ? 'Z' : 'LT';
-  if(hEl) hEl.textContent = ctot + ' ' + tzSuf;
+  if(hEl) hEl.innerHTML = escapeHtml(ctot) + ' <small>' + tzSuf + '</small>';
 
-  // Regulation + historique CTOT stockes dans akMeta de l'onglet courant
   let reg = null, ctotHistory = [];
   try{
     const data = JSON.parse(localStorage.getItem('tab-'+currentTabId) || '{}');
@@ -1039,72 +1031,55 @@ function showCtotRegulation(){
     if(Array.isArray(data?.akMeta?.ctotHistory)) ctotHistory = data.akMeta.ctotHistory;
   }catch(_){ }
 
-  // Bloc historique : affiche l'evolution du slot si plusieurs valeurs vues
-  const histHtml = (function(){
-    if(!ctotHistory || ctotHistory.length < 2) return '';
-    // Formate un horodatage absolu (ms ou ISO) dans le mode courant (local/UTC),
-    // pour que l'historique suive le bouton local/UTC comme le reste de l'app.
-    const fmtMs = (ms)=>{
-      const d = new Date(ms);
-      if(isNaN(d.getTime())) return '';
-      return String(isUTC ? d.getUTCHours() : d.getHours()).padStart(2,'0')
-        + ':' + String(isUTC ? d.getUTCMinutes() : d.getMinutes()).padStart(2,'0');
-    };
-    const lignes = ctotHistory.map((h, i)=>{
-      const actuel = (i === ctotHistory.length - 1);
-      // On recalcule l'heure du CTOT depuis l'ISO absolu (h.iso). L'ancien
-      // h.hhmm etait fige dans le mode actif a la capture -> ne suivait pas.
-      const ctotTxt = h.iso ? fmtMs(h.iso) : (h.hhmm || '');
-      const ctotAff = ctotTxt ? ctotTxt + ' ' + tzSuf : '';
-      return '<div style="display:flex; justify-content:space-between; gap:10px; '
-        + 'padding:3px 0; '+(actuel?'font-weight:900;':'color:var(--muted);font-weight:700;')+'">'
-        + '<span>'+escapeHtml(ctotAff)+(h.manual?' (man)':'')+(actuel?' (actuel)':'')+'</span>'
-        + '<span style="font-size:.72rem; opacity:.7;">vu '+escapeHtml(fmtMs(h.seenAt))+'</span>'
-        + '</div>';
-    }).join('');
-    return '<div style="margin-top:12px;">'
-      + '<div style="font-weight:800; color:var(--muted); font-size:.8rem; margin-bottom:4px;">Historique CTOT</div>'
-      + lignes + '</div>';
-  })();
+  const fm = m => { m = ((Math.round(m) % 1440) + 1440) % 1440; return String(Math.floor(m/60)).padStart(2,'0') + ':' + String(m%60).padStart(2,'0'); };
+  const C = parseHHMM(ctot);
+  const rel = m => (m == null) ? null : ((((m - C) % 1440) + 2160) % 1440) - 720;   // minutes relatives au CTOT
+  const eobtR = rel(window._eobtRawMins ?? null);
+  const pushR = -15, wFrom = -5, wTo = 10;
+  const lo = Math.min(pushR, eobtR ?? pushR) - 6, hi = wTo + 6;
+  const X = r => ((r - lo) / (hi - lo) * 100).toFixed(1) + '%';
+  const mk = (r, lbl, cls, low) => '<div class="ct-mk ' + cls + (low ? ' lo' : '') + '" style="left:' + X(r) + '"><span>' + lbl + '</span><b class="num">' + fm(C + r) + '</b><i></i></div>';
+  const frise = '<div class="ct-track">'
+    + '<div class="ct-axis"></div>'
+    + ((eobtR != null && pushR > eobtR) ? '<div class="ct-gap" style="left:' + X(eobtR) + ';width:calc(' + X(pushR) + ' - ' + X(eobtR) + ')"></div>' : '')
+    + '<div class="ct-win" style="left:' + X(wFrom) + ';width:calc(' + X(wTo) + ' - ' + X(wFrom) + ')"></div>'
+    + (eobtR != null ? mk(eobtR, 'EOBT', 'eobt', false) : '')
+    + mk(0, 'CTOT', 'ctot', false)
+    + mk(pushR, 'PUSH EST.', 'push', true)
+    + mk(wFrom, 'DÉCOL. −5', 'win', true)
+    + mk(wTo, '+10', 'win', true)
+    + '</div>';
 
-  if(!reg){
-    body.innerHTML = '<p style="color:var(--muted);">CTOT '
-      + escapeHtml(ctot) + ' actif, mais aucune information de régulation '
-      + 'transmise par Airport Keeper.</p>'
-      + histHtml + editHtml;
-    modal.style.display = 'flex';
-    return;
+  const dly = (eobtR != null) ? pushR - eobtR : null;
+  const dlyHtml = (dly == null) ? ''
+    : '<div class="ct-band ' + (dly > 0 ? 'late' : 'ok') + '"><span>Retard estimé · push est. − EOBT</span><b class="num">' + (dly > 0 ? '+' + dly + ' min' : 'Aucun') + '</b></div>';
+  const pushHtml = '<div class="ct-band push"><span>Push estimé · CTOT − 15</span><b class="num">' + fm(C + pushR) + '</b></div>';
+
+  let regHtml;
+  if(reg){
+    const descTxt = (reg.description || '').trim(), remarkTxt = (reg.remark || '').trim();
+    const box = (lbl, txt) => '<div class="ct-box"><small>' + lbl + '</small>' + escapeHtml(txt) + '</div>';
+    regHtml = '<div class="ct-reg">' + (reg.regul ? '<b>' + escapeHtml(reg.regul) + '</b>' : '')
+      + (reg.reason ? '<span class="ct-tag am">' + escapeHtml(reg.reason) + '</span>' : '')
+      + (reg.cause ? '<span class="ct-tag">' + escapeHtml(reg.cause) + '</span>' : '') + '</div>'
+      + (descTxt ? box('Description', descTxt) : '')
+      + (remarkTxt ? box('Remarque', remarkTxt) : '');
+  } else {
+    regHtml = '<p class="ct-none">Aucune information de régulation transmise par Airport Keeper.</p>';
   }
 
-  // Reason : conserve tel quel, en anglais, sans traduction ni reformatage.
-  const reasonTxt = reg.reason || '';
-
-  // Motif : reason brut (anglais), sans localisation accolee.
-  const motifTxt = reasonTxt;
-
-  // description = secteur/zone concerne, remark = remarque operationnelle.
-  // Les deux peuvent coexister -> on les affiche separement.
-  const descTxt   = (reg.description || '').trim();
-  const remarkTxt = (reg.remark || '').trim();
-  const box = (lbl, txt)=> '<div style="margin-top:10px;">'
-    + '<div style="font-weight:800; color:var(--muted); font-size:.8rem; margin-bottom:4px;">'+lbl+'</div>'
-    + '<div style="padding:10px; background:var(--field-bg, rgba(127,127,127,.08)); '
-    + 'border-radius:8px; font-weight:700; line-height:1.4;">'+escapeHtml(txt)+'</div></div>';
-
-  const row = (lbl, val)=> val
-    ? '<div style="display:flex; gap:8px; margin-bottom:8px;">'
-      + '<span style="min-width:96px; font-weight:800; color:var(--muted); font-size:.8rem;">'+lbl+'</span>'
-      + '<span style="font-weight:700;">'+escapeHtml(val)+'</span></div>'
+  const fmtMs = ms => { const d = new Date(ms); if(isNaN(d.getTime())) return ''; return String(isUTC ? d.getUTCHours() : d.getHours()).padStart(2,'0') + ':' + String(isUTC ? d.getUTCMinutes() : d.getMinutes()).padStart(2,'0'); };
+  const histHtml = (ctotHistory && ctotHistory.length >= 2)
+    ? '<div><div class="ct-k">Slots reçus</div><div class="ct-chain num">'
+      + ctotHistory.map((h, i) => {
+          const t = h.iso ? fmtMs(h.iso) : (h.hhmm || '');
+          const on = i === ctotHistory.length - 1;
+          return '<span class="' + (on ? 'on' : '') + '" title="vu ' + escapeHtml(fmtMs(h.seenAt)) + '">' + escapeHtml(t) + (h.manual ? ' <small>man</small>' : '') + '</span>';
+        }).join('<i>→</i>')
+      + '</div></div>'
     : '';
 
-  body.innerHTML =
-      row('Régulation', reg.regul)
-    + row('Cause',      reg.cause)
-    + row('Motif',      motifTxt)
-    + (descTxt   ? box('Description', descTxt) : '')
-    + (remarkTxt ? box('Remarque',    remarkTxt) : '')
-    + histHtml + editHtml;
-
+  body.innerHTML = frise + dlyHtml + pushHtml + regHtml + histHtml + editHtml;
   modal.style.display = 'flex';
 }
 
@@ -6809,7 +6784,7 @@ function checkAndDeleteIfEmpty(){
 /* ===== Service Worker — enregistrement ===== */
 if ('serviceWorker' in navigator) {
   const swCode = `
-const CACHE = 'suivi-perf-v51';
+const CACHE = 'suivi-perf-v52';
 const PRECACHE = [];   // fichiers à précacher (vide = online-only)
 
 self.addEventListener('install', e => {
