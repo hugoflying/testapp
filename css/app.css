@@ -1291,3 +1291,7 @@ html.dark .ct-chain span.on{color:#FFC94D}
 .ct-edit input{width:92px;flex:none;text-align:center;font-weight:800;font-size:17px}
 .ct-edit .btn-primary{flex:1}
 .ct-edit .ct-del{background:transparent;border:1px solid var(--crit);color:var(--crit)}
+/* v2.48 : les repères verticaux (NOW, EOBT, CTOT…) passent sous les barres et les durées */
+.tl-gantt-row{z-index:3}
+.tl-now-line,.tl-eobt-line,.tl-ctot-line,.tl-tobt-line,.tl-sched-line,.tl-act-line,.tl-marker-line{z-index:1}
+.tl-dur{background:var(--surface);border-radius:3px;padding:0 2px}
