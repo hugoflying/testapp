@@ -903,11 +903,13 @@
     // v2.57 : « FR5595 » tapé dans le n° de vol → compagnie FR + n° 5595 (plus de FRFR5595)
     const nv = document.getElementById('NVol');
     if(nv) nv.addEventListener('input', () => {
-      const m = nv.value.toUpperCase().match(/^([A-Z][A-Z0-9]|[0-9][A-Z])\s*(\d{1,4}[A-Z]?)$/);
+      // Un n° de vol commence toujours par un chiffre (lettres possibles au milieu ou à la fin) :
+      // ce qui précède est le code compagnie (2 lettres, ou W4/U5… si c'est une compagnie connue).
+      const m = nv.value.toUpperCase().match(/^([A-Z][A-Z0-9])\s*(\d[A-Z0-9]*)$/);
       if(!m) return;
       const known = [...document.querySelectorAll('#ivCieChips button[data-v]')].map(b => b.dataset.v);
       const cieEl = document.getElementById('Cie'), cie = (cieEl?.value || '').toUpperCase();
-      if(m[1] !== cie && !known.includes(m[1])) return;
+      if(!/^[A-Z]{2}$/.test(m[1]) && m[1] !== cie && !known.includes(m[1])) return;
       nv.value = m[2];
       if(cieEl && m[1] !== cie){
         cieEl.value = m[1];
