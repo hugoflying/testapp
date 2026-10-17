@@ -292,12 +292,13 @@ function updateFinalTHOB(){
 }
 
 /* Poids par soute :
-   FR/RK = 13 kg par bagage standard (15 kg vers AMM)
+   FR/RK = 13 kg par bagage, toujours (Hugo, v2.50)
    autres = poids moyen du FINAL (POIDS / BAGS), affiché « ≈ » */
 function holdBagKg(){
   const cie = (document.getElementById('Cie')?.value || '').toUpperCase().trim();
   const to  = (document.getElementById('To')?.value  || '').toUpperCase().trim();
-  if(cie === 'FR' || cie === 'RK') return { kg: (to === 'AMM') ? 15 : 13, approx:false };
+  // v2.50 (Hugo) : FR/RK, un bagage = toujours 13 kg ; autres compagnies = poids moyen POIDS / BAGS
+  if(cie === 'FR' || cie === 'RK') return { kg: 13, approx:false };
   const poids = parseInt(document.getElementById('FinalPOIDS')?.value, 10);
   const bags  = parseInt(document.getElementById('FinalBAGS')?.value, 10);
   if(poids > 0 && bags > 0) return { kg: poids / bags, approx:true };
@@ -315,6 +316,13 @@ function updateHWeights(){
     lbl.style.display = show ? '' : 'none';
     lbl.textContent = show ? `${k.approx ? '≈ ' : ''}${Math.round(bags * k.kg)} kg` : '';
   });
+  // Poids moyen d'un bagage affiché sous BAGS (hors FR/RK, qui comptent 13 kg)
+  const avg = document.getElementById('FinalBagAvg');
+  if(avg){
+    const on = !!k && k.approx;
+    avg.style.display = on ? '' : 'none';
+    avg.textContent = on ? 'moy. ' + k.kg.toFixed(1).replace('.', ',') + ' kg' : '';
+  }
 }
 
 function updateCrewThobVisibility(){
@@ -6801,7 +6809,7 @@ function checkAndDeleteIfEmpty(){
 /* ===== Service Worker — enregistrement ===== */
 if ('serviceWorker' in navigator) {
   const swCode = `
-const CACHE = 'suivi-perf-v57';
+const CACHE = 'suivi-perf-v58';
 const PRECACHE = [];   // fichiers à précacher (vide = online-only)
 
 self.addEventListener('install', e => {
