@@ -220,14 +220,45 @@
     const dep = document.getElementById('panel-dep');
     return (dep && dep.style.display !== 'none') ? 'dep' : 'arr';
   }
+  /* v2.38 : un seul swipe qui enchaîne tout l'onglet vol :
+     Vol → Arrivée → Départ → Timeline → Load ARR → PREVI → FINAL → FUEL → Retard → Notes */
+  const FLOW = ['vol','timing:arr','timing:dep','timing:tl','load:arr','load:previ','load:final','load:fuel','retard','notes'];
+  function flowCur(){
+    if(ldmIsOpen()) return 'load:' + ((typeof _ldmMode !== 'undefined' && LDM.includes(_ldmMode)) ? _ldmMode : 'arr');
+    const p = document.body.dataset.panel;
+    return p === 'timing' ? 'timing:' + curSeg() : p;
+  }
+  function flowGo(dx){
+    const i = FLOW.indexOf(flowCur());
+    if(i < 0) return false;
+    const j = i + (dx < 0 ? 1 : -1);
+    if(j < 0 || j >= FLOW.length) return false;
+    const [tab, sub] = FLOW[j].split(':');
+    let el = null;
+    if(tab === 'load'){
+      uiTab('load');
+      if(typeof ldmSwitch === 'function') ldmSwitch(sub);
+      el = document.getElementById(LDM_EL[sub]);
+    } else {
+      uiTab(tab);
+      if(tab === 'timing'){ switchTimingPanel(sub); el = sub === 'tl' ? document.getElementById('timelineCard') : document.getElementById('panel-' + sub); }
+      else el = document.querySelector('.panel-' + tab);
+      const w = document.getElementById('appWrap'); if(w) w.scrollTop = 0;
+    }
+    if(el){ el.classList.remove('sw-l','sw-r'); void el.offsetWidth; el.classList.add(dx < 0 ? 'sw-l' : 'sw-r'); }
+    return true;
+  }
+  const SWIPE_PANELS = new Set(['vol','timing','retard','notes']);
+
   function initSwipe(){
     const zone = document.getElementById('appWrap');
     if(!zone) return;
     let x0 = null, y0 = 0, t0 = 0;
     zone.addEventListener('touchstart', e => {
       x0 = null;
-      if(e.touches.length !== 1 || document.body.dataset.panel !== 'timing') return;
-      if(e.target.closest('#timelineScroll, input, textarea, select, .sheet-modal')) return;
+      if(e.touches.length !== 1 || !SWIPE_PANELS.has(document.body.dataset.panel)) return;
+      // Pas de swipe sur la timeline (défilement), les champs, le dessin et les feuilles
+      if(e.target.closest('#timelineScroll, input, textarea, select, .sheet-modal, #bnCanvas, .nb-dock, .nj-quick, .iv-chips, [data-noswipe]')) return;
       x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; t0 = Date.now();
     }, { passive:true });
     zone.addEventListener('touchend', e => {
@@ -235,12 +266,7 @@
       const t = e.changedTouches[0], dx = t.clientX - x0, dy = t.clientY - y0;
       x0 = null;
       if(Math.abs(dx) < 60 || Math.abs(dx) < Math.abs(dy) * 1.6 || Date.now() - t0 > 700) return;
-      const i = SEG.indexOf(curSeg()) + (dx < 0 ? 1 : -1);
-      if(i < 0 || i >= SEG.length) return;
-      switchTimingPanel(SEG[i]);
-      const el = SEG[i] === 'tl' ? document.getElementById('timelineCard') : document.getElementById('panel-'+SEG[i]);
-      if(el){ el.classList.remove('sw-l','sw-r'); void el.offsetWidth; el.classList.add(dx < 0 ? 'sw-l' : 'sw-r'); }
-      const w = document.getElementById('appWrap'); if(w) w.scrollTop = 0;
+      flowGo(dx);
     }, { passive:true });
   }
 
@@ -403,12 +429,7 @@
       const t = e.changedTouches[0], dx = t.clientX - x0, dy = t.clientY - y0;
       x0 = null;
       if(Math.abs(dx) < 60 || Math.abs(dx) < Math.abs(dy) * 1.6 || Date.now() - t0 > 700) return;
-      const cur = (typeof _ldmMode !== 'undefined' && LDM.includes(_ldmMode)) ? _ldmMode : 'arr';
-      const i = LDM.indexOf(cur) + (dx < 0 ? 1 : -1);
-      if(i < 0 || i >= LDM.length || typeof ldmSwitch !== 'function') return;
-      ldmSwitch(LDM[i]);
-      const el = document.getElementById(LDM_EL[LDM[i]]);
-      if(el){ el.classList.remove('sw-l','sw-r'); void el.offsetWidth; el.classList.add(dx < 0 ? 'sw-l' : 'sw-r'); }
+      flowGo(dx);
     }, { passive:true });
   }
 
