@@ -40,9 +40,32 @@ function cfgTargets(cie, type){
   return out;
 }
 
+// v3.37 : événements ajoutés, événements masqués, mots rapides du journal, codes retard par compagnie
+const cfgId = s => String(s || '').toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 20);
+function cfgEvents(){
+  if(!window.CFG || !Array.isArray(window.CFG.events)) return [];
+  return window.CFG.events.filter(e => e && cfgId(e.id) && e.t).map(e => ({ ...e, id: cfgId(e.id) }));
+}
+function cfgEvFields(e){ return e.kind === 'span' ? ['CxD_' + e.id, 'CxF_' + e.id] : ['Cx_' + e.id]; }
+function cfgEvHidden(k){ return !!(window.CFG && Array.isArray(window.CFG.evHide) && window.CFG.evHide.includes(k)); }
+function cfgWords(){ return (window.CFG && Array.isArray(window.CFG.words) && window.CFG.words.length) ? window.CFG.words.map(String) : null; }
+// Liste de codes retard propre à la compagnie (ou à celle qu'elle copie), sinon null
+function cfgDl(cie){
+  const a = cfgAl(cie); if(!a) return null;
+  if(a.dl && Array.isArray(a.dl.codes)) return a.dl;
+  const b = a.dlLike ? cfgAl(a.dlLike) : null;
+  return (b && b.dl && Array.isArray(b.dl.codes)) ? b.dl : null;
+}
+function cfgDlLike(cie){ const a = cfgAl(cie); return (a && a.dlLike) || null; }
+
 // Compagnies ajoutées dans l'admin : pastille dans « Modifier le vol » et indicatif OACI → code IATA
 function cfgPatchUI(){
   if(!window.CFG) return;
+  const words = cfgWords(), quick = document.querySelector('#bnTextMode .nj-quick');
+  if(words && quick){
+    quick.innerHTML = '';
+    words.forEach(w => { const b = document.createElement('button'); b.type = 'button'; b.dataset.njTag = w; b.textContent = w; quick.appendChild(b); });
+  }
   const box = document.getElementById('ivCieChips'), other = box && box.querySelector('.iv-other');
   Object.keys(window.CFG.al).forEach(c => {
     const a = window.CFG.al[c];

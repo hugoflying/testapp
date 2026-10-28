@@ -586,6 +586,10 @@ function renderTimeline(){
     ['ConnexionPush','Connexion push'], ['ChangementPush','Changement push'],
     ['AnnonceINAD','Annonce INAD'], ['AppelNayak','Appel Nayak'],
   ];
+  if(typeof cfgEvents === 'function') cfgEvents().forEach(e => {   // v3.37 : événements ajoutés dans l'admin (démo)
+    const [a, b] = cfgEvFields(e);
+    if(b) EV_SPANS.push([e.t, a, b]); else EV_POINTS.push([a, e.t]);
+  });
   EV_POINTS.forEach(([id]) => POINT_EVENTS.add(id));
   function eventRows(){
     const out = [];

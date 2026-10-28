@@ -147,7 +147,35 @@ tr.sel td{background:var(--accent-soft)}
   .stp td.d::before{content:attr(data-l);display:block;font-size:10.5px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin-bottom:3px}
   .stp .mini{width:52px}
 }
+.txt{font:inherit;font-size:13.5px;color:var(--fg);background:var(--surf2);border:1px solid var(--line);border-radius:8px;padding:6px 9px;width:100%;min-width:120px}
+.txt.ch{border-color:var(--warn);background:var(--warn-soft)}
+.dlt td{padding:6px 10px}.dlt td:nth-child(3) .txt{min-width:220px}
+.sw{display:flex;gap:5px}.sw button{width:20px;height:20px;border-radius:50%;border:2px solid transparent;cursor:pointer;padding:0}
+.sw button.on{border-color:var(--fg);box-shadow:0 0 0 2px var(--surf) inset}
+.nqp{display:flex;flex-wrap:wrap;gap:6px}.nqp span{border:1px solid var(--line);border-radius:20px;padding:6px 12px;font-weight:700;font-size:13px;background:var(--surf2)}
+.btn:disabled{opacity:.4}
 a.nav,a.btn{text-decoration:none}a.btn{display:inline-block}.btn:disabled{opacity:.45;cursor:default}[hidden]{display:none!important}.me .back{font-size:12.5px}
+/* v3.37 : look B (clair, gris neutres, marine pour la sélection) */
+:root{--bg:#F6F7F9;--surf:#FFFFFF;--surf2:#F8F9FB;--line:#E3E6EB;--fg:#14213D;--muted:#5F6878;--accent:#0B1E4F;--accent-soft:#EEF1F6}
+.side{background:#FFFFFF;color:#14213D;border-right:1px solid var(--line)}.brand i{background:#0B1E4F;color:#fff}.brand small,.grp,.me{color:#7A8291}.me{border-top-color:var(--line)}.me b{color:#14213D}
+.nav{color:#3C4556}.nav:hover{background:#F1F3F6}.nav.on{background:#EEF1F6;color:#0B1E4F;box-shadow:inset 3px 0 0 #0B1E4F}
+.me .back{color:var(--muted)}
+:root[data-theme="dark"]{--bg:#141516;--surf:#1C1D1F;--surf2:#17181A;--line:#2C2E31;--fg:#EDEEF0;--muted:#9EA2A9;--accent:#9DB2FF;--accent-soft:#25272B}
+:root[data-theme="dark"] .side{background:#1C1D1F;color:#EDEEF0;border-right-color:#2C2E31}
+:root[data-theme="dark"] .nav{color:#C4C7CD}:root[data-theme="dark"] .nav.on{background:#26282C;color:#fff;box-shadow:inset 3px 0 0 #9DB2FF}
+:root[data-theme="dark"] .me b{color:#EDEEF0}:root[data-theme="dark"] .brand i{background:#EDEEF0;color:#141516}
+:root[data-theme="dark"] .code{background:#2C2E33}:root[data-theme="dark"] .chip.on{background:#EDEEF0;color:#141516;border-color:#EDEEF0}
+:root[data-theme="dark"] .btn.p{background:#EDEEF0;color:#141516;border-color:#EDEEF0}:root[data-theme="dark"] .gb{background:#9DB2FF}
+:root[data-theme="dark"] .tc.on{border-color:#9DB2FF;box-shadow:0 0 0 1px #9DB2FF inset;background:#25272B}
+@media (prefers-color-scheme: dark){
+:root:not([data-theme="light"]){--bg:#141516;--surf:#1C1D1F;--surf2:#17181A;--line:#2C2E31;--fg:#EDEEF0;--muted:#9EA2A9;--accent:#9DB2FF;--accent-soft:#25272B}
+:root:not([data-theme="light"]) .side{background:#1C1D1F;color:#EDEEF0;border-right-color:#2C2E31}
+:root:not([data-theme="light"]) .nav{color:#C4C7CD}:root:not([data-theme="light"]) .nav.on{background:#26282C;color:#fff;box-shadow:inset 3px 0 0 #9DB2FF}
+:root:not([data-theme="light"]) .me b{color:#EDEEF0}:root:not([data-theme="light"]) .brand i{background:#EDEEF0;color:#141516}
+:root:not([data-theme="light"]) .code{background:#2C2E33}:root:not([data-theme="light"]) .chip.on{background:#EDEEF0;color:#141516;border-color:#EDEEF0}
+:root:not([data-theme="light"]) .btn.p{background:#EDEEF0;color:#141516;border-color:#EDEEF0}:root:not([data-theme="light"]) .gb{background:#9DB2FF}
+:root:not([data-theme="light"]) .tc.on{border-color:#9DB2FF;box-shadow:0 0 0 1px #9DB2FF inset;background:#25272B}
+}
 </style></head><body>
 <div class="app">
   <nav class="side" id="side" aria-label="Sections de l'admin"></nav>
@@ -161,9 +189,10 @@ a.nav,a.btn{text-decoration:none}a.btn{display:inline-block}.btn:disabled{opacit
 const ICONS = {
   plane:'<path d="M2 16l20-6-20-6 4 6-4 6z"/>', clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
   plus:'<circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/>', phone:'<rect x="7" y="2.5" width="10" height="19" rx="2.5"/><path d="M11 18h2"/>',
-  back:'<path d="M15 5l-7 7 7 7"/>'
+  back:'<path d="M15 5l-7 7 7 7"/>', flag:'<path d="M5 21V4h11l-2 4 2 4H5"/>', text:'<path d="M4 7V5h16v2M12 5v14M9 19h6"/>'
 };
-const NAV = [['Exploitation'],['compagnies','Compagnies','plane'],['cibles','Temps d\'escale cibles','clock'],['ajout','Ajouter une compagnie','plus'],['Contrôle'],['apercu','Aperçu dans l\'app','phone']];
+const NAV = [['Compagnies'],['compagnies','Compagnies','plane'],['cibles','Temps d\'escale cibles','clock'],['ajout','Ajouter une compagnie','plus'],
+  ['Pour toutes les compagnies'],['events','Événements','flag'],['words','Mots rapides','text'],['Contrôle'],['apercu','Aperçu dans l\'app','phone']];
 // Étapes que la timeline de l'app sait afficher (clé = action de renderTimeline)
 const STEPS = {
   'Débarquement':'Débarquement', 'Cabin release':'Cabin tidy / cleaning', 'Avitair':'Avitaillement', 'Lift (Dep)':'Lift départ',
@@ -226,7 +255,7 @@ function side(){
   NAV.forEach(n => { h += n.length === 1 ? '<div class="grp">' + n[0] + '</div>'
     : '<button type="button" class="nav' + (navOn(n[0]) ? ' on' : '') + '" onclick="go(\'' + n[0] + '\')">' + icon(n[2]) + n[1] + '</button>'; });
   h += '<a class="nav" href="./">' + icon('back') + 'Retour à l\'app</a>';
-  h += '<div class="me"><button type="button" class="back" style="color:#D5DEF5" onclick="resetAll()">Revenir aux réglages d\'origine</button></div>';
+  h += '<div class="me"><button type="button" class="back" onclick="resetAll()">Revenir aux réglages d\'origine</button></div>';
   $('#side').innerHTML = h;
 }
 function navOn(k){ return k === 'cibles' ? (cur === 'fiche' && tab === 'cibles') : k === 'compagnies' ? (cur === 'compagnies' || (cur === 'fiche' && tab !== 'cibles')) : cur === k; }
@@ -238,8 +267,9 @@ function go(v, c, t){
   side(); render(); pubBar();
 }
 function render(){
-  const v = $('#view'); v.innerHTML = ({compagnies:vList, fiche:vFiche, ajout:vAjout, apercu:vApercu})[cur]();
-  v.classList.remove('view'); void v.offsetWidth; v.classList.add('view');
+  const v = $('#view'); v.innerHTML = ({compagnies:vList, fiche:vFiche, ajout:vAjout, apercu:vApercu, events:vEvents, words:vWords})[cur]();
+  const key = cur + ':' + sel + ':' + tab;   // animation seulement quand on change d'écran
+  if(key !== render.k){ render.k = key; v.classList.remove('view'); void v.offsetWidth; v.classList.add('view'); }
   if(cur === 'fiche' && tab === 'cibles') drawGantt();
 }
 
@@ -260,11 +290,11 @@ function vList(){
 /* Fiche compagnie */
 function vFiche(){
   const a = AL(sel);
-  const tabs = [['general','Général'],['types','Types avion & rotations'],['cibles','Temps d\'escale cibles'],['regles','Règles particulières']];
+  const tabs = [['general','Général'],['types','Types avion & rotations'],['cibles','Temps d\'escale cibles'],['dl','Codes retard'],['regles','Règles particulières']];
   return '<button class="back" type="button" onclick="go(\'compagnies\')">← Compagnies</button>'
    + '<div class="hd"><div class="idc"><span class="code">' + sel + '</span><div><h1>' + (esc(a.n) || sel) + '</h1><p style="margin:2px 0 0">' + (a.icao ? 'Callsign ' + esc(a.icao) + ' · ' : '') + Object.keys(a.types).length + ' types avion</p></div></div><span class="sp"></span><div class="chips">' + Object.keys(C.al).map(x => '<button type="button" class="chip' + (x === sel ? ' on' : '') + '" onclick="go(\'fiche\',\'' + x + '\')">' + x + '</button>').join('') + '</div></div>'
    + '<div class="tabs" role="tablist">' + tabs.map(t => '<button type="button" role="tab" class="' + (tab === t[0] ? 'on' : '') + '" onclick="go(\'fiche\',null,\'' + t[0] + '\')">' + t[1] + '</button>').join('') + '</div>'
-   + ({general:tGen, types:tTypes, cibles:tCibles, regles:tRegles})[tab](a);
+   + ({general:tGen, types:tTypes, cibles:tCibles, dl:tDl, regles:tRegles})[tab](a);
 }
 function setA(k, v){ AL(sel)[k] = v; save(); }
 function tGen(a){
@@ -425,6 +455,7 @@ function addAl(){
     types[t] = {mtt: s ? s.mtt : null, crew: s ? s.crew : null}; if(st && st.length) types[t].steps = clone(st);
   });
   C.al[W.c] = {n: W.n, icao: W.icao, hle: src ? src.hle : 40, types};
+  if(src){ if(src.dl) C.al[W.c].dl = clone(src.dl); else C.al[W.c].dlLike = src.dlLike || W.from; }
   save(); const c = W.c; Object.assign(W, {c:'', icao:'', n:'', from:'W6', types:[]}); wiz = 1; ty = Object.keys(types)[0]; go('fiche', c, 'types');
 }
 
@@ -449,5 +480,95 @@ function vApercu(){
 function authed(){ try{ const o = JSON.parse(localStorage.getItem('pv_auth') || 'null'); return sessionStorage.getItem('pv_auth') === '1' || (o && o.h && new Date(o.t - 3*36e5).toDateString() === new Date(Date.now() - 3*36e5).toDateString()); }catch(e){ return false; } }
 if(!authed()){
   document.body.innerHTML = '<div style="min-height:100vh;display:grid;place-items:center;padding:16px"><div class="card" style="padding:24px;max-width:400px;text-align:center"><h1 style="margin:0 0 8px;font-size:20px">Admin compagnies</h1><p class="hint" style="padding:0 0 16px">Connectez-vous d\'abord dans la démo, puis revenez par le menu « Admin compagnies ».</p><a class="btn p" href="./">Ouvrir la démo</a></div></div>';
-} else { go('compagnies'); }
+} else {
+  fetch('./dlcodes.js').then(r => r.text()).then(t => { const m = /window\.DL_CODES = (\{.*\});/.exec(t); if(m) DLC = JSON.parse(m[1]); }).catch(() => {}).then(() => { if(cur === 'fiche' && tab === 'dl') render(); });
+  go('compagnies');
+}
+
+/* Codes retard par compagnie (v3.37) : liste du manuel (dlcodes.js), « comme » une autre compagnie, ou liste propre */
+let DLC = null, dlQ = '';
+const DL_ALIAS = c => ({ FR:'FR', RK:'FR', W4:'W4', W6:'W4', H4:'H4', H6:'H4', V7:'V7' })[c] || 'H4';
+const DL_NAME = { FR:'Ryanair', W4:'Wizz Air', H4:'HiSky', V7:'Volotea' };
+function dlBase(c){ const a = AL(c), k = DL_ALIAS((a && a.dlLike) || c); return (DLC && DLC[k]) || {src:'', codes:[]}; }
+function dlEff(c){ const a = AL(c); if(a.dl) return a.dl; if(a.dlLike && AL(a.dlLike) && AL(a.dlLike).dl) return AL(a.dlLike).dl; return dlBase(c); }
+function dlMode(v){
+  const a = AL(sel);
+  if(v === '__own'){ a.dl = clone(dlEff(sel)); a.dl.src = 'Liste ' + sel + ' modifiée dans l\'admin'; delete a.dlLike; }
+  else if(v === '__base'){ delete a.dl; delete a.dlLike; }
+  else { delete a.dl; a.dlLike = v; }
+  save(); render();
+}
+function dlOwn(){ const a = AL(sel); if(!a.dl){ a.dl = clone(dlEff(sel)); a.dl.src = 'Liste ' + sel + ' modifiée dans l\'admin'; delete a.dlLike; } return a.dl.codes; }
+function dlSet(i, j, el){ const c = dlOwn(); c[i][j] = j === 0 ? el.value.toUpperCase().trim() : el.value; el.classList.add('ch'); save(); syncDlHead(); }
+function dlDel(i){ dlOwn().splice(i, 1); save(); render(); }
+function dlAdd(){ dlOwn().unshift(['', '', '']); dlQ = ''; save(); render(); const f = document.querySelector('.dlt input'); if(f) f.focus(); }
+function syncDlHead(){ const e = $('#dlMode'); if(e && e.value !== '__own'){ e.value = '__own'; } }
+function tDl(a){
+  if(!DLC) return '<div class="card"><div class="hint" style="padding-top:14px">Chargement des listes…</div></div>';
+  const L = dlEff(sel), base = DL_ALIAS(a.dlLike || sel), baseName = DL_ALIAS(sel) === 'H4' && !['H4','H6'].includes(sel) ? 'IATA générique' : DL_NAME[DL_ALIAS(sel)];
+  const others = Object.keys(C.al).filter(c => c !== sel);
+  const opt = '<option value="__base"' + (!a.dl && !a.dlLike ? ' selected' : '') + '>Liste du manuel (' + baseName + ')</option>'
+    + others.map(c => '<option value="' + c + '"' + (a.dlLike === c ? ' selected' : '') + '>Comme ' + c + '</option>').join('')
+    + '<option value="__own"' + (a.dl ? ' selected' : '') + '>Liste propre à ' + sel + '</option>';
+  const q = dlQ.trim().toLowerCase();
+  const rows = (L.codes || []).map((r, i) => [r, i]).filter(([r]) => !q || r.join(' ').toLowerCase().includes(q));
+  const shown = rows.slice(0, 400);
+  const tr = shown.map(([r, i]) => '<tr style="cursor:default"><td><input class="mini" style="width:64px" value="' + esc(r[0]) + '" oninput="dlSet(' + i + ',0,this)"></td><td><input class="txt" value="' + esc(r[1]) + '" oninput="dlSet(' + i + ',1,this)"></td><td><input class="txt" value="' + esc(r[2] || '') + '" oninput="dlSet(' + i + ',2,this)"></td><td><button class="btn d" type="button" aria-label="Retirer" onclick="dlDel(' + i + ')">×</button></td></tr>').join('');
+  return '<div class="card"><div class="form"><div class="row2"><div class="f"><label>Liste utilisée par l\'app pour ' + sel + '</label><select id="dlMode" onchange="dlMode(this.value)">' + opt + '</select><small>' + esc(L.src || '') + ' · ' + (L.codes || []).length + ' codes. Modifier un code crée une liste propre à ' + sel + '.</small></div>'
+   + '<div class="f"><label>Chercher</label><input value="' + esc(dlQ) + '" placeholder="81, météo, bag…" oninput="dlQ=this.value;clearTimeout(window._dlT);window._dlT=setTimeout(()=>{render();const f=document.querySelector(\'.form .row2 .f:nth-child(2) input\');if(f){f.focus();f.setSelectionRange(f.value.length,f.value.length);}},250)"></div></div>'
+   + '<div style="display:flex;gap:8px;flex-wrap:wrap"><button class="chip add" type="button" onclick="dlAdd()">+ Ajouter un code</button></div></div>'
+   + '<div class="tw"><table class="dlt"><thead><tr><th>Code</th><th>Libellé</th><th>Précision</th><th></th></tr></thead><tbody>' + tr + '</tbody></table></div>'
+   + (rows.length > shown.length ? '<div class="hint" style="padding-top:10px">' + (rows.length - shown.length) + ' codes de plus : affinez la recherche.</div>' : '')
+   + '<div class="hint" style="padding-top:10px">Les codes automatiques de l\'app (93, 81, 89…) ne changent pas : cette liste sert aux suggestions et au bouton « Liste » de l\'onglet Retard.</div></div>';
+}
+
+/* Événements (v3.37) : ceux de l'app, qu'on peut masquer, et ceux qu'on ajoute */
+const EV_BASE = [
+  ['crew','Crew','dep'],['recherche-bag','Recherche bag','dep'],['inad','INAD','dep'],['gpu','Nayak','dep'],['casque','Connexion casque','dep'],
+  ['push','Push','dep'],['soutes','Portes de soute','dep'],['echelles','Retrait échelles','dep'],['reouverture','Réouverture porte','dep'],
+  ['comptage','Comptage bagages','dep'],['chargement','Chargement bagages','dep'],['degivrage','Dégivrage','dep'],
+  ['tapis','Tapis bagages','arr'],['dechargement','Déchargement bagages','arr'],['repositionnement','Repositionnement avion','arr'],
+  ['cleaning','Cleaning cabine','both'],['vidange','Vidange toilettes','both'],['eau','Eau potable','both']];
+const SIDE = { arr:'Arrivée', dep:'Départ', both:'Arrivée ou départ' };
+const EV_COLORS = ['#0d9488','#15803d','#2563eb','#7c3aed','#db2777','#D7263D','#d97706','#64748b'];
+function evHide(k, hide){ const h = C.evHide || []; C.evHide = hide ? [...new Set([...h, k])] : h.filter(x => x !== k); save(); render(); }
+function evSet(i, k, v){ C.events[i][k] = v; save(); if(k !== 't') render(); }
+function evAdd(){
+  C.events = C.events || [];
+  C.events.push({ id:'e' + Date.now().toString(36), t:'Nouvel événement', side:'dep', kind:'point', c:EV_COLORS[C.events.length % EV_COLORS.length], cies:[] });
+  save(); render(); const f = document.querySelector('.evt tbody tr:last-child input.txt'); if(f){ f.focus(); f.select(); }
+}
+function evDel(i){ if(!confirm('Retirer « ' + C.events[i].t + ' » ? Les heures déjà saisies sur les vols ne seront plus affichées.')) return; C.events.splice(i, 1); save(); render(); }
+function vEvents(){
+  const hid = new Set(C.evHide || []), evs = C.events || [];
+  const base = ['arr','dep','both'].map(sd => EV_BASE.filter(e => e[2] === sd).map(([k, t]) =>
+    '<tr style="cursor:default"><td><b>' + t + '</b></td><td>' + SIDE[sd] + '</td><td><div class="seg"><button type="button" class="' + (hid.has(k) ? '' : 'on') + '" onclick="evHide(\'' + k + '\',false)">Proposé</button><button type="button" class="' + (hid.has(k) ? 'on' : '') + '" onclick="evHide(\'' + k + '\',true)">Masqué</button></div></td></tr>').join('')).join('');
+  const own = evs.map((e, i) => '<tr style="cursor:default"><td><input class="txt" value="' + esc(e.t) + '" oninput="evSet(' + i + ',\'t\',this.value)" aria-label="Nom"></td>'
+    + '<td><select class="refsel" onchange="evSet(' + i + ',\'side\',this.value)">' + Object.keys(SIDE).map(k => '<option value="' + k + '"' + (e.side === k ? ' selected' : '') + '>' + SIDE[k] + '</option>').join('') + '</select></td>'
+    + '<td><select class="refsel" onchange="evSet(' + i + ',\'kind\',this.value)"><option value="point"' + (e.kind !== 'span' ? ' selected' : '') + '>Une heure</option><option value="span"' + (e.kind === 'span' ? ' selected' : '') + '>Début et fin</option></select></td>'
+    + '<td><div class="sw">' + EV_COLORS.map(c => '<button type="button" aria-label="Couleur" class="' + (e.c === c ? 'on' : '') + '" style="background:' + c + '" onclick="evSet(' + i + ',\'c\',\'' + c + '\')"></button>').join('') + '</div></td>'
+    + '<td><input class="txt" style="width:110px" value="' + esc((e.cies || []).join(' ')) + '" placeholder="Toutes" oninput="evSet(' + i + ',\'cies\',this.value.toUpperCase().split(/[^A-Z0-9]+/).filter(Boolean))" aria-label="Compagnies"></td>'
+    + '<td><button class="btn d" type="button" aria-label="Retirer" onclick="evDel(' + i + ')">×</button></td></tr>').join('');
+  return '<div class="hd"><div><h1>Événements</h1><p>Ce que l\'agent trouve dans « + Ajouter un événement », côté Arrivée ou Départ. Un événement ajouté a ses heures, apparaît sur la timeline et dans le rapport du vol.</p></div></div>'
+   + '<div class="card tw"><h2>Événements ajoutés</h2><table class="evt"><thead><tr><th>Nom</th><th>Côté</th><th>Saisie</th><th>Couleur</th><th>Compagnies</th><th></th></tr></thead><tbody>' + (own || '<tr><td colspan="6" style="color:var(--muted)">Aucun pour l\'instant.</td></tr>') + '</tbody></table>'
+   + '<div class="rule"><button class="chip add" type="button" onclick="evAdd()">+ Ajouter un événement</button><span style="color:var(--muted)">Compagnies vide : proposé à toutes. Sinon, par exemple « FR RK ».</span></div></div>'
+   + '<div class="card tw"><h2>Événements de l\'app</h2><table><thead><tr><th>Nom</th><th>Côté</th><th>Dans la liste</th></tr></thead><tbody>' + base + '</tbody></table>'
+   + '<div class="hint" style="padding-top:10px">Un événement masqué reste visible sur un vol où une heure est déjà saisie.</div></div>';
+}
+
+/* Mots rapides du journal (onglet Notes, mode clavier) */
+const WORDS0 = ['SNY','BAGS OK','PMR','Bag manquant','Pax en retard','Nettoyage','Fuel'];
+const words = () => C.words || (C.words = WORDS0.slice());
+function wSet(i, el){ words()[i] = el.value; save(); }
+function wMove(i, d){ const w = words(), j = i + d; if(j < 0 || j >= w.length) return; [w[i], w[j]] = [w[j], w[i]]; save(); render(); }
+function wDel(i){ words().splice(i, 1); save(); render(); }
+function wAdd(){ const el = $('#newWord'), v = el.value.trim(); if(!v || words().includes(v)){ el.focus(); return; } words().push(v); save(); render(); $('#newWord').focus(); }
+function vWords(){
+  const w = C.words || WORDS0;
+  const rows = w.map((x, i) => '<tr style="cursor:default"><td style="width:1%"><span class="tag">' + (i + 1) + '</span></td><td><input class="txt" value="' + esc(x) + '" oninput="wSet(' + i + ',this)" aria-label="Mot rapide"></td><td style="white-space:nowrap;text-align:right"><button class="btn" type="button" aria-label="Monter" onclick="wMove(' + i + ',-1)"' + (i ? '' : ' disabled') + '>↑</button> <button class="btn" type="button" aria-label="Descendre" onclick="wMove(' + i + ',1)"' + (i < w.length - 1 ? '' : ' disabled') + '>↓</button> <button class="btn d" type="button" aria-label="Retirer" onclick="wDel(' + i + ')">×</button></td></tr>').join('');
+  return '<div class="hd"><div><h1>Mots rapides</h1><p>Les boutons « Ajout rapide » du journal (onglet Notes, mode clavier). Un mot touché commence la ligne : « 10:42 · PMR · texte ».</p></div></div>'
+   + '<div class="split"><div class="card tw"><table>' + '<tbody>' + rows + '</tbody></table><div class="rule" style="align-items:center"><input id="newWord" class="txt" style="max-width:220px" placeholder="ex. Pushback" onkeydown="if(event.key===\'Enter\')wAdd()"><button class="chip add" type="button" onclick="wAdd()">+ Ajouter</button></div>'
+   + '<div class="hint" style="padding-top:10px">SNY garde sa saisie spéciale : codes équipage en majuscules.</div></div>'
+   + '<div class="card" style="padding:16px"><h2 style="padding:0 0 10px">Aperçu</h2><div class="nqp">' + w.filter(Boolean).map(x => '<span>' + esc(x) + '</span>').join('') + '</div></div></div>';
+}
 </script></body></html>
