@@ -632,7 +632,7 @@ function clockMin(){
       } else {
         let d = {}; try{ d = JSON.parse(localStorage.getItem('tab-' + t.dataset.tab) || '{}'); }catch(e){}
         // v3.05 : sans arrivée (vol qui part de la base), départ du chrono à HLE = SOBT − 60
-        const sobt = toMin(d.SOBT || ''), hle = /^(FR|RK)$/i.test((d.Cie || '').trim()) ? 60 : 40;
+        const sobt = toMin(d.SOBT || ''), hleA = (typeof cfgAl === 'function') ? cfgAl(d.Cie) : null, hle = (hleA && +hleA.hle) ? +hleA.hle : /^(FR|RK)$/i.test((d.Cie || '').trim()) ? 60 : 40;
         r = ringRatio(rotStart(toMin(d.AIBT || ''), toMin(d.SIBT || ''), sobt != null ? sobt - hle : null), toMin(String(d.timer_eobt || '')) ?? sobt, toMin(d.AOBT || ''), d.Date, sobt ?? toMin(d.SIBT || ''));
       }
       ring.classList.remove('done');
@@ -1206,7 +1206,9 @@ function clockMin(){
     V7:['A319','A320'], H4:['A319','A320','A321','A21N'], H6:['A319','A320','A321','A21N'] };
   function renderIvTypes(){
     const box = document.getElementById('ivTypeChips'); if(!box) return;
-    const list = IV_TYPES[(document.getElementById('Cie')?.value || '').trim().toUpperCase()] || IV_TYPES_ALL;
+    const cieV = (document.getElementById('Cie')?.value || '').trim().toUpperCase();
+    const cfgA = (typeof cfgAl === 'function') ? cfgAl(cieV) : null;   // v3.36 : types réglés dans l'admin (démo)
+    const list = (cfgA && Object.keys(cfgA.types || {}).length) ? Object.keys(cfgA.types) : IV_TYPES[cieV] || IV_TYPES_ALL;
     const key = list.join(',');
     if(box.dataset.k === key) return;
     box.dataset.k = key;

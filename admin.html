@@ -1,0 +1,453 @@
+<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><meta name="robots" content="noindex"><title>Admin compagnies · Timing</title><link rel="stylesheet" href="./fonts/fonts.css">
+<style>
+/* Layout : console d'admin, barre latérale navy + zone de travail claire ; sur mobile la barre devient une rangée défilante */
+:root{
+  --bg:#EEF1F7; --surf:#FFFFFF; --surf2:#F6F8FC; --line:#DCE2EE; --fg:#14213D; --muted:#5D6A8A;
+  --navy:#0B1E4F; --navy2:#16306F; --on-navy:#FFFFFF; --dim:#9FB0DA;
+  --accent:#2F5BD3; --accent-soft:#E7EEFD; --ok:#1F9D63; --ok-soft:#E3F5EC; --warn:#B7791F; --warn-soft:#FFF4DC; --bad:#D6404A; --bad-soft:#FDECEC;
+  --f:"Manrope",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#0A1230;--surf:#111B40;--surf2:#0E1738;--line:#24336A;--fg:#E7ECF8;--muted:#9AA7C9;--accent:#7EA0FF;--accent-soft:#1B2B63;--ok-soft:#123528;--warn-soft:#3A2C10;--bad-soft:#3B1519;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0A1230;--surf:#111B40;--surf2:#0E1738;--line:#24336A;--fg:#E7ECF8;--muted:#9AA7C9;--accent:#7EA0FF;--accent-soft:#1B2B63;--ok-soft:#123528;--warn-soft:#3A2C10;--bad-soft:#3B1519;color-scheme:dark}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--f);font-size:14px}
+button{font:inherit;color:inherit}
+.app{display:grid;grid-template-columns:232px minmax(0,1fr);min-height:100%}
+.side{background:var(--navy);color:var(--on-navy);padding:18px 12px;display:flex;flex-direction:column;gap:4px}
+.brand{display:flex;align-items:center;gap:10px;padding:2px 8px 16px}
+.brand i{width:30px;height:30px;border-radius:8px;background:#fff;color:var(--navy);display:grid;place-items:center;font-style:normal;font-weight:800;font-size:14px}
+.brand b{font-size:15px;font-weight:800;display:block}
+.brand small{font-size:11.5px;color:var(--dim);font-weight:600}
+.grp{font-size:10.5px;font-weight:800;letter-spacing:.1em;color:var(--dim);padding:12px 10px 4px;text-transform:uppercase}
+.nav{display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:none;border:0;color:#D5DEF5;padding:8px 10px;border-radius:8px;font-weight:600;cursor:pointer}
+.nav:hover{background:rgba(255,255,255,.07)}
+.nav.on{background:rgba(255,255,255,.13);color:#fff}
+.nav svg{width:17px;height:17px;flex:none;stroke:currentColor;fill:none;stroke-width:1.8}
+.nav .n{margin-left:auto;font-size:11px;font-weight:800;background:#E5484D;color:#fff;border-radius:9px;padding:0 6px}
+.me{margin-top:auto;padding:12px 10px 0;border-top:1px solid rgba(255,255,255,.12);font-size:12.5px;color:var(--dim)}
+.me b{color:#fff;display:block;font-size:13px}
+.main{min-width:0;display:flex;flex-direction:column}
+.pub{position:sticky;top:0;z-index:5;background:var(--warn-soft);border-bottom:1px solid var(--line);padding:9px max(20px,env(safe-area-inset-right,0px)) 9px 24px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.pub span{font-weight:700;font-size:13px}
+.pub .sp{flex:1}
+.btn{border:1px solid var(--line);background:var(--surf);border-radius:9px;padding:7px 13px;font-weight:700;font-size:13px;cursor:pointer}
+.btn.p{background:var(--navy);border-color:var(--navy);color:#fff}
+.btn.d{color:var(--bad);border-color:color-mix(in srgb,var(--bad) 40%,transparent)}
+.btn:focus-visible,.nav:focus-visible,.chip:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.wrap{padding:22px 24px 40px;padding-right:max(24px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:16px;max-width:1180px}
+.hd{display:flex;align-items:flex-end;gap:12px;flex-wrap:wrap}
+.hd h1{margin:0;font-size:22px;font-weight:800;text-wrap:balance}
+.hd p{margin:4px 0 0;color:var(--muted);font-size:13.5px;max-width:68ch;line-height:1.45}
+.hd .sp{flex:1}
+.card{background:var(--surf);border:1px solid var(--line);border-radius:14px;min-width:0}
+.card h2{margin:0;font-size:14px;font-weight:800;padding:14px 16px 0}
+.tw{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+th{text-align:left;font-size:11px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);padding:12px 14px 8px;border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:10px 14px;border-bottom:1px solid var(--line);vertical-align:middle}
+tr:last-child td{border-bottom:0}
+tbody tr{cursor:pointer}
+tbody tr:hover td{background:var(--surf2)}
+tr.sel td{background:var(--accent-soft)}
+.num{font-variant-numeric:tabular-nums;font-weight:700}
+.code{display:inline-grid;place-items:center;min-width:34px;height:26px;border-radius:7px;background:var(--navy);color:#fff;font-weight:800;font-size:12px;padding:0 6px}
+.tag{display:inline-block;font-size:11.5px;font-weight:700;border-radius:6px;padding:2px 7px;background:var(--surf2);border:1px solid var(--line);margin:1px 2px 1px 0}
+.st{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:800;border-radius:20px;padding:3px 9px}
+.st.ok{background:var(--ok-soft);color:var(--ok)} .st.w{background:var(--warn-soft);color:var(--warn)} .st.m{background:var(--surf2);color:var(--muted)}
+.st::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+.split{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(280px,1fr);gap:16px;align-items:start}
+.form{padding:14px 16px 16px;display:flex;flex-direction:column;gap:12px}
+.f{display:flex;flex-direction:column;gap:5px}
+.f label{font-size:12px;font-weight:700;color:var(--muted)}
+.f input,.f select,.f textarea{font:inherit;font-size:14px;color:var(--fg);background:var(--surf2);border:1px solid var(--line);border-radius:9px;padding:8px 10px;width:100%}
+.f textarea{min-height:110px;resize:vertical;line-height:1.45}
+.f small{font-size:11.5px;color:var(--muted)}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border:1px solid var(--line);background:var(--surf);border-radius:20px;padding:5px 11px;font-weight:700;font-size:12.5px;cursor:pointer}
+.chip.on{background:var(--navy);color:#fff;border-color:var(--navy)}
+.chip.add{border-style:dashed;color:var(--muted)}
+.seg{display:inline-flex;background:var(--surf2);border:1px solid var(--line);border-radius:9px;padding:2px}
+.seg button{border:0;background:none;border-radius:7px;padding:6px 12px;font-weight:700;font-size:12.5px;color:var(--muted);cursor:pointer}
+.seg button.on{background:var(--surf);color:var(--fg);box-shadow:0 1px 3px rgba(11,30,79,.12)}
+.drop{border:1.5px dashed var(--line);border-radius:12px;padding:18px;text-align:center;color:var(--muted);font-size:13px;line-height:1.5;background:var(--surf2)}
+.drop b{color:var(--fg)}
+.hint{font-size:12.5px;color:var(--muted);line-height:1.45;padding:0 16px 14px}
+.phone{width:250px;max-width:100%;border-radius:22px;border:1px solid var(--line);overflow:hidden;background:#EFF2F8;color:#14213D;margin:0 auto}
+.ph-top{background:var(--navy);color:#fff;padding:10px 14px;font-weight:800;font-size:14px;display:flex;justify-content:space-between}
+.ph-item{background:#fff;margin:8px;border-radius:11px;padding:9px 11px;border:1px solid #E3E8F2}
+.ph-item b{display:block;font-size:13px}
+.ph-item small{font-size:11px;color:#6B7799;font-weight:600}
+.new{font-size:10px;font-weight:800;color:#fff;background:#E5484D;border-radius:5px;padding:1px 5px;margin-left:6px;vertical-align:1px}
+.log td:first-child{white-space:nowrap;color:var(--muted)}
+.mock{font-size:11.5px;font-weight:800;letter-spacing:.06em;color:var(--warn);background:var(--warn-soft);border-radius:6px;padding:3px 8px}
+@media (max-width:820px){
+  .app{grid-template-columns:1fr}
+  .side{flex-direction:row;overflow-x:auto;padding:10px max(12px,env(safe-area-inset-left,0px));gap:4px;align-items:center}
+  .brand{padding:0 10px 0 2px}.brand small{display:none}
+  .grp,.me{display:none}
+  .nav{width:auto;white-space:nowrap;padding:7px 10px}
+  .split{grid-template-columns:1fr}
+  .wrap{padding:18px max(16px,env(safe-area-inset-left,0px)) 32px max(16px,env(safe-area-inset-right,0px))}
+  .pub{padding-left:max(16px,env(safe-area-inset-left,0px))}
+  .row2{grid-template-columns:1fr}
+}
+@media (prefers-reduced-motion:no-preference){.view{animation:fade .18s ease}@keyframes fade{from{opacity:.4;transform:translateY(3px)}to{opacity:1;transform:none}}}
+.tabs{display:flex;gap:2px;border-bottom:1px solid var(--line);margin-top:-4px;overflow-x:auto}
+.tabs button{border:0;background:none;padding:10px 14px;font-weight:700;font-size:13.5px;color:var(--muted);border-bottom:2.5px solid transparent;cursor:pointer;white-space:nowrap}
+.tabs button.on{color:var(--fg);border-bottom-color:var(--navy)}
+:root[data-theme="dark"] .tabs button.on{border-bottom-color:var(--accent)}
+.back{align-self:flex-start;border:0;background:none;color:var(--accent);font-weight:700;cursor:pointer;padding:0;font-size:13px}
+.idc{display:flex;align-items:center;gap:14px}
+.idc .code{min-width:52px;height:40px;font-size:17px;border-radius:10px}
+.mini{width:62px;font:inherit;font-weight:700;font-variant-numeric:tabular-nums;text-align:center;background:var(--surf2);border:1px solid var(--line);border-radius:8px;padding:6px 4px;color:var(--fg)}
+.mini.ch{border-color:var(--warn);background:var(--warn-soft)}
+.refsel{font:inherit;font-size:12.5px;font-weight:700;background:var(--surf2);border:1px solid var(--line);border-radius:8px;padding:5px 6px;color:var(--fg)}
+.u{color:var(--muted);font-size:12px;font-weight:600;margin-left:3px}
+.gantt{padding:10px 16px 16px}
+.gx{position:relative;height:22px;margin-left:124px;border-bottom:1px solid var(--line);font-size:11px;color:var(--muted);font-weight:700}
+.gx span{position:absolute;transform:translateX(-50%);top:2px;font-variant-numeric:tabular-nums}
+.gr{display:flex;align-items:center;height:28px}
+.gr .gl{width:124px;flex:none;font-size:12.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-right:8px}
+.gr .gt{position:relative;flex:1;height:100%}
+.gb{position:absolute;top:6px;height:16px;border-radius:5px;background:var(--navy)}
+:root[data-theme="dark"] .gb{background:var(--accent)}
+.gb.pt{width:4px!important;border-radius:2px;background:var(--warn)}
+.gline{position:absolute;top:0;bottom:0;width:0;border-left:1.5px dashed var(--muted);opacity:.6}
+.gline.e{border-left:2px solid var(--bad);opacity:.9}
+.gcap{position:absolute;top:-1px;font-size:10.5px;font-weight:800;transform:translateX(-50%);background:var(--surf);padding:0 3px}
+.typecards{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;padding:12px 16px 16px}
+.tc{border:1px solid var(--line);border-radius:11px;padding:10px 12px;cursor:pointer;background:var(--surf)}
+.tc.on{border-color:var(--navy);box-shadow:0 0 0 1px var(--navy) inset;background:var(--accent-soft)}
+.tc b{font-size:15px;display:block}.tc small{color:var(--muted);font-weight:600;font-size:12px}
+.steps{display:flex;gap:6px;padding:14px 16px 0;flex-wrap:wrap}
+.steps span{font-size:12px;font-weight:800;padding:5px 10px;border-radius:20px;background:var(--surf2);color:var(--muted);border:1px solid var(--line)}
+.steps span.on{background:var(--navy);color:#fff;border-color:var(--navy)}
+.steps span.dn{color:var(--ok);background:var(--ok-soft);border-color:transparent}
+.rule{display:flex;gap:10px;align-items:flex-start;padding:10px 16px;border-top:1px solid var(--line);font-size:13px;line-height:1.45}
+.rule .tag{flex:none}
+.inh{font-size:11.5px;font-weight:700;color:var(--muted)}
+.inh.ov{color:var(--warn)}
+.ph-tl{padding:8px 10px 12px;background:#fff;margin:8px;border-radius:11px;border:1px solid #E3E8F2}
+.ph-tl .r{display:flex;align-items:center;height:20px;font-size:10px;font-weight:700}
+.ph-tl .r i{width:62px;flex:none;font-style:normal;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.ph-tl .r em{position:relative;flex:1;height:100%}
+.ph-tl .r em b{position:absolute;top:5px;height:10px;border-radius:3px;background:#0B1E4F}
+.ph-tl .r em b.pt{width:3px!important;background:#E0A100}
+.ph-tl .now{position:absolute;top:0;bottom:0;border-left:1.5px solid #D6404A}
+@media (max-width:820px){.gx{margin-left:96px}.gr .gl{width:96px;font-size:11.5px}}
+@media (max-width:820px){
+  .stp thead{display:none}
+  .stp tr{display:grid;grid-template-columns:1fr 1fr auto;border-bottom:1px solid var(--line)}
+  .stp td{border:0;padding:6px 10px}
+  .stp td:first-child{grid-column:1/3;padding-top:10px}
+  .stp td:last-child{grid-column:3;grid-row:1/3;align-self:center}
+  .stp td.d{grid-row:2;padding-bottom:10px}
+  .stp td.d::before{content:attr(data-l);display:block;font-size:10.5px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin-bottom:3px}
+  .stp .mini{width:52px}
+}
+a.nav,a.btn{text-decoration:none}a.btn{display:inline-block}.btn:disabled{opacity:.45;cursor:default}[hidden]{display:none!important}.me .back{font-size:12.5px}
+</style></head><body>
+<div class="app">
+  <nav class="side" id="side" aria-label="Sections de l'admin"></nav>
+  <div class="main">
+    <div class="pub" role="status"><span class="mock">DÉMO</span><span id="pubtxt"></span><span class="sp"></span><button class="btn" id="undoBtn" type="button" onclick="undo()" hidden>Annuler</button><button class="btn p" id="pubBtn" type="button" onclick="publish()">Publier</button></div>
+    <div class="wrap view" id="view"></div>
+  </div>
+</div>
+<script>
+/* Admin compagnies (démo) : brouillon dans localStorage 'adminCfgDraft', publication dans 'adminCfg' que lit l'app (cfg.js). */
+const ICONS = {
+  plane:'<path d="M2 16l20-6-20-6 4 6-4 6z"/>', clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+  plus:'<circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/>', phone:'<rect x="7" y="2.5" width="10" height="19" rx="2.5"/><path d="M11 18h2"/>',
+  back:'<path d="M15 5l-7 7 7 7"/>'
+};
+const NAV = [['Exploitation'],['compagnies','Compagnies','plane'],['cibles','Temps d\'escale cibles','clock'],['ajout','Ajouter une compagnie','plus'],['Contrôle'],['apercu','Aperçu dans l\'app','phone']];
+// Étapes que la timeline de l'app sait afficher (clé = action de renderTimeline)
+const STEPS = {
+  'Débarquement':'Débarquement', 'Cabin release':'Cabin tidy / cleaning', 'Avitair':'Avitaillement', 'Lift (Dep)':'Lift départ',
+  'Embarquement':'Embarquement', 'ArrPNT':'Arrivée PNT', 'ArrPNC':'Arrivée PNC', 'RemiseLID':'LID / LDS-LDF',
+  'FermeturePorteAvion':'Fermeture porte', 'ConnexionCasque':'Connexion casque', 'ArriveeINAD':'Arrivée INAD'
+};
+const POINTS = new Set(['ArrPNT','ArrPNC','RemiseLID','FermeturePorteAvion','ConnexionCasque','ArriveeINAD']);
+const S = (k,a,b) => ({k, a, b: b || null});
+const FR_ST = [S('ArrPNT',['EOBT',-45]),S('ArrPNC',['EOBT',-45]),S('Débarquement',['AIBT',2],['EOBT',-13]),S('Avitair',['EOBT',-25],['EOBT',-5]),
+  S('Lift (Dep)',['EOBT',-25],['EOBT',-5]),S('Cabin release',['EOBT',-13],['EOBT',-10]),S('Embarquement',['EOBT',-13],['EOBT',-5]),
+  S('RemiseLID',['EOBT',-5]),S('FermeturePorteAvion',['EOBT',-5])];
+const W320 = [S('Débarquement',['EOBT',-27],['EOBT',-20]),S('Avitair',['EOBT',-27],['EOBT',-5]),S('Cabin release',['EOBT',-19],['EOBT',-15]),
+  S('Embarquement',['EOBT',-14],['EOBT',-3]),S('RemiseLID',['EOBT',-7]),S('FermeturePorteAvion',['EOBT',-2])];
+const W321 = [S('Débarquement',['EOBT',-32],['EOBT',-24]),S('Avitair',['EOBT',-32],['EOBT',-5]),S('Cabin release',['EOBT',-23],['EOBT',-18]),
+  S('Embarquement',['EOBT',-17],['EOBT',-3]),S('RemiseLID',['EOBT',-9]),S('FermeturePorteAvion',['EOBT',-2])];
+const V7S = [S('Débarquement',['EOBT',-28],['EOBT',-23]),S('Cabin release',['EOBT',-23],['EOBT',-21]),S('Embarquement',['EOBT',-20],['EOBT',-7]),S('FermeturePorteAvion',['EOBT',-5])];
+const T = (mtt,crew,steps,like) => { const o = {mtt, crew}; if(steps) o.steps = steps; if(like) o.like = like; return o; };
+const ryr = (n,icao) => ({n, icao, hle:60, types:{B737:T(25,35,FR_ST),B738:T(25,35,null,'B737'),B38M:T(25,35,null,'B737'),A320:T(25,35,null,'B737'),CL35:T(25,35,null,'B737')}});
+const wzz = (n,icao) => ({n, icao, hle:40, types:{A320:T(30,null,W320),A321:T(35,null,W321),A20N:T(30,null,null,'A320'),A21N:T(35,null,null,'A321'),A21NY:T(35,null,null,'A321')}});
+const hsk = n => ({n, icao:'', hle:40, types:{A319:T(null,null),A320:T(null,null),A321:T(null,null),A21N:T(null,null)}});
+// Réglages d'origine = valeurs codées dans l'app (v3.35)
+const DEFAULTS = JSON.parse(JSON.stringify({v:1, al:{
+  FR:ryr('Ryanair','RYR'), RK:ryr('Ryanair UK','RUK'), W6:wzz('Wizz Air','WZZ'), W4:wzz('Wizz Air Malta','WMT'),
+  V7:{n:'Volotea', icao:'VOE', hle:40, types:{A319:T(null,null,null,'A320'),A320:T(null,null,V7S)}},
+  H4:hsk('HiSky'), H6:hsk('')
+}}));
+const RULES = {
+  FR:[['Départ de BVA','L\'embarquement commence à EOBT −35.'],['Changement d\'équipage','Arrivée PNT ou PNC remplie : rotation mini « avec changement d\'équipage », cabin tidy jusqu\'au dernier débarqué +10 au lieu de +3.'],['Paper LID','LID 3 min avant la cible eLID.']],
+  W6:[['A320 en Y186','Immatriculations connues en 186 sièges, sinon Y180.']]
+};
+RULES.RK = RULES.FR; RULES.W4 = RULES.W6;
+const clone = o => JSON.parse(JSON.stringify(o));
+const LS = { get(k){ try{ return JSON.parse(localStorage.getItem(k) || 'null'); }catch(e){ return null; } }, set(k,v){ try{ v == null ? localStorage.removeItem(k) : localStorage.setItem(k, JSON.stringify(v)); }catch(e){} } };
+const pubCfg = () => LS.get('adminCfg') || DEFAULTS;
+let C = LS.get('adminCfgDraft') || clone(pubCfg());
+let cur = 'compagnies', sel = 'W6', tab = 'types', ty = 'A320', wiz = 1, flash = '';
+const W = {c:'', icao:'', n:'', from:'W6', types:[]};
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+const AL = c => C.al[c];
+const stepsOf = (a,t) => { const x = a.types[t]; if(!x) return null; return x.steps || (x.like && a.types[x.like] && a.types[x.like].steps) || null; };
+const sgn = v => (v > 0 ? '+' : '') + v;
+
+function save(){ LS.set('adminCfgDraft', C); pubBar(); }
+function dirty(){ return JSON.stringify(C) !== JSON.stringify(pubCfg()); }
+function pubBar(){
+  const d = dirty();
+  $('#pubtxt').textContent = d ? 'Modifications pas encore publiées' : flash || (LS.get('adminCfg') ? 'Réglages publiés sur la démo' : 'Réglages d\'origine de l\'app');
+  $('#pubBtn').disabled = !d; $('#undoBtn').hidden = !d;
+}
+function publish(){ LS.set('adminCfg', C); LS.set('adminCfgDraft', null); flash = 'Publié. La démo ouverte sur cet appareil utilise maintenant ces réglages.'; pubBar(); }
+function undo(){ C = clone(pubCfg()); LS.set('adminCfgDraft', null); flash = ''; go(cur); }
+function resetAll(){
+  if(!confirm('Revenir aux réglages d\'origine de l\'app ? Les compagnies ajoutées et les cibles modifiées seront perdues.')) return;
+  LS.set('adminCfg', null); LS.set('adminCfgDraft', null); C = clone(DEFAULTS); flash = 'Réglages d\'origine rétablis.'; go('compagnies');
+}
+function icon(k){ return '<svg viewBox="0 0 24 24" aria-hidden="true">' + ICONS[k] + '</svg>'; }
+function side(){
+  let h = '<div class="brand"><i>T</i><div><b>Timing · Admin</b><small>Démo · Escale BVA</small></div></div>';
+  NAV.forEach(n => { h += n.length === 1 ? '<div class="grp">' + n[0] + '</div>'
+    : '<button type="button" class="nav' + (navOn(n[0]) ? ' on' : '') + '" onclick="go(\'' + n[0] + '\')">' + icon(n[2]) + n[1] + '</button>'; });
+  h += '<a class="nav" href="./">' + icon('back') + 'Retour à l\'app</a>';
+  h += '<div class="me"><button type="button" class="back" style="color:#D5DEF5" onclick="resetAll()">Revenir aux réglages d\'origine</button></div>';
+  $('#side').innerHTML = h;
+}
+function navOn(k){ return k === 'cibles' ? (cur === 'fiche' && tab === 'cibles') : k === 'compagnies' ? (cur === 'compagnies' || (cur === 'fiche' && tab !== 'cibles')) : cur === k; }
+function go(v, c, t){
+  cur = v; if(c) sel = c; if(t) tab = t;
+  if(v === 'cibles'){ cur = 'fiche'; tab = 'cibles'; }
+  if(!AL(sel)) sel = Object.keys(C.al)[0];
+  if(cur === 'fiche' && !AL(sel).types[ty]) ty = Object.keys(AL(sel).types)[0] || '';
+  side(); render(); pubBar();
+}
+function render(){
+  const v = $('#view'); v.innerHTML = ({compagnies:vList, fiche:vFiche, ajout:vAjout, apercu:vApercu})[cur]();
+  v.classList.remove('view'); void v.offsetWidth; v.classList.add('view');
+  if(cur === 'fiche' && tab === 'cibles') drawGantt();
+}
+
+/* Compagnies */
+function vList(){
+  let r = '';
+  Object.entries(C.al).forEach(([c,a]) => {
+    const ts = Object.keys(a.types), mt = [...new Set(ts.map(t => a.types[t].mtt).filter(v => v != null && v !== ''))];
+    const nT = ts.filter(t => (stepsOf(a,t) || []).length).length;
+    const st = ts.length && nT === ts.length ? '<span class="st ok">Complètes</span>' : nT ? '<span class="st w">' + nT + '/' + ts.length + ' types</span>' : '<span class="st m">Aucune</span>';
+    r += '<tr onclick="go(\'fiche\',\'' + c + '\',\'types\')"><td><span class="code">' + c + '</span></td><td><b>' + (esc(a.n) || '<span style="color:var(--muted)">Sans nom</span>') + '</b>' + (a.icao ? '<br><small style="color:var(--muted);font-weight:600">Callsign ' + esc(a.icao) + '</small>' : '') + '</td><td>' + ts.map(t => '<span class="tag">' + esc(t) + '</span>').join('') + '</td><td class="num">' + (mt.length ? mt.join(' / ') + ' min' : '<span style="color:var(--muted)">programme</span>') + '</td><td class="num">SOBT −' + a.hle + '</td><td>' + st + '</td></tr>';
+  });
+  return '<div class="hd"><div><h1>Compagnies</h1><p>Ce que la démo connaît de chaque compagnie. Touchez une ligne pour régler ses types avion, ses rotations minimales et ses temps d\'escale cibles.</p></div><span class="sp"></span><button class="btn p" type="button" onclick="wiz=1;go(\'ajout\')">+ Ajouter une compagnie</button></div>'
+   + '<div class="card tw"><table><thead><tr><th>Code</th><th>Compagnie</th><th>Types avion</th><th>Rotation mini</th><th>Début HLE</th><th>Cibles timeline</th></tr></thead><tbody>' + r + '</tbody></table></div>'
+   + '<p class="hint" style="padding:0">Rotation mini « programme » : l\'app garde la rotation prévue (SOBT − SIBT). Une compagnie absente de cette liste garde les règles de base de l\'app.</p>';
+}
+
+/* Fiche compagnie */
+function vFiche(){
+  const a = AL(sel);
+  const tabs = [['general','Général'],['types','Types avion & rotations'],['cibles','Temps d\'escale cibles'],['regles','Règles particulières']];
+  return '<button class="back" type="button" onclick="go(\'compagnies\')">← Compagnies</button>'
+   + '<div class="hd"><div class="idc"><span class="code">' + sel + '</span><div><h1>' + (esc(a.n) || sel) + '</h1><p style="margin:2px 0 0">' + (a.icao ? 'Callsign ' + esc(a.icao) + ' · ' : '') + Object.keys(a.types).length + ' types avion</p></div></div><span class="sp"></span><div class="chips">' + Object.keys(C.al).map(x => '<button type="button" class="chip' + (x === sel ? ' on' : '') + '" onclick="go(\'fiche\',\'' + x + '\')">' + x + '</button>').join('') + '</div></div>'
+   + '<div class="tabs" role="tablist">' + tabs.map(t => '<button type="button" role="tab" class="' + (tab === t[0] ? 'on' : '') + '" onclick="go(\'fiche\',null,\'' + t[0] + '\')">' + t[1] + '</button>').join('') + '</div>'
+   + ({general:tGen, types:tTypes, cibles:tCibles, regles:tRegles})[tab](a);
+}
+function setA(k, v){ AL(sel)[k] = v; save(); }
+function tGen(a){
+  const hles = [30,40,45,50,60,75,90]; if(!hles.includes(+a.hle)) hles.push(+a.hle);
+  return '<div class="card" style="max-width:640px"><h2>Identité</h2><div class="form">'
+   + '<div class="row2"><div class="f"><label>Code IATA</label><input value="' + sel + '" disabled><small>Le code ne se change pas : créez une nouvelle compagnie au besoin.</small></div>'
+   + '<div class="f"><label>Préfixe callsign (OACI)</label><input value="' + esc(a.icao) + '" maxlength="3" oninput="setA(\'icao\',this.value.toUpperCase())"><small>Reconnaît la compagnie quand le vol n\'a qu\'un indicatif (' + (a.icao || 'XXX') + '123).</small></div></div>'
+   + '<div class="f"><label>Nom affiché</label><input value="' + esc(a.n) + '" oninput="setA(\'n\',this.value)"></div>'
+   + '<div class="f"><label>Début HLE (vols sans arrivée)</label><select onchange="setA(\'hle\',+this.value)">' + hles.sort((x,y) => x-y).map(v => '<option value="' + v + '"' + (v === +a.hle ? ' selected' : '') + '>SOBT −' + v + ' min</option>').join('') + '</select><small>Heure HLE du bloc Timing, et départ de la barre de progression quand l\'avion part de BVA.</small></div>'
+   + (DEFAULTS.al[sel] ? '' : '<div class="rule" style="padding:10px 0 0"><button class="btn d" type="button" onclick="delAl()">Supprimer cette compagnie</button></div>')
+   + '</div></div>';
+}
+function delAl(){ if(!confirm('Supprimer ' + sel + ' ?')) return; delete C.al[sel]; save(); go('compagnies'); }
+function setT(t, k, el){
+  const x = AL(sel).types[t], v = el.value.trim();
+  x[k] = v === '' ? null : Math.max(0, parseInt(v, 10) || 0); el.classList.add('ch'); save();
+}
+function setLike(t, v){
+  const a = AL(sel), x = a.types[t];
+  if(v === '__own'){ x.steps = clone(stepsOf(a,t) || []); delete x.like; }
+  else if(v === '__none'){ delete x.steps; delete x.like; }
+  else { delete x.steps; x.like = v; Object.values(a.types).forEach(y => { if(y.like === t) y.like = v; }); }
+  save(); render();
+}
+function addType(){
+  const el = $('#newType'), t = (el.value || '').toUpperCase().replace(/\s/g, ''); const a = AL(sel);
+  if(!t || a.types[t]) { el.focus(); return; }
+  const first = Object.keys(a.types)[0], f = first ? a.types[first] : null;
+  a.types[t] = f ? {mtt:f.mtt, crew:f.crew, like: f.steps ? first : f.like} : {mtt:null, crew:null};
+  if(a.types[t].like == null) delete a.types[t].like;
+  save(); render();
+}
+function delType(t){
+  const a = AL(sel); if(Object.keys(a.types).length < 2) return;
+  if(!confirm('Retirer ' + t + ' de ' + sel + ' ?')) return;
+  const own = a.types[t].steps; delete a.types[t];
+  Object.values(a.types).forEach(y => { if(y.like === t){ delete y.like; if(own) y.steps = clone(own); } });
+  save(); render();
+}
+function tTypes(a){
+  const ts = Object.keys(a.types); let r = '';
+  ts.forEach(t => {
+    const x = a.types[t];
+    const opts = '<option value="__own"' + (x.steps ? ' selected' : '') + '>Cibles propres</option>'
+      + ts.filter(o => o !== t && a.types[o].steps).map(o => '<option value="' + o + '"' + (x.like === o ? ' selected' : '') + '>Comme ' + o + '</option>').join('')
+      + '<option value="__none"' + (!x.steps && !x.like ? ' selected' : '') + '>Aucune cible</option>';
+    r += '<tr style="cursor:default"><td><b>' + esc(t) + '</b>' + (t === ts[0] ? '<br><small style="color:var(--muted);font-weight:600">par défaut</small>' : '') + '</td>'
+      + '<td><input class="mini" inputmode="numeric" value="' + (x.mtt ?? '') + '" placeholder="—" oninput="setT(\'' + t + '\',\'mtt\',this)"><span class="u">min</span></td>'
+      + '<td><input class="mini" inputmode="numeric" value="' + (x.crew ?? '') + '" placeholder="—" oninput="setT(\'' + t + '\',\'crew\',this)"><span class="u">min</span></td>'
+      + '<td><select class="refsel" onchange="setLike(\'' + t + '\',this.value)">' + opts + '</select></td>'
+      + '<td style="white-space:nowrap"><button class="btn" type="button" onclick="ty=\'' + t + '\';go(\'fiche\',null,\'cibles\')">Cibles</button> ' + (ts.length > 1 ? '<button class="btn d" type="button" aria-label="Retirer ' + t + '" onclick="delType(\'' + t + '\')">×</button>' : '') + '</td></tr>';
+  });
+  return '<div class="card tw"><table><thead><tr><th>Type</th><th>Rotation mini</th><th>Avec changement d\'équipage</th><th>Timeline cible</th><th></th></tr></thead><tbody>' + r + '</tbody></table>'
+   + '<div class="rule" style="flex-wrap:wrap;align-items:center"><input id="newType" class="mini" style="width:96px;text-transform:uppercase" maxlength="6" placeholder="A21N" onkeydown="if(event.key===\'Enter\')addType()"><button class="chip add" type="button" onclick="addType()">+ Ajouter un type</button>'
+   + '<span style="color:var(--muted);flex-basis:100%">EOBT = max(SOBT, AIBT + rotation mini). Rotation vide : rotation prévue au programme. Changement d\'équipage vide : même rotation. Un type absent de la liste prend les réglages du type par défaut.</span></div></div>';
+}
+function tCibles(a){
+  const ts = Object.keys(a.types);
+  if(!ts.length) return '<div class="card"><div class="hint" style="padding-top:14px">Ajoutez d\'abord un type avion.</div></div>';
+  const x = a.types[ty], steps = stepsOf(a, ty);
+  let h = '<div class="card"><h2>Type avion</h2><div class="typecards">' + ts.map(t => { const y = a.types[t]; return '<div class="tc' + (t === ty ? ' on' : '') + '" role="button" tabindex="0" onclick="ty=\'' + t + '\';go(\'fiche\')"><b>' + esc(t) + '</b><small>' + (y.mtt ? y.mtt + ' min mini · ' : '') + (y.steps ? 'cibles propres' : y.like ? 'comme ' + y.like : 'aucune cible') + '</small></div>'; }).join('') + '</div></div>';
+  if(!steps){
+    const srcs = []; Object.entries(C.al).forEach(([c,b]) => Object.keys(b.types).forEach(t => { if(b.types[t].steps && b.types[t].steps.length) srcs.push(c + ' ' + t); }));
+    return h + '<div class="card"><div class="drop" style="margin:16px"><b>Pas de cibles pour ' + sel + ' ' + esc(ty) + '</b><br>La timeline n\'affiche alors que les heures réelles.<br><br>'
+      + '<select class="refsel" id="srcSel">' + srcs.map(s => '<option' + (s === 'W6 A320' ? ' selected' : '') + '>' + s + '</option>').join('') + '</select> <button class="btn p" type="button" onclick="copyFrom($(\'#srcSel\').value)">Copier ces cibles</button> <button class="btn" type="button" onclick="copyFrom(null)">Partir de zéro</button></div></div>';
+  }
+  const ref = (i,k,r) => '<select class="refsel" aria-label="Référence" onchange="setRef(' + i + ',\'' + k + '\',this.value)">' + ['AIBT','EOBT'].map(v => '<option' + (v === r ? ' selected' : '') + '>' + v + '</option>').join('') + '</select>';
+  const off = (i,k,v) => '<input class="mini" inputmode="numeric" aria-label="Minutes" value="' + sgn(v) + '" oninput="setOff(' + i + ',\'' + k + '\',this)">';
+  let r = '';
+  steps.forEach((s,i) => {
+    r += '<tr style="cursor:default"><td><b>' + esc(STEPS[s.k] || s.k) + '</b></td><td class="d" data-l="Début" style="white-space:nowrap">' + ref(i,'a',s.a[0]) + ' ' + off(i,'a',s.a[1]) + '</td><td class="d" data-l="Fin" style="white-space:nowrap">' + (s.b ? ref(i,'b',s.b[0]) + ' ' + off(i,'b',s.b[1]) : '<span class="tag">jalon</span>') + '</td><td><button class="btn d" type="button" aria-label="Retirer" onclick="delStep(' + i + ')">×</button></td></tr>';
+  });
+  const left = Object.keys(STEPS).filter(k => !steps.some(s => s.k === k));
+  const mtt = x.mtt || 30;
+  h += '<div class="split"><div class="card tw"><h2>' + sel + ' ' + esc(ty) + ' : étapes et cibles' + (x.steps ? '' : ' <span class="inh ov">(celles de ' + x.like + ')</span>') + '</h2>'
+   + (x.steps ? '' : '<div class="hint" style="padding-top:8px">Modifier une valeur donne à ' + esc(ty) + ' ses propres cibles ; ' + x.like + ' ne change pas.</div>')
+   + '<table class="stp"><thead><tr><th>Étape</th><th>Début</th><th>Fin</th><th></th></tr></thead><tbody>' + r + '</tbody></table>'
+   + (left.length ? '<div class="rule" style="align-items:center"><select class="refsel" id="newStep">' + left.map(k => '<option value="' + k + '">' + STEPS[k] + '</option>').join('') + '</select><button class="chip add" type="button" onclick="addStep($(\'#newStep\').value)">+ Ajouter l\'étape</button></div>' : '')
+   + '<div class="hint" style="padding-top:10px">Cabin : la cible démarre au dernier débarqué réel dès qu\'il est saisi.</div></div>'
+   + '<div class="card"><h2>Aperçu de la timeline</h2><div class="hint" style="padding-top:6px">Avion à l\'heure, rotation de ' + mtt + ' min : AIBT = EOBT −' + mtt + '. Se met à jour pendant la saisie.</div><div class="gantt" id="gantt"></div></div></div>';
+  return h;
+}
+function editable(){ const a = AL(sel), x = a.types[ty]; if(!x.steps){ x.steps = clone(stepsOf(a,ty) || []); delete x.like; } return x.steps; }
+function setOff(i,k,el){ const v = parseInt(el.value.replace(/[−–]/g,'-'), 10); if(isNaN(v)) return; const st = editable(); st[i][k][1] = v; el.classList.add('ch'); save(); drawGantt(); syncHead(); }
+function setRef(i,k,v){ editable()[i][k][0] = v; save(); render(); }
+function delStep(i){ editable().splice(i,1); save(); render(); }
+function addStep(k){ editable().push(POINTS.has(k) ? S(k,['EOBT',-10]) : S(k,['EOBT',-20],['EOBT',-10])); save(); render(); }
+function copyFrom(src){
+  const x = AL(sel).types[ty]; delete x.like;
+  if(src){ const [c,t] = src.split(' '); x.steps = clone(C.al[c].types[t].steps); }
+  else x.steps = [S('Débarquement',['AIBT',2],['EOBT',-20]),S('Embarquement',['EOBT',-15],['EOBT',-5]),S('FermeturePorteAvion',['EOBT',-3])];
+  save(); render();
+}
+function syncHead(){ const h = document.querySelector('.split .card.tw h2'); if(h && AL(sel).types[ty].steps) h.innerHTML = sel + ' ' + esc(ty) + ' : étapes et cibles'; }
+function ganttHTML(st, mtt, cls){
+  const abs = p => p[0] === 'AIBT' ? -mtt + p[1] : p[1];   // minutes par rapport à EOBT
+  const lo = Math.min(-mtt - 5, ...st.map(s => abs(s.a)), ...st.filter(s => s.b).map(s => abs(s.b))) - 2;
+  const hi = Math.max(5, ...st.map(s => abs(s.b || s.a)) .map(v => v + 3)), Wd = hi - lo, pc = m => ((m - lo) / Wd * 100).toFixed(2) + '%';
+  return {abs, lo, hi, Wd, pc};
+}
+function drawGantt(){
+  const g = $('#gantt'); if(!g) return;
+  const a = AL(sel), x = a.types[ty], st = stepsOf(a,ty) || [], mtt = x.mtt || 30;
+  const {abs, lo, hi, Wd, pc} = ganttHTML(st, mtt);
+  let ax = ''; for(let m = Math.ceil(lo / 10) * 10; m <= hi; m += 10) ax += '<span style="left:' + pc(m) + '">' + (m === 0 ? 'EOBT' : m) + '</span>';
+  let h = '<div class="gx">' + ax + '</div>';
+  st.forEach(s => {
+    const s0 = abs(s.a), s1 = s.b ? abs(s.b) : s0, bad = s.b && s1 < s0;
+    h += '<div class="gr"><div class="gl" title="' + esc(STEPS[s.k] || s.k) + '">' + esc(STEPS[s.k] || s.k) + '</div><div class="gt"><span class="gline" style="left:' + pc(-mtt) + '"></span><span class="gline e" style="left:' + pc(0) + '"></span><span class="gb' + (s.b ? '' : ' pt') + '" style="left:' + pc(Math.min(s0,s1)) + ';width:' + (Math.abs(s1 - s0) / Wd * 100).toFixed(2) + '%' + (bad ? ';background:var(--bad)' : '') + '"></span></div></div>';
+  });
+  h += '<div class="gr"><div class="gl"></div><div class="gt"><span class="gcap" style="left:' + pc(-mtt) + ';color:var(--muted)">AIBT</span><span class="gcap" style="left:' + pc(0) + ';color:var(--bad)">EOBT</span></div></div>';
+  if(st.some(s => s.b && abs(s.b) < abs(s.a))) h += '<div class="hint" style="padding:6px 0 0;color:var(--bad)">Une étape finit avant de commencer (en rouge).</div>';
+  g.innerHTML = h;
+}
+function tRegles(a){
+  const rs = RULES[sel] || [];
+  return '<div class="card"><h2>Règles appliquées par l\'app</h2><div class="hint" style="padding-top:6px">Elles s\'ajoutent aux cibles selon la situation du vol. Elles restent dans le code de l\'app pour l\'instant ; seules les valeurs des autres onglets se règlent ici.</div>'
+   + (rs.length ? rs.map(r => '<div class="rule"><span class="tag">Si</span><div><b>' + esc(r[0]) + '</b><br><span style="color:var(--muted)">' + esc(r[1]) + '</span></div></div>').join('') : '<div class="rule" style="color:var(--muted)">Aucune règle particulière pour ' + sel + '.</div>')
+   + '</div>';
+}
+
+/* Ajout d'une compagnie */
+const ALL_TYPES = ['A319','A320','A20N','A321','A21N','A21NY','B737','B738','B38M','BCS3','CL35','E190','E195','AT76'];
+function vAjout(){
+  const steps = ['Identité','Types avion','Récapitulatif'];
+  let h = '<div class="hd"><div><h1>Ajouter une compagnie</h1><p>Le plus rapide : partir d\'une compagnie qui ressemble, puis ajuster dans sa fiche.</p></div></div>'
+   + '<div class="card" style="max-width:760px"><div class="steps">' + steps.map((s,i) => '<span class="' + (i + 1 === wiz ? 'on' : i + 1 < wiz ? 'dn' : '') + '">' + (i + 1) + '. ' + s + '</span>').join('') + '</div>';
+  if(wiz === 1) h += '<div class="form"><div class="row2"><div class="f"><label>Code IATA</label><input id="wc" value="' + esc(W.c) + '" placeholder="ex. U2" maxlength="3" style="text-transform:uppercase"></div><div class="f"><label>Préfixe callsign (OACI)</label><input id="wi" value="' + esc(W.icao) + '" placeholder="ex. EZY" maxlength="3" style="text-transform:uppercase"></div></div><div class="f"><label>Nom affiché</label><input id="wn" value="' + esc(W.n) + '" placeholder="ex. easyJet"></div><div class="f"><label>Partir de</label><div class="chips">' + Object.keys(C.al).map(c => '<button type="button" class="chip' + (W.from === c ? ' on' : '') + '" onclick="saveW();W.from=\'' + c + '\';W.types=[];render()">' + c + '</button>').join('') + '<button type="button" class="chip' + (W.from === '' ? ' on' : '') + '" onclick="saveW();W.from=\'\';W.types=[];render()">Vide</button></div><small>Copie les types, rotations, HLE et cibles. Rien ne reste lié ensuite.</small></div><div class="hint" id="werr" style="padding:0;color:var(--bad)"></div></div>';
+  if(wiz === 2){
+    const src = W.from && AL(W.from), list = [...new Set([...(src ? Object.keys(src.types) : []), ...ALL_TYPES])];
+    h += '<div class="form"><div class="f"><label>Types exploités</label><div class="chips">' + list.map(t => '<button type="button" class="chip' + (W.types.includes(t) ? ' on' : '') + '" onclick="togT(\'' + t + '\')">' + t + '</button>').join('') + '</div><small>Le premier choisi sert de type par défaut.</small></div></div>';
+  }
+  if(wiz === 3){
+    const src = W.from && AL(W.from);
+    h += '<div class="form"><div class="rule" style="border:1px solid var(--line);border-radius:10px"><span class="code">' + esc(W.c) + '</span><div><b>' + esc(W.n || W.c) + '</b><br><span style="color:var(--muted)">' + (W.icao ? 'Callsign ' + esc(W.icao) + ' · ' : '') + 'HLE SOBT −' + (src ? src.hle : 40) + '</span></div></div>'
+      + W.types.map(t => { const s = src && src.types[t], st = src && stepsOf(src,t); return '<div class="rule" style="border:1px solid var(--line);border-radius:10px"><b style="width:64px">' + t + '</b><span style="flex:1;color:var(--muted)">' + (s && s.mtt ? s.mtt + ' min mini · ' : 'rotation du programme · ') + (st && st.length ? st.length + ' étapes copiées de ' + W.from + ' ' + t : 'aucune cible') + '</span></div>'; }).join('')
+      + '<small style="color:var(--muted)">Tout se modifie ensuite dans la fiche de la compagnie.</small></div>';
+  }
+  h += '<div class="rule" style="justify-content:flex-end">' + (wiz > 1 ? '<button class="btn" type="button" onclick="saveW();wiz--;render()">Retour</button>' : '') + (wiz < 3 ? '<button class="btn p" type="button" onclick="next()">Continuer</button>' : '<button class="btn p" type="button" onclick="addAl()">Créer la compagnie</button>') + '</div></div>';
+  return h;
+}
+function saveW(){ if($('#wc')){ W.c = $('#wc').value.toUpperCase().trim(); W.icao = $('#wi').value.toUpperCase().trim(); W.n = $('#wn').value.trim(); } }
+function next(){
+  saveW();
+  if(wiz === 1){
+    const e = !/^[A-Z0-9]{2,3}$/.test(W.c) ? 'Le code IATA fait 2 ou 3 caractères.' : C.al[W.c] ? W.c + ' existe déjà.' : W.icao && !/^[A-Z]{3}$/.test(W.icao) ? 'Le préfixe callsign fait 3 lettres.' : '';
+    if(e){ $('#werr').textContent = e; return; }
+    if(!W.types.length) W.types = W.from ? Object.keys(AL(W.from).types) : ['A320'];
+  }
+  if(wiz === 2 && !W.types.length) return;
+  wiz++; render();
+}
+function togT(t){ const i = W.types.indexOf(t); i < 0 ? W.types.push(t) : W.types.splice(i,1); render(); }
+function addAl(){
+  const src = W.from && AL(W.from), types = {};
+  W.types.forEach(t => {
+    const s = src && src.types[t], st = src && stepsOf(src,t);
+    types[t] = {mtt: s ? s.mtt : null, crew: s ? s.crew : null}; if(st && st.length) types[t].steps = clone(st);
+  });
+  C.al[W.c] = {n: W.n, icao: W.icao, hle: src ? src.hle : 40, types};
+  save(); const c = W.c; Object.assign(W, {c:'', icao:'', n:'', from:'W6', types:[]}); wiz = 1; ty = Object.keys(types)[0]; go('fiche', c, 'types');
+}
+
+/* Aperçu côté app */
+let pv = {c:'W6', t:'A321'};
+function vApercu(){
+  if(!AL(pv.c)) pv.c = Object.keys(C.al)[0];
+  const a = AL(pv.c); if(!a.types[pv.t]) pv.t = Object.keys(a.types)[0];
+  const x = a.types[pv.t] || {}, st = stepsOf(a, pv.t) || [], mtt = x.mtt || 30;
+  const {abs, Wd, pc} = ganttHTML(st, mtt);
+  const eobt = 630, hm = m => { m = (m + 1440) % 1440; return String(Math.floor(m / 60)).padStart(2,'0') + ':' + String(m % 60).padStart(2,'0'); };
+  const at = p => hm(eobt + abs(p));
+  const rows = st.map(s => { const s0 = abs(s.a), s1 = s.b ? abs(s.b) : s0; return '<div class="r"><i>' + esc(STEPS[s.k] || s.k) + '</i><em><b class="' + (s.b ? '' : 'pt') + '" style="left:' + pc(Math.min(s0,s1)) + ';width:' + (Math.abs(s1 - s0) / Wd * 100).toFixed(1) + '%"></b><span class="now" style="left:' + pc(-12) + '"></span></em></div>'; }).join('') || '<div style="font-size:11px;color:#6B7799;padding:8px 0">Pas de cibles : heures réelles seulement.</div>';
+  const tbl = st.map(s => '<tr style="cursor:default"><td>' + esc(STEPS[s.k] || s.k) + '</td><td class="num">' + at(s.a) + (s.b ? ' → ' + at(s.b) : '') + '</td></tr>').join('');
+  return '<div class="hd"><div><h1>Aperçu dans l\'app</h1><p>Vol à l\'heure, EOBT 10:30 : les cibles que l\'agent verra dans la timeline une fois publié.</p></div></div>'
+   + '<div class="split"><div class="card"><h2>Vol d\'exemple</h2><div class="form"><div class="f"><label>Compagnie</label><div class="chips">' + Object.keys(C.al).map(c => '<button type="button" class="chip' + (c === pv.c ? ' on' : '') + '" onclick="pv.c=\'' + c + '\';render()">' + c + '</button>').join('') + '</div></div><div class="f"><label>Type avion</label><div class="chips">' + Object.keys(a.types).map(t => '<button type="button" class="chip' + (t === pv.t ? ' on' : '') + '" onclick="pv.t=\'' + t + '\';render()">' + t + '</button>').join('') + '</div></div>'
+   + '<table><tbody><tr style="cursor:default"><td>AIBT</td><td class="num">' + hm(eobt - mtt) + '</td></tr><tr style="cursor:default"><td>EOBT</td><td class="num">' + hm(eobt) + (x.mtt ? ' <span class="u">AIBT + ' + mtt + ' min</span>' : '') + '</td></tr><tr style="cursor:default"><td>HLE</td><td class="num">' + hm(eobt - a.hle) + '</td></tr>' + tbl + '</tbody></table></div></div>'
+   + '<div class="card" style="padding:16px"><div class="phone"><div class="ph-top"><span>' + pv.c + ' 1234 · ' + esc(pv.t) + '</span><span>' + hm(eobt - 12) + '</span></div><div class="ph-item"><small>Timeline · Départ</small><b>EOBT ' + hm(eobt) + '</b></div><div class="ph-tl">' + rows + '</div></div><p class="hint" style="padding:12px 0 0;text-align:center">Après « Publier », rouvrez la démo pour voir ces cibles sur un vol ' + pv.c + '.</p></div></div>';
+}
+
+/* Accès : connexion faite dans la démo aujourd'hui (même clé que l'app) */
+function authed(){ try{ const o = JSON.parse(localStorage.getItem('pv_auth') || 'null'); return sessionStorage.getItem('pv_auth') === '1' || (o && o.h && new Date(o.t - 3*36e5).toDateString() === new Date(Date.now() - 3*36e5).toDateString()); }catch(e){ return false; } }
+if(!authed()){
+  document.body.innerHTML = '<div style="min-height:100vh;display:grid;place-items:center;padding:16px"><div class="card" style="padding:24px;max-width:400px;text-align:center"><h1 style="margin:0 0 8px;font-size:20px">Admin compagnies</h1><p class="hint" style="padding:0 0 16px">Connectez-vous d\'abord dans la démo, puis revenez par le menu « Admin compagnies ».</p><a class="btn p" href="./">Ouvrir la démo</a></div></div>';
+} else { go('compagnies'); }
+</script></body></html>

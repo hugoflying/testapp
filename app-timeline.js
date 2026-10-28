@@ -535,7 +535,17 @@ function renderTimeline(){
     'Embarquement':        { ref:'EOBT', from:-20, to: -7, fromField:null,              toOffset:null, label:null              },
     'FermeturePorteAvion': { ref:'EOBT', from: -5, to: -5, fromField:null,              toOffset:null, label:'Fermeture porte' },
   };
-  const FRRK_TARGETS = isFRRK ? TARGETS_FRRK : isW4W6 ? TARGETS_W4W6 : isV7 ? TARGETS_V7 : {};
+  let FRRK_TARGETS = isFRRK ? TARGETS_FRRK : isW4W6 ? TARGETS_W4W6 : isV7 ? TARGETS_V7 : {};
+  // v3.36 : compagnie réglée dans l'admin (démo) → ses cibles ; les règles FR/RK restent appliquées par-dessus
+  const cfgT = (typeof cfgTargets === 'function') ? cfgTargets(cie, typeAvion) : null;
+  if(cfgT){
+    if(isFRRK){
+      if(cfgT['Cabin release']) cfgT['Cabin release'].toOffset = cabinMaxMin;
+      if(fromBVA && cfgT['Embarquement']) Object.assign(cfgT['Embarquement'], { fromRef:'EOBT', from:-35 });
+      if(!elidMode && cfgT['RemiseLID']){ cfgT['RemiseLID'].from -= 3; cfgT['RemiseLID'].to -= 3; }   // Paper LID 3 min avant l'eLID
+    }
+    FRRK_TARGETS = cfgT;
+  }
   const aibt = parseHHMM((document.getElementById('AIBT')?.value || '').trim());
 
   // Mapping champs DOM pour chaque action
