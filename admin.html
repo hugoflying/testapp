@@ -198,10 +198,10 @@ a.nav,a.btn{text-decoration:none}a.btn{display:inline-block}.btn:disabled{opacit
 const ICONS = {
   plane:'<path d="M2 16l20-6-20-6 4 6-4 6z"/>', clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
   plus:'<circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/>', phone:'<rect x="7" y="2.5" width="10" height="19" rx="2.5"/><path d="M11 18h2"/>',
-  back:'<path d="M15 5l-7 7 7 7"/>', flag:'<path d="M5 21V4h11l-2 4 2 4H5"/>', text:'<path d="M4 7V5h16v2M12 5v14M9 19h6"/>'
+  back:'<path d="M15 5l-7 7 7 7"/>', flag:'<path d="M5 21V4h11l-2 4 2 4H5"/>', text:'<path d="M4 7V5h16v2M12 5v14M9 19h6"/>', send:'<path d="M3 11l18-8-8 18-2-8-8-2z"/>'
 };
 const NAV = [['Compagnies'],['compagnies','Compagnies','plane'],['cibles','Temps d\'escale cibles','clock'],['ajout','Ajouter une compagnie','plus'],
-  ['Pour toutes les compagnies'],['events','Événements','flag'],['words','Mots rapides','text'],['Démo'],['demo','Vols de démo','plane'],['Contrôle'],['apercu','Aperçu dans l\'app','phone']];
+  ['Pour toutes les compagnies'],['events','Événements','flag'],['words','Mots rapides','text'],['Démo'],['demo','Vols de démo','plane'],['Contrôle'],['apercu','Aperçu dans l\'app','phone'],['publication','Publication','send']];
 // Étapes que la timeline de l'app sait afficher (clé = action de renderTimeline)
 const STEPS = {
   'Débarquement':'Débarquement', 'Cabin release':'Cabin tidy / cleaning', 'Avitair':'Avitaillement', 'Lift (Dep)':'Lift départ',
@@ -235,7 +235,10 @@ const RULES = {
 RULES.RK = RULES.FR; RULES.W4 = RULES.W6;
 const clone = o => JSON.parse(JSON.stringify(o));
 const LS = { get(k){ try{ return JSON.parse(localStorage.getItem(k) || 'null'); }catch(e){ return null; } }, set(k,v){ try{ v == null ? localStorage.removeItem(k) : localStorage.setItem(k, JSON.stringify(v)); }catch(e){} } };
-const pubCfg = () => LS.get('adminCfg') || DEFAULTS;
+// v3.40 : la version publiée la plus récente (copie locale ou fichier config.json en ligne) ; fichier « réinitialisé » = réglages d'origine
+const newest = () => { const a = LS.get('adminCfg'), b = LS.get('adminCfgRemote'); return (a && b) ? ((+a.at || 0) >= (+b.at || 0) ? a : b) : (a || b); };
+const pubCfg = () => { const c = newest(); return (c && c.v === 1 && c.al) ? c : DEFAULTS; };
+const bare = o => { const x = clone(o); delete x.at; return JSON.stringify(x); };
 let C = LS.get('adminCfgDraft') || clone(pubCfg());
 let cur = 'compagnies', sel = 'W6', tab = 'types', ty = 'A320', wiz = 1, flash = '';
 const W = {c:'', icao:'', n:'', from:'W6', types:[]};
@@ -246,17 +249,42 @@ const stepsOf = (a,t) => { const x = a.types[t]; if(!x) return null; return x.st
 const sgn = v => (v > 0 ? '+' : '') + v;
 
 function save(){ LS.set('adminCfgDraft', C); pubBar(); }
-function dirty(){ return JSON.stringify(C) !== JSON.stringify(pubCfg()); }
+function dirty(){ return bare(C) !== bare(pubCfg()); }
 function pubBar(){
   const d = dirty();
-  $('#pubtxt').textContent = d ? 'Modifications pas encore publiées' : flash || (LS.get('adminCfg') ? 'Réglages publiés sur la démo' : 'Réglages d\'origine de l\'app');
-  $('#pubBtn').disabled = !d; $('#undoBtn').hidden = !d;
+  $('#pubtxt').textContent = busy ? 'Envoi en cours…' : d ? 'Modifications pas encore publiées' : flash || (pubCfg() !== DEFAULTS ? 'Réglages publiés sur la démo' : 'Réglages d\'origine de l\'app');
+  $('#pubBtn').disabled = !d || busy; $('#undoBtn').hidden = !d || busy;
 }
-function publish(){ LS.set('adminCfg', C); LS.set('adminCfgDraft', null); flash = 'Publié. La démo ouverte sur cet appareil utilise maintenant ces réglages.'; pubBar(); }
+let busy = false;
+// v3.40 : écrit config.json dans le repo de la démo (API GitHub, jeton gardé dans ce navigateur)
+const GH = (() => { const o = (location.hostname.match(/^([^.]+)\.github\.io$/) || [])[1] || 'hugoflying', r = location.pathname.split('/').filter(Boolean)[0] || 'testapp';
+  return { owner:o, repo: /\.html$/.test(r) ? 'testapp' : r, path:'config.json' }; })();
+const b64 = t => btoa(unescape(encodeURIComponent(t)));
+async function ghPut(obj, msg){
+  const tok = (localStorage.getItem('ghToken') || '').trim(); if(!tok) throw new Error('notoken');
+  const api = 'https://api.github.com/repos/' + GH.owner + '/' + GH.repo + '/contents/' + GH.path;
+  const h = { Authorization:'Bearer ' + tok, Accept:'application/vnd.github+json' };
+  let sha; const g = await fetch(api + '?ref=main&t=' + Date.now(), { headers:h, cache:'no-store' });
+  if(g.ok) sha = (await g.json()).sha; else if(g.status !== 404) throw new Error(String(g.status));
+  const text = JSON.stringify(obj, null, 1), body = { message:msg, content:b64(text), branch:'main' }; if(sha) body.sha = sha;
+  const r = await fetch(api, { method:'PUT', headers:Object.assign({ 'Content-Type':'application/json' }, h), body:JSON.stringify(body) });
+  if(!r.ok) throw new Error(String(r.status));
+  LS.set('adminCfgRemote', obj); try{ localStorage.setItem('adminCfgRemote', text); }catch(e){}
+}
+const ghWhy = e => e.message === 'notoken' ? 'aucun jeton GitHub enregistré (menu Publication)' : e.message === '401' ? 'jeton GitHub refusé ou expiré' : /^(403|404)$/.test(e.message) ? 'le jeton n\'a pas le droit d\'écrire dans ' + GH.repo : 'GitHub injoignable (' + e.message + ')';
+async function publish(){
+  C.at = Date.now(); LS.set('adminCfg', C); LS.set('adminCfgDraft', null);
+  busy = true; pubBar();
+  try{ await ghPut(C, 'Admin démo : réglages publiés'); flash = 'Publié pour tout le monde : visible dans la démo d\'ici 1 à 2 min.'; }
+  catch(e){ flash = 'Publié sur cet appareil seulement : ' + ghWhy(e) + '.'; }
+  busy = false; pubBar(); if(cur === 'publication') render();
+}
 function undo(){ C = clone(pubCfg()); LS.set('adminCfgDraft', null); flash = ''; go(cur); }
 function resetAll(){
   if(!confirm('Revenir aux réglages d\'origine de l\'app ? Les compagnies ajoutées et les cibles modifiées seront perdues.')) return;
-  LS.set('adminCfg', null); LS.set('adminCfgDraft', null); C = clone(DEFAULTS); flash = 'Réglages d\'origine rétablis.'; go('compagnies');
+  const r = {v:1, reset:true, at:Date.now()};
+  LS.set('adminCfg', r); LS.set('adminCfgDraft', null); C = clone(DEFAULTS); busy = true; go('compagnies');
+  ghPut(r, 'Admin démo : retour aux réglages d\'origine').then(() => { flash = 'Réglages d\'origine rétablis pour tout le monde.'; }, e => { flash = 'Réglages d\'origine rétablis sur cet appareil seulement : ' + ghWhy(e) + '.'; }).then(() => { busy = false; pubBar(); });
 }
 function icon(k){ return '<svg viewBox="0 0 24 24" aria-hidden="true">' + ICONS[k] + '</svg>'; }
 function side(){
@@ -276,7 +304,7 @@ function go(v, c, t){
   side(); render(); pubBar();
 }
 function render(){
-  const v = $('#view'); v.innerHTML = ({compagnies:vList, fiche:vFiche, ajout:vAjout, apercu:vApercu, events:vEvents, words:vWords, demo:vDemo})[cur]();
+  const v = $('#view'); v.innerHTML = ({compagnies:vList, fiche:vFiche, ajout:vAjout, apercu:vApercu, events:vEvents, words:vWords, demo:vDemo, publication:vPub})[cur]();
   const key = cur + ':' + sel + ':' + tab;   // animation seulement quand on change d'écran
   if(key !== render.k){ render.k = key; v.classList.remove('view'); void v.offsetWidth; v.classList.add('view'); }
   if(cur === 'fiche' && tab === 'cibles') drawGantt();
@@ -490,6 +518,12 @@ function authed(){ try{ const o = JSON.parse(localStorage.getItem('pv_auth') || 
 if(!authed()){
   document.body.innerHTML = '<div style="min-height:100vh;display:grid;place-items:center;padding:16px"><div class="card" style="padding:24px;max-width:400px;text-align:center"><h1 style="margin:0 0 8px;font-size:20px">Admin compagnies</h1><p class="hint" style="padding:0 0 16px">Connectez-vous d\'abord dans la démo, puis revenez par le menu « Admin compagnies ».</p><a class="btn p" href="./">Ouvrir la démo</a></div></div>';
 } else {
+  fetch('./config.json?t=' + Date.now(), { cache:'no-store' }).then(r => r.ok ? r.text() : null).then(t => {
+    if(t == null) return; let o; try{ o = JSON.parse(t); }catch(e){ return; }
+    try{ localStorage.setItem('adminCfgRemote', t); }catch(e){}
+    if(!LS.get('adminCfgDraft')){ C = clone(pubCfg()); }
+    go(cur);
+  }).catch(() => {});
   fetch('./dlcodes.js').then(r => r.text()).then(t => { const m = /window\.DL_CODES = (\{.*\});/.exec(t); if(m) DLC = JSON.parse(m[1]); }).catch(() => {}).then(() => { if(cur === 'fiche' && tab === 'dl') render(); });
   go('compagnies');
 }
@@ -645,5 +679,32 @@ function vDemo(){
    + (own ? '' : '<div class="card"><div class="hint" style="padding:12px 16px">Voici le scénario par défaut. Modifiez n\'importe quel champ pour en faire le vôtre.</div></div>')
    + cards
    + '<p class="hint" style="padding:0">Après « Publier », rouvrez la démo : elle repart sur ce scénario. Entre deux réinitialisations, ce que vous saisissez dans l\'app reste en place.</p>';
+}
+
+/* Publication (v3.40) : jeton GitHub pour écrire config.json dans le repo de la démo */
+function tokSave(){ const v = $('#ghTok').value.trim(); try{ v ? localStorage.setItem('ghToken', v) : localStorage.removeItem('ghToken'); }catch(e){} tokMsg = v ? 'Jeton enregistré dans ce navigateur.' : 'Jeton retiré.'; render(); }
+let tokMsg = '';
+async function tokTest(){
+  tokMsg = 'Vérification…'; render();
+  try{
+    const tok = (localStorage.getItem('ghToken') || '').trim(); if(!tok) throw new Error('notoken');
+    const r = await fetch('https://api.github.com/repos/' + GH.owner + '/' + GH.repo, { headers:{ Authorization:'Bearer ' + tok, Accept:'application/vnd.github+json' }, cache:'no-store' });
+    if(!r.ok) throw new Error(String(r.status));
+    const j = await r.json(); tokMsg = j.permissions && j.permissions.push === false ? 'Le jeton lit ' + GH.repo + ' mais ne peut pas y écrire : ajoutez le droit Contents en écriture.' : 'Jeton valide : la publication pour tout le monde est prête.';
+  }catch(e){ tokMsg = 'Problème : ' + ghWhy(e) + '.'; }
+  render();
+}
+function vPub(){
+  const has = !!(localStorage.getItem('ghToken') || '').trim();
+  return '<div class="hd"><div><h1>Publication</h1><p>« Publier » écrit vos réglages dans le fichier config.json du repo ' + esc(GH.owner + '/' + GH.repo) + '. Toute personne qui ouvre la démo les reçoit, en général 1 à 2 minutes après. Sans jeton, ils ne s\'appliquent que sur cet appareil.</p></div></div>'
+   + '<div class="split"><div class="card"><h2>Jeton GitHub</h2><div class="form">'
+   + '<div class="f"><label>Jeton (gardé seulement dans ce navigateur)</label><input id="ghTok" type="password" autocomplete="off" class="txt" value="' + (has ? '••••••••••••' : '') + '" onfocus="if(this.value.startsWith(\'•\'))this.value=\'\'" placeholder="github_pat_…"></div>'
+   + '<div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn p" type="button" onclick="tokSave()">Enregistrer</button><button class="btn" type="button" onclick="tokTest()"' + (has ? '' : ' disabled') + '>Vérifier</button>' + (has ? '<button class="btn d" type="button" onclick="$(\'#ghTok\').value=\'\';tokSave()">Retirer</button>' : '') + '</div>'
+   + (tokMsg ? '<div class="hint" style="padding:0">' + esc(tokMsg) + '</div>' : '') + '</div></div>'
+   + '<div class="card"><h2>Créer le jeton (une seule fois)</h2><ol class="hint" style="padding:8px 16px 14px 34px;line-height:1.6;margin:0">'
+   + '<li>Ouvrez <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">github.com › Fine-grained token</a>.</li>'
+   + '<li>Repository access : <b>Only select repositories</b> → <b>' + esc(GH.repo) + '</b>.</li>'
+   + '<li>Permissions › Repository › <b>Contents : Read and write</b>. Rien d\'autre.</li>'
+   + '<li>Choisissez une expiration, générez, copiez le jeton et collez-le ici.</li></ol></div></div>';
 }
 </script></body></html>
