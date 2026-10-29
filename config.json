@@ -1,0 +1,1024 @@
+{
+ "v": 1,
+ "al": {
+  "FR": {
+   "n": "Ryanair",
+   "icao": "RYR",
+   "hle": 60,
+   "types": {
+    "B737": {
+     "mtt": 25,
+     "crew": 35,
+     "steps": [
+      {
+       "k": "ArrPNT",
+       "a": [
+        "EOBT",
+        -45
+       ],
+       "b": null
+      },
+      {
+       "k": "ArrPNC",
+       "a": [
+        "EOBT",
+        -45
+       ],
+       "b": null
+      },
+      {
+       "k": "Débarquement",
+       "a": [
+        "AIBT",
+        2
+       ],
+       "b": [
+        "EOBT",
+        -13
+       ]
+      },
+      {
+       "k": "Avitair",
+       "a": [
+        "EOBT",
+        -25
+       ],
+       "b": [
+        "EOBT",
+        -5
+       ]
+      },
+      {
+       "k": "Lift (Dep)",
+       "a": [
+        "EOBT",
+        -25
+       ],
+       "b": [
+        "EOBT",
+        -5
+       ]
+      },
+      {
+       "k": "Cabin release",
+       "a": [
+        "EOBT",
+        -13
+       ],
+       "b": [
+        "EOBT",
+        -10
+       ]
+      },
+      {
+       "k": "Embarquement",
+       "a": [
+        "EOBT",
+        -13
+       ],
+       "b": [
+        "EOBT",
+        -5
+       ]
+      },
+      {
+       "k": "RemiseLID",
+       "a": [
+        "EOBT",
+        -5
+       ],
+       "b": null
+      },
+      {
+       "k": "FermeturePorteAvion",
+       "a": [
+        "EOBT",
+        -5
+       ],
+       "b": null
+      }
+     ]
+    },
+    "B738": {
+     "mtt": 25,
+     "crew": 35,
+     "like": "B737"
+    },
+    "B38M": {
+     "mtt": 25,
+     "crew": 35,
+     "like": "B737"
+    },
+    "A320": {
+     "mtt": 25,
+     "crew": 35,
+     "like": "B737"
+    },
+    "CL35": {
+     "mtt": 25,
+     "crew": 35,
+     "like": "B737"
+    }
+   }
+  },
+  "RK": {
+   "n": "Ryanair UK",
+   "icao": "RUK",
+   "hle": 60,
+   "types": {
+    "B737": {
+     "mtt": 25,
+     "crew": 35,
+     "steps": [
+      {
+       "k": "ArrPNT",
+       "a": [
+        "EOBT",
+        -45
+       ],
+       "b": null
+      },
+      {
+       "k": "ArrPNC",
+       "a": [
+        "EOBT",
+        -45
+       ],
+       "b": null
+      },
+      {
+       "k": "Débarquement",
+       "a": [
+        "AIBT",
+        2
+       ],
+       "b": [
+        "EOBT",
+        -13
+       ]
+      },
+      {
+       "k": "Avitair",
+       "a": [
+        "EOBT",
+        -25
+       ],
+       "b": [
+        "EOBT",
+        -5
+       ]
+      },
+      {
+       "k": "Lift (Dep)",
+       "a": [
+        "EOBT",
+        -25
+       ],
+       "b": [
+        "EOBT",
+        -5
+       ]
+      },
+      {
+       "k": "Cabin release",
+       "a": [
+        "EOBT",
+        -13
+       ],
+       "b": [
+        "EOBT",
+        -10
+       ]
+      },
+      {
+       "k": "Embarquement",
+       "a": [
+        "EOBT",
+        -13
+       ],
+       "b": [
+        "EOBT",
+        -5
+       ]
+      },
+      {
+       "k": "RemiseLID",
+       "a": [
+        "EOBT",
+        -5
+       ],
+       "b": null
+      },
+      {
+       "k": "FermeturePorteAvion",
+       "a": [
+        "EOBT",
+        -5
+       ],
+       "b": null
+      }
+     ]
+    },
+    "B738": {
+     "mtt": 25,
+     "crew": 35,
+     "like": "B737"
+    },
+    "B38M": {
+     "mtt": 25,
+     "crew": 35,
+     "like": "B737"
+    },
+    "A320": {
+     "mtt": 25,
+     "crew": 35,
+     "like": "B737"
+    },
+    "CL35": {
+     "mtt": 25,
+     "crew": 35,
+     "like": "B737"
+    }
+   }
+  },
+  "W6": {
+   "n": "Wizz Air",
+   "icao": "WZZ",
+   "hle": 40,
+   "types": {
+    "A320": {
+     "mtt": 30,
+     "crew": null,
+     "steps": [
+      {
+       "k": "Débarquement",
+       "a": [
+        "EOBT",
+        -27
+       ],
+       "b": [
+        "EOBT",
+        -20
+       ]
+      },
+      {
+       "k": "Avitair",
+       "a": [
+        "EOBT",
+        -27
+       ],
+       "b": [
+        "EOBT",
+        -5
+       ]
+      },
+      {
+       "k": "Cabin release",
+       "a": [
+        "EOBT",
+        -19
+       ],
+       "b": [
+        "EOBT",
+        -15
+       ]
+      },
+      {
+       "k": "Embarquement",
+       "a": [
+        "EOBT",
+        -14
+       ],
+       "b": [
+        "EOBT",
+        -3
+       ]
+      },
+      {
+       "k": "RemiseLID",
+       "a": [
+        "EOBT",
+        -7
+       ],
+       "b": null
+      },
+      {
+       "k": "FermeturePorteAvion",
+       "a": [
+        "EOBT",
+        -2
+       ],
+       "b": null
+      }
+     ]
+    },
+    "A321": {
+     "mtt": 35,
+     "crew": null,
+     "steps": [
+      {
+       "k": "Débarquement",
+       "a": [
+        "EOBT",
+        -32
+       ],
+       "b": [
+        "EOBT",
+        -24
+       ]
+      },
+      {
+       "k": "Avitair",
+       "a": [
+        "EOBT",
+        -32
+       ],
+       "b": [
+        "EOBT",
+        -5
+       ]
+      },
+      {
+       "k": "Cabin release",
+       "a": [
+        "EOBT",
+        -23
+       ],
+       "b": [
+        "EOBT",
+        -18
+       ]
+      },
+      {
+       "k": "Embarquement",
+       "a": [
+        "EOBT",
+        -17
+       ],
+       "b": [
+        "EOBT",
+        -3
+       ]
+      },
+      {
+       "k": "RemiseLID",
+       "a": [
+        "EOBT",
+        -9
+       ],
+       "b": null
+      },
+      {
+       "k": "FermeturePorteAvion",
+       "a": [
+        "EOBT",
+        -2
+       ],
+       "b": null
+      }
+     ]
+    },
+    "A20N": {
+     "mtt": 30,
+     "crew": null,
+     "like": "A320"
+    },
+    "A21N": {
+     "mtt": 35,
+     "crew": null,
+     "like": "A321"
+    },
+    "A21NY": {
+     "mtt": 35,
+     "crew": null,
+     "like": "A321"
+    }
+   }
+  },
+  "W4": {
+   "n": "Wizz Air Malta",
+   "icao": "WMT",
+   "hle": 40,
+   "types": {
+    "A320": {
+     "mtt": 30,
+     "crew": null,
+     "steps": [
+      {
+       "k": "Débarquement",
+       "a": [
+        "EOBT",
+        -27
+       ],
+       "b": [
+        "EOBT",
+        -20
+       ]
+      },
+      {
+       "k": "Avitair",
+       "a": [
+        "EOBT",
+        -27
+       ],
+       "b": [
+        "EOBT",
+        -5
+       ]
+      },
+      {
+       "k": "Cabin release",
+       "a": [
+        "EOBT",
+        -19
+       ],
+       "b": [
+        "EOBT",
+        -15
+       ]
+      },
+      {
+       "k": "Embarquement",
+       "a": [
+        "EOBT",
+        -14
+       ],
+       "b": [
+        "EOBT",
+        -3
+       ]
+      },
+      {
+       "k": "RemiseLID",
+       "a": [
+        "EOBT",
+        -7
+       ],
+       "b": null
+      },
+      {
+       "k": "FermeturePorteAvion",
+       "a": [
+        "EOBT",
+        -2
+       ],
+       "b": null
+      }
+     ]
+    },
+    "A321": {
+     "mtt": 35,
+     "crew": null,
+     "steps": [
+      {
+       "k": "Débarquement",
+       "a": [
+        "EOBT",
+        -32
+       ],
+       "b": [
+        "EOBT",
+        -24
+       ]
+      },
+      {
+       "k": "Avitair",
+       "a": [
+        "EOBT",
+        -32
+       ],
+       "b": [
+        "EOBT",
+        -5
+       ]
+      },
+      {
+       "k": "Cabin release",
+       "a": [
+        "EOBT",
+        -23
+       ],
+       "b": [
+        "EOBT",
+        -18
+       ]
+      },
+      {
+       "k": "Embarquement",
+       "a": [
+        "EOBT",
+        -17
+       ],
+       "b": [
+        "EOBT",
+        -3
+       ]
+      },
+      {
+       "k": "RemiseLID",
+       "a": [
+        "EOBT",
+        -9
+       ],
+       "b": null
+      },
+      {
+       "k": "FermeturePorteAvion",
+       "a": [
+        "EOBT",
+        -2
+       ],
+       "b": null
+      }
+     ]
+    },
+    "A20N": {
+     "mtt": 30,
+     "crew": null,
+     "like": "A320"
+    },
+    "A21N": {
+     "mtt": 35,
+     "crew": null,
+     "like": "A321"
+    },
+    "A21NY": {
+     "mtt": 35,
+     "crew": null,
+     "like": "A321"
+    }
+   }
+  },
+  "V7": {
+   "n": "Volotea",
+   "icao": "VOE",
+   "hle": 40,
+   "types": {
+    "A319": {
+     "mtt": null,
+     "crew": null,
+     "like": "A320"
+    },
+    "A320": {
+     "mtt": null,
+     "crew": null,
+     "steps": [
+      {
+       "k": "Débarquement",
+       "a": [
+        "EOBT",
+        -28
+       ],
+       "b": [
+        "EOBT",
+        -23
+       ]
+      },
+      {
+       "k": "Cabin release",
+       "a": [
+        "EOBT",
+        -23
+       ],
+       "b": [
+        "EOBT",
+        -21
+       ]
+      },
+      {
+       "k": "Embarquement",
+       "a": [
+        "EOBT",
+        -20
+       ],
+       "b": [
+        "EOBT",
+        -7
+       ]
+      },
+      {
+       "k": "FermeturePorteAvion",
+       "a": [
+        "EOBT",
+        -5
+       ],
+       "b": null
+      }
+     ]
+    }
+   }
+  },
+  "H4": {
+   "n": "HiSky",
+   "icao": "",
+   "hle": 40,
+   "types": {
+    "A319": {
+     "mtt": null,
+     "crew": null
+    },
+    "A320": {
+     "mtt": null,
+     "crew": null
+    },
+    "A321": {
+     "mtt": null,
+     "crew": null
+    },
+    "A21N": {
+     "mtt": null,
+     "crew": null
+    }
+   }
+  },
+  "H6": {
+   "n": "",
+   "icao": "",
+   "hle": 40,
+   "types": {
+    "A319": {
+     "mtt": null,
+     "crew": null
+    },
+    "A320": {
+     "mtt": null,
+     "crew": null
+    },
+    "A321": {
+     "mtt": null,
+     "crew": null
+    },
+    "A21N": {
+     "mtt": null,
+     "crew": null
+    }
+   }
+  }
+ },
+ "events": [
+  {
+   "id": "emvtin63q",
+   "t": "Nouvel événement",
+   "side": "dep",
+   "c": "#0d9488",
+   "cies": [],
+   "items": [
+    {
+     "id": "a",
+     "t": "Début",
+     "r": "d"
+    },
+    {
+     "id": "b",
+     "t": "Fin",
+     "r": "d"
+    }
+   ]
+  }
+ ],
+ "demo": {
+  "flights": [
+   {
+    "open": true,
+    "cie": "FR",
+    "arr": "594",
+    "dep": "595",
+    "ap": "OPO",
+    "reg": "EIHGO",
+    "type": "B38M",
+    "park": "4",
+    "tat": 25,
+    "paf": "",
+    "sibt": "-15",
+    "aibt": "",
+    "sobt": "",
+    "ctot": "",
+    "aobt": "",
+    "fill": "auto",
+    "dl": "",
+    "cx": false
+   },
+   {
+    "open": true,
+    "cie": "W4",
+    "arr": "5148",
+    "dep": "5149",
+    "ap": "TIA",
+    "reg": "9HWAU",
+    "type": "A321",
+    "park": "12",
+    "tat": 35,
+    "paf": "S3",
+    "sibt": "1",
+    "aibt": "",
+    "sobt": "",
+    "ctot": "56",
+    "aobt": "",
+    "fill": "auto",
+    "dl": "",
+    "cx": false
+   },
+   {
+    "open": true,
+    "cie": "FR",
+    "arr": "1037",
+    "dep": "1038",
+    "ap": "VIE",
+    "reg": "9HLOA",
+    "type": "A320",
+    "park": "7",
+    "tat": 25,
+    "paf": "S2",
+    "sibt": "10",
+    "aibt": "",
+    "sobt": "",
+    "ctot": "63",
+    "aobt": "",
+    "fill": "auto",
+    "dl": "",
+    "cx": false
+   },
+   {
+    "open": false,
+    "cie": "FR",
+    "arr": "3016",
+    "dep": "3017",
+    "ap": "PMI",
+    "reg": "EIEVA",
+    "type": "B738",
+    "park": "2",
+    "tat": 25,
+    "paf": "",
+    "sibt": "-99",
+    "aibt": "-85",
+    "sobt": "",
+    "ctot": "",
+    "aobt": "-56",
+    "fill": "auto",
+    "dl": "32 4",
+    "cx": false
+   },
+   {
+    "open": false,
+    "cie": "FR",
+    "arr": "2961",
+    "dep": "2962",
+    "ap": "OTP",
+    "reg": "EIIGR",
+    "type": "B38M",
+    "park": "5",
+    "tat": 25,
+    "paf": "",
+    "sibt": "-82",
+    "aibt": "",
+    "sobt": "",
+    "ctot": "",
+    "aobt": "",
+    "fill": "auto",
+    "dl": "",
+    "cx": false
+   },
+   {
+    "open": false,
+    "cie": "FR",
+    "arr": "2853",
+    "dep": "2854",
+    "ap": "VNO",
+    "reg": "EIFZD",
+    "type": "B738",
+    "park": "9",
+    "tat": 25,
+    "paf": "",
+    "sibt": "-65",
+    "aibt": "",
+    "sobt": "",
+    "ctot": "",
+    "aobt": "-30",
+    "fill": "auto",
+    "dl": "89 6, 77 4",
+    "cx": false
+   },
+   {
+    "open": false,
+    "cie": "FR",
+    "arr": "1179",
+    "dep": "1180",
+    "ap": "BHX",
+    "reg": "EIDWB",
+    "type": "B738",
+    "park": "3",
+    "tat": 25,
+    "paf": "",
+    "sibt": "-48",
+    "aibt": "",
+    "sobt": "",
+    "ctot": "-3",
+    "aobt": "",
+    "fill": "auto",
+    "dl": "",
+    "cx": false
+   },
+   {
+    "open": false,
+    "cie": "W4",
+    "arr": "3061",
+    "dep": "3062",
+    "ap": "TSR",
+    "reg": "9HWBY",
+    "type": "A320",
+    "park": "11",
+    "tat": 35,
+    "paf": "",
+    "sibt": "-31",
+    "aibt": "",
+    "sobt": "",
+    "ctot": "37",
+    "aobt": "",
+    "fill": "auto",
+    "dl": "",
+    "cx": false
+   },
+   {
+    "open": false,
+    "cie": "W4",
+    "arr": "3065",
+    "dep": "3066",
+    "ap": "CLJ",
+    "reg": "9HWDA",
+    "type": "A21N",
+    "park": "14",
+    "tat": 35,
+    "paf": "",
+    "sibt": "-14",
+    "aibt": "",
+    "sobt": "",
+    "ctot": "48",
+    "aobt": "",
+    "fill": "auto",
+    "dl": "",
+    "cx": false
+   },
+   {
+    "open": false,
+    "cie": "W4",
+    "arr": "3233",
+    "dep": "3234",
+    "ap": "IAS",
+    "reg": "9HWAV",
+    "type": "A320",
+    "park": "10",
+    "tat": 35,
+    "paf": "",
+    "sibt": "3",
+    "aibt": "",
+    "sobt": "",
+    "ctot": "",
+    "aobt": "",
+    "fill": "auto",
+    "dl": "",
+    "cx": false
+   },
+   {
+    "open": false,
+    "cie": "W4",
+    "arr": "3027",
+    "dep": "3028",
+    "ap": "OTP",
+    "reg": "9HWXA",
+    "type": "A21N",
+    "park": "13",
+    "tat": 35,
+    "paf": "",
+    "sibt": "20",
+    "aibt": "",
+    "sobt": "",
+    "ctot": "",
+    "aobt": "",
+    "fill": "auto",
+    "dl": "",
+    "cx": false
+   },
+   {
+    "open": false,
+    "cie": "FR",
+    "arr": "8338",
+    "dep": "8339",
+    "ap": "RAK",
+    "reg": "EIEFB",
+    "type": "B738",
+    "park": "6",
+    "tat": 25,
+    "paf": "",
+    "sibt": "25",
+    "aibt": "",
+    "sobt": "",
+    "ctot": "",
+    "aobt": "",
+    "fill": "auto",
+    "dl": "",
+    "cx": false
+   },
+   {
+    "open": false,
+    "cie": "FR",
+    "arr": "6512",
+    "dep": "6513",
+    "ap": "NAP",
+    "reg": "EIIHD",
+    "type": "B38M",
+    "park": "3",
+    "tat": 25,
+    "paf": "",
+    "sibt": "53",
+    "aibt": "",
+    "sobt": "",
+    "ctot": "",
+    "aobt": "",
+    "fill": "auto",
+    "dl": "",
+    "cx": false
+   },
+   {
+    "open": false,
+    "cie": "V7",
+    "arr": "2104",
+    "dep": "2105",
+    "ap": "BIA",
+    "reg": "EIFNH",
+    "type": "A319",
+    "park": "8",
+    "tat": 40,
+    "paf": "",
+    "sibt": "81",
+    "aibt": "",
+    "sobt": "",
+    "ctot": "",
+    "aobt": "",
+    "fill": "auto",
+    "dl": "",
+    "cx": false
+   },
+   {
+    "open": false,
+    "cie": "W4",
+    "arr": "3381",
+    "dep": "3382",
+    "ap": "SKP",
+    "reg": "9HWNC",
+    "type": "A321",
+    "park": "12",
+    "tat": 35,
+    "paf": "",
+    "sibt": "109",
+    "aibt": "",
+    "sobt": "",
+    "ctot": "",
+    "aobt": "",
+    "fill": "auto",
+    "dl": "",
+    "cx": false
+   },
+   {
+    "open": false,
+    "cie": "FR",
+    "arr": "4721",
+    "dep": "4722",
+    "ap": "FEZ",
+    "reg": "EIDPW",
+    "type": "B738",
+    "park": "1",
+    "tat": 25,
+    "paf": "",
+    "sibt": "137",
+    "aibt": "",
+    "sobt": "",
+    "ctot": "",
+    "aobt": "",
+    "fill": "auto",
+    "dl": "",
+    "cx": true
+   },
+   {
+    "open": false,
+    "cie": "H4",
+    "arr": "2379",
+    "dep": "2380",
+    "ap": "AGA",
+    "reg": "9HHAB",
+    "type": "A320",
+    "park": "9",
+    "tat": 45,
+    "paf": "",
+    "sibt": "165",
+    "aibt": "",
+    "sobt": "",
+    "ctot": "",
+    "aobt": "",
+    "fill": "auto",
+    "dl": "",
+    "cx": false
+   }
+  ]
+ },
+ "at": 1793276742487
+}
