@@ -587,7 +587,7 @@ function tDl(a){
 
 /* Événements (v3.37) : ceux de l'app, qu'on peut masquer, et ceux qu'on ajoute */
 const EV_BASE = [
-  ['crew','Crew','dep'],['recherche-bag','Recherche bag','dep'],['inad','INAD','dep'],['gpu','Nayak','dep'],['casque','Connexion casque','dep'],
+  ['crew','Crew','dep'],['recherche-bag','Recherche bag','dep'],['inad','INAD','dep'],['gpu','Nayak','dep'],['scan','Embarquement (scan)','dep'],['casque','Connexion casque','dep'],
   ['push','Push','dep'],['soutes','Portes de soute','dep'],['echelles','Retrait échelles','dep'],['reouverture','Réouverture porte','dep'],
   ['comptage','Comptage bagages','dep'],['chargement','Chargement bagages','dep'],['degivrage','Dégivrage','dep'],
   ['tapis','Tapis bagages','arr'],['dechargement','Déchargement bagages','arr'],['repositionnement','Repositionnement avion','arr'],
@@ -739,7 +739,7 @@ function dTp(v, c){ if(/^vide$/i.test(String(v).trim())) return 'reste vide'; co
 const DT_ARR = [['PremierDebarque','1er débarqué (AV)'],['PremierDebarqueL2','1er débarqué (AR)'],['DernierDebarque','Dernier débarqué'],['ArriveeFuel','Arrivée Avitair'],['ArriveeLiftArr','Arrivée lift'],['DepartLiftArr','Départ lift']];
 const DT_DEP = [['AvionPremierEmbarque','Premier embarqué'],['AvionDernierEmbarque','Dernier embarqué'],['RemiseLID','Remise LID'],['FermeturePorteAvion','Fermeture porte'],['DepartFuel','Départ Avitair'],['ArriveeLift','Arrivée lift'],['DepartLift','Départ lift']];
 const DT_EV = { crew:[['ArrPNT','Arrivée PNT'],['ArrPNC','Arrivée PNC']], 'recherche-bag':[['RechercheBagDebut','Début de recherche'],['RechercheBagFin','Fin de recherche']],
-  inad:[['AnnonceINAD','Annonce INAD'],['ArriveeINAD','Arrivée INAD']], gpu:[['AppelNayak','Appel Nayak'],['ArriveeNayak','Arrivée Nayak'],['DepartNayak','Départ Nayak']],
+  inad:[['AnnonceINAD','Annonce INAD'],['ArriveeINAD','Arrivée INAD']], gpu:[['AppelNayak','Appel Nayak'],['ArriveeNayak','Arrivée Nayak'],['DepartNayak','Départ Nayak']], scan:[['PremierScanne','Premier scanné'],['DernierScanne','Dernier scanné']],
   casque:[['ConnexionAgentCasque','Connexion casque']], push:[['ConnexionPush','Connexion push'],['ChangementPush','Changement de push']],
   soutes:[['FermetureSouteAV','Fermeture soute AV'],['FermetureSouteAR','Fermeture soute AR']], echelles:[['RetraitEchelleAV','Retrait échelle AV'],['RetraitEchelleAR','Retrait échelle AR']],
   reouverture:[['ReouverturePorteAvion','Réouverture porte']], comptage:[['DebutComptageBagages','Début comptage'],['FinComptageBagages','Fin comptage']],
