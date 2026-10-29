@@ -154,6 +154,15 @@ tr.sel td{background:var(--accent-soft)}
 .sw button.on{border-color:var(--fg);box-shadow:0 0 0 2px var(--surf) inset}
 .nqp{display:flex;flex-wrap:wrap;gap:6px}.nqp span{border:1px solid var(--line);border-radius:20px;padding:6px 12px;font-weight:700;font-size:13px;background:var(--surf2)}
 .btn:disabled{opacity:.4}
+.dcard{padding:14px 16px}
+.dhd{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.dhd .btn{padding:5px 10px}
+.dgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:8px 10px;margin-bottom:8px}
+.dgrid .f label{font-size:11px}
+.dgrid.dt{grid-template-columns:repeat(5,minmax(70px,96px)) minmax(130px,1fr)}
+.dft{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.dcx{display:flex;gap:6px;align-items:center;font-weight:700;font-size:13px;color:var(--muted)}
+@media (max-width:820px){.dgrid.dt{grid-template-columns:repeat(3,1fr)}}
 a.nav,a.btn{text-decoration:none}a.btn{display:inline-block}.btn:disabled{opacity:.45;cursor:default}[hidden]{display:none!important}.me .back{font-size:12.5px}
 /* v3.37 : look B (clair, gris neutres, marine pour la sélection) */
 :root{--bg:#F6F7F9;--surf:#FFFFFF;--surf2:#F8F9FB;--line:#E3E6EB;--fg:#14213D;--muted:#5F6878;--accent:#0B1E4F;--accent-soft:#EEF1F6}
@@ -192,7 +201,7 @@ const ICONS = {
   back:'<path d="M15 5l-7 7 7 7"/>', flag:'<path d="M5 21V4h11l-2 4 2 4H5"/>', text:'<path d="M4 7V5h16v2M12 5v14M9 19h6"/>'
 };
 const NAV = [['Compagnies'],['compagnies','Compagnies','plane'],['cibles','Temps d\'escale cibles','clock'],['ajout','Ajouter une compagnie','plus'],
-  ['Pour toutes les compagnies'],['events','Événements','flag'],['words','Mots rapides','text'],['Contrôle'],['apercu','Aperçu dans l\'app','phone']];
+  ['Pour toutes les compagnies'],['events','Événements','flag'],['words','Mots rapides','text'],['Démo'],['demo','Vols de démo','plane'],['Contrôle'],['apercu','Aperçu dans l\'app','phone']];
 // Étapes que la timeline de l'app sait afficher (clé = action de renderTimeline)
 const STEPS = {
   'Débarquement':'Débarquement', 'Cabin release':'Cabin tidy / cleaning', 'Avitair':'Avitaillement', 'Lift (Dep)':'Lift départ',
@@ -267,7 +276,7 @@ function go(v, c, t){
   side(); render(); pubBar();
 }
 function render(){
-  const v = $('#view'); v.innerHTML = ({compagnies:vList, fiche:vFiche, ajout:vAjout, apercu:vApercu, events:vEvents, words:vWords})[cur]();
+  const v = $('#view'); v.innerHTML = ({compagnies:vList, fiche:vFiche, ajout:vAjout, apercu:vApercu, events:vEvents, words:vWords, demo:vDemo})[cur]();
   const key = cur + ':' + sel + ':' + tab;   // animation seulement quand on change d'écran
   if(key !== render.k){ render.k = key; v.classList.remove('view'); void v.offsetWidth; v.classList.add('view'); }
   if(cur === 'fiche' && tab === 'cibles') drawGantt();
@@ -570,5 +579,71 @@ function vWords(){
    + '<div class="split"><div class="card tw"><table>' + '<tbody>' + rows + '</tbody></table><div class="rule" style="align-items:center"><input id="newWord" class="txt" style="max-width:220px" placeholder="ex. Pushback" onkeydown="if(event.key===\'Enter\')wAdd()"><button class="chip add" type="button" onclick="wAdd()">+ Ajouter</button></div>'
    + '<div class="hint" style="padding-top:10px">SNY garde sa saisie spéciale : codes équipage en majuscules.</div></div>'
    + '<div class="card" style="padding:16px"><h2 style="padding:0 0 10px">Aperçu</h2><div class="nqp">' + w.filter(Boolean).map(x => '<span>' + esc(x) + '</span>').join('') + '</div></div></div>';
+}
+
+/* Vols de démo (v3.39) : scénario rejoué au lancement de la démo et par « Réinitialiser » */
+const DF0 = [['FR','594','595','OPO','EIDCL','B38M','4',25,''],['W4','5148','5149','TIA','9HWAU','A321','12',35,'S3'],['FR','1037','1038','VIE','9HLOA','A320','7',25,'S2'],
+  ['FR','3016','3017','PMI','EIEVA','B738','2',25,''],['FR','2961','2962','OTP','EIIGR','B38M','5',25,''],['FR','2853','2854','VNO','EIFZD','B738','9',25,''],
+  ['FR','1179','1180','BHX','EIDWB','B738','3',25,''],['W4','3061','3062','TSR','9HWBY','A320','11',35,''],['W4','3065','3066','CLJ','9HWDA','A21N','14',35,''],
+  ['W4','3233','3234','IAS','9HWAV','A320','10',35,''],['W4','3027','3028','OTP','9HWXA','A21N','13',35,'']];
+const DX0 = [['FR','8338','8339','RAK','EIEFB','B738','6',25],['FR','6512','6513','NAP','EIIHD','B38M','3',25],['V7','2104','2105','BIA','EIFNH','A319','8',40],
+  ['W4','3381','3382','SKP','9HWNC','A321','12',35],['FR','4721','4722','FEZ','EIDPW','B738','1',25],['H4','2379','2380','AGA','9HHAB','A320','9',45]];
+function demoDefault(){
+  const S0 = {0:{sibt:-15},1:{sibt:1,ctot:20},2:{sibt:10,ctot:28}}, SC = {3:'late',5:'89-77',6:'ctot',7:'ctot',8:'ctot'}, out = [];
+  const mk = (r, open, sibt, extra) => Object.assign({open, cie:r[0], arr:r[1], dep:r[2], ap:r[3], reg:r[4], type:r[5], park:r[6], tat:r[7], paf:r[8] || '', sibt:String(sibt), aibt:'', sobt:'', ctot:'', aobt:'', fill:'auto', dl:'', cx:false}, extra || {});
+  DF0.forEach((r, i) => {
+    const o = S0[i], sc = SC[i] || 'ok', sibt = o ? o.sibt : -150 + i*17, D = sibt + r[7], A = sc === 'late' ? sibt + 14 : sibt - 2;
+    const mt = r[0] === 'FR' ? 25 : r[0] === 'W4' ? 30 : r[7], eobt = Math.max(D, A + mt), x = {};
+    if(sc === 'late'){ x.aibt = String(A); x.aobt = String(eobt + 4); x.dl = '32 4'; }
+    if(sc === '89-77'){ x.aobt = String(D + 10); x.dl = '89 6, 77 4'; }
+    if(o && o.ctot != null) x.ctot = String(D + o.ctot); else if(sc === 'ctot') x.ctot = String(D + (i === 6 ? 20 : i === 7 ? 33 : 27));
+    out.push(mk(r, i < 3, sibt, x));
+  });
+  DX0.forEach((r, k) => out.push(mk(r, false, 25 + k*28, {cx: k === 4})));
+  return out;
+}
+const dfl = () => (C.demo && C.demo.flights) || null;
+function dEdit(){ if(!C.demo || !C.demo.flights) C.demo = {flights: demoDefault()}; return C.demo.flights; }
+function dSet(i, k, v){ dEdit()[i][k] = v; save(); if(['open','fill','cx'].includes(k)) render(); else dSync(i); }
+function dAdd(){ const f = dEdit(); f.push({open:true, cie:'FR', arr:'', dep:'', ap:'', reg:'', type:'B738', park:'', tat:25, paf:'', sibt:'-10', aibt:'', sobt:'', ctot:'', aobt:'', fill:'auto', dl:'', cx:false}); save(); render(); }
+function dDel(i){ if(!confirm('Retirer ce vol du scénario ?')) return; dEdit().splice(i, 1); save(); render(); }
+function dMove(i, d){ const f = dEdit(), j = i + d; if(j < 0 || j >= f.length) return; [f[i], f[j]] = [f[j], f[i]]; save(); render(); }
+function dReset(){ if(!confirm('Revenir au scénario par défaut ?')) return; delete C.demo; save(); render(); }
+// Aperçu des heures si la démo était lancée maintenant (même calcul que l'app)
+function dRel(v){ v = String(v ?? '').trim().replace(/[−–]/g, '-'); if(!v) return null; if(/^(non|x|pas encore)$/i.test(v)) return 'non';
+  const m = /^(\d{1,2})[:h](\d{2})$/.exec(v); if(m){ const t = new Date(); t.setHours(+m[1], +m[2], 0, 0); let r = Math.round((t - Date.now()) / 60000); if(r > 720) r -= 1440; if(r < -720) r += 1440; return r; }
+  const n = parseInt(v, 10); return isNaN(n) ? NaN : n; }
+function dCalc(f, i){
+  const num = (v, d) => (v === null || v === 'non') ? d : v, tat = +f.tat || 30;
+  const sibt = num(dRel(f.sibt), -60 + i*20), D = num(dRel(f.sobt), sibt + tat), a = dRel(f.aibt), A = a === 'non' ? Math.max(sibt, 5) : num(a, sibt - 2);
+  const mt = ['FR','RK'].includes(f.cie) ? 25 : ['W4','W6'].includes(f.cie) ? 30 : tat, eobt = Math.max(D, A + mt);
+  const c = dRel(f.ctot), ctot = typeof c === 'number' ? c : null, o = dRel(f.aobt);
+  let off = typeof o === 'number' ? o : (ctot != null ? Math.max(eobt, ctot - 12) : eobt - 1); if(o === 'non') off = Math.max(off, 5);
+  return {sibt, A, D, ctot, off, eobt, bad: [sibt, D, A, off].some(x => typeof x === 'number' && isNaN(x))};
+}
+function dLine(f, i){
+  const c = dCalc(f, i), hm = m => { const d = new Date(Date.now() + m*60000); return String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0'); };
+  if(c.bad) return '<span style="color:var(--bad)">Une heure n\'est pas comprise : utilisez -20, +15, 10:35 ou non.</span>';
+  const st = c.off <= 0 ? 'parti' : c.A <= 0 ? 'au sol' : 'pas encore arrivé';
+  return 'Lancée maintenant : SIBT ' + hm(c.sibt) + ' · AIBT ' + hm(c.A) + ' · SOBT ' + hm(c.D) + (c.ctot != null ? ' · CTOT ' + hm(c.ctot) : '') + ' · AOBT ' + hm(c.off) + ' → <b>' + st + '</b>';
+}
+function dSync(i){ const el = document.getElementById('dl-' + i); if(el) el.innerHTML = dLine(dfl()[i], i); }
+function vDemo(){
+  const fl = dfl() || demoDefault(), own = !!dfl();
+  const inp = (i, k, lbl, w, ph) => '<div class="f"><label>' + lbl + '</label><input class="txt" style="min-width:0' + (w ? ';max-width:' + w + 'px' : '') + '" value="' + esc(fl[i][k] ?? '') + '" placeholder="' + (ph || '') + '" oninput="dSet(' + i + ',\'' + k + '\',this.value)"></div>';
+  const cards = fl.map((f, i) => '<div class="card dcard"><div class="dhd"><span class="code">' + esc(f.cie || '?') + '</span><b>' + esc((f.cie || '') + (f.arr || '') + ' → ' + (f.cie || '') + (f.dep || '')) + '</b><span class="tag">' + esc(f.ap || '---') + '</span>'
+    + (f.cx ? '<span class="st w">Annulé</span>' : '') + '<span class="sp" style="flex:1"></span>'
+    + '<div class="seg"><button type="button" class="' + (f.open ? 'on' : '') + '" onclick="dSet(' + i + ',\'open\',true)">Onglet ouvert</button><button type="button" class="' + (f.open ? '' : 'on') + '" onclick="dSet(' + i + ',\'open\',false)">Dans la liste</button></div>'
+    + '<button class="btn" type="button" aria-label="Monter" onclick="dMove(' + i + ',-1)"' + (i ? '' : ' disabled') + '>↑</button><button class="btn" type="button" aria-label="Descendre" onclick="dMove(' + i + ',1)"' + (i < fl.length - 1 ? '' : ' disabled') + '>↓</button><button class="btn d" type="button" aria-label="Retirer" onclick="dDel(' + i + ')">×</button></div>'
+    + '<div class="dgrid">' + inp(i,'cie','Cie',70) + inp(i,'arr','N° arrivée',100) + inp(i,'dep','N° départ',100) + inp(i,'ap','Prov. / dest.',90) + inp(i,'reg','Immat',110) + inp(i,'type','Type',90) + inp(i,'park','Parking',80) + inp(i,'paf','PAF',70) + inp(i,'tat','Escale (min)',90) + '</div>'
+    + '<div class="dgrid dt">' + inp(i,'sibt','SIBT',90,'-60') + inp(i,'aibt','AIBT',90,'auto') + inp(i,'sobt','SOBT',90,'auto') + inp(i,'ctot','CTOT',90,'aucun') + inp(i,'aobt','AOBT',90,'auto') + inp(i,'dl','Codes retard',140,'ex. 32 4, 77 4') + '</div>'
+    + '<div class="dft"><div class="seg"><button type="button" class="' + (f.fill !== 'none' ? 'on' : '') + '" onclick="dSet(' + i + ',\'fill\',\'auto\')">Rempli comme un vrai vol</button><button type="button" class="' + (f.fill === 'none' ? 'on' : '') + '" onclick="dSet(' + i + ',\'fill\',\'none\')">Je saisis moi-même</button></div>'
+    + '<label class="dcx"><input type="checkbox"' + (f.cx ? ' checked' : '') + ' onchange="dSet(' + i + ',\'cx\',this.checked)"> Annulé</label></div>'
+    + '<div class="hint" id="dl-' + i + '" style="padding:8px 0 0">' + dLine(f, i) + '</div></div>').join('');
+  return '<div class="hd"><div><h1>Vols de démo</h1><p>Le scénario que la démo rejoue à son lancement et quand on touche « Réinitialiser ». Les heures se donnent par rapport au lancement : <b>-20</b> = 20 min avant, <b>+15</b> = dans 15 min, <b>10:35</b> = heure exacte, <b>non</b> = pas encore (AIBT ou AOBT). Vide = calculé comme d\'habitude.</p></div><span class="sp"></span>'
+   + (own ? '<button class="btn" type="button" onclick="dReset()">Scénario par défaut</button>' : '') + '<button class="btn p" type="button" onclick="dAdd()">+ Ajouter un vol</button></div>'
+   + (own ? '' : '<div class="card"><div class="hint" style="padding:12px 16px">Voici le scénario par défaut. Modifiez n\'importe quel champ pour en faire le vôtre.</div></div>')
+   + cards
+   + '<p class="hint" style="padding:0">Après « Publier », rouvrez la démo : elle repart sur ce scénario. Entre deux réinitialisations, ce que vous saisissez dans l\'app reste en place.</p>';
 }
 </script></body></html>
