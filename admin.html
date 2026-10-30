@@ -308,7 +308,7 @@ const hsk = n => ({n, icao:'', hle:40, types:{A319:T(null,null),A320:T(null,null
 const DEFAULTS = JSON.parse(JSON.stringify({v:1, al:{
   FR:ryr('Ryanair','RYR'), RK:ryr('Ryanair UK','RUK'), W6:wzz('Wizz Air','WZZ'), W4:wzz('Wizz Air Malta','WMT'),
   V7:{n:'Volotea', icao:'VOE', hle:40, types:{A319:T(null,null,null,'A320'),A320:T(null,null,V7S)}},
-  H4:hsk('HiSky'), H6:hsk('')
+  H4:Object.assign(hsk('HiSky'), {icao:'HYS'}), H6:hsk('')
 }}));
 const RULES = {
   FR:[['Départ de BVA','L\'embarquement commence à EOBT −35.'],['Changement d\'équipage','Arrivée PNT ou PNC remplie : rotation mini « avec changement d\'équipage », cabin tidy jusqu\'au dernier débarqué +10 au lieu de +3.'],['Paper LID','LID 3 min avant la cible eLID.']],
@@ -981,14 +981,18 @@ function dReset(){ if(!confirm('Revenir au scénario par défaut ?')) return; de
 const dUTC = () => { try{ return localStorage.getItem('modeUTC') === '1'; }catch(e){ return false; } };
 function dTz(u){ try{ localStorage.setItem('modeUTC', u ? '1' : '0'); }catch(e){} render(); }
 const dTzName = () => dUTC() ? 'UTC' : 'LT';
-function dHM(m){ const d = new Date(Date.now() + m*60000), u = dUTC(); return String(u ? d.getUTCHours() : d.getHours()).padStart(2,'0') + ':' + String(u ? d.getUTCMinutes() : d.getMinutes()).padStart(2,'0'); }
+const dN0 = () => Math.floor(Date.now() / 60000) * 60000;   // v3.47.1 : à la minute pile, comme l'app
+const dR5 = (rel, up) => { const m = dN0() / 60000 + rel; return (up ? Math.ceil(m / 5) : Math.round(m / 5)) * 5 - dN0() / 60000; };
+function dHM(m){ const d = new Date(dN0() + m*60000), u = dUTC(); return String(u ? d.getUTCHours() : d.getHours()).padStart(2,'0') + ':' + String(u ? d.getUTCMinutes() : d.getMinutes()).padStart(2,'0'); }
 function dRel(v){ v = String(v ?? '').trim().replace(/[−–]/g, '-'); if(!v) return null; if(/^(non|x|pas encore)$/i.test(v)) return 'non';
-  const m = /^(\d{1,2})[:h](\d{2})$/.exec(v); if(m){ const t = new Date(); if(dUTC()) t.setUTCHours(+m[1], +m[2], 0, 0); else t.setHours(+m[1], +m[2], 0, 0); let r = Math.round((t - Date.now()) / 60000); if(r > 720) r -= 1440; if(r < -720) r += 1440; return r; }
+  const m = /^(\d{1,2})[:h](\d{2})$/.exec(v); if(m){ const t = new Date(); if(dUTC()) t.setUTCHours(+m[1], +m[2], 0, 0); else t.setHours(+m[1], +m[2], 0, 0); let r = Math.round((t - dN0()) / 60000); if(r > 720) r -= 1440; if(r < -720) r += 1440; return r; }
   const n = parseInt(v, 10); return isNaN(n) ? NaN : n; }
 function dCalc(f, i){
   const num = (v, d) => (v === null || v === 'non') ? d : v, tat = +f.tat || 30;
-  const sibt = num(dRel(f.sibt), -60 + i*20), D = num(dRel(f.sobt), sibt + tat), a = dRel(f.aibt), A = a === 'non' ? Math.max(sibt, 5) : num(a, sibt - 2);
-  const mt = ['FR','RK'].includes(f.cie) ? 25 : ['W4','W6'].includes(f.cie) ? 30 : tat, eobt = Math.max(D, A + mt);
+  const mt = ['FR','RK'].includes(f.cie) ? 25 : ['W4','W6'].includes(f.cie) ? 30 : tat;
+  // v3.47.1 (Hugo) : heures prévues sur 0 ou 5, SOBT au moins SIBT + rotation mini (même calcul que l'app)
+  const s0 = num(dRel(f.sibt), -60 + i*20), sibt = isNaN(s0) ? NaN : dR5(s0), d0 = num(dRel(f.sobt), sibt + tat), D = isNaN(d0) ? NaN : dR5(Math.max(d0, sibt + mt), true);
+  const a = dRel(f.aibt), A = a === 'non' ? Math.max(sibt, 5) : num(a, sibt - 2), eobt = Math.max(D, A + mt);
   const c = dRel(f.ctot), ctot = typeof c === 'number' ? c : null, o = dRel(f.aobt);
   let off = typeof o === 'number' ? o : (ctot != null ? Math.max(eobt, ctot - 12) : eobt - 1); if(o === 'non') off = Math.max(off, 5);
   return {sibt, A, D, ctot, off, eobt, bad: [sibt, D, A, off].some(x => typeof x === 'number' && isNaN(x))};
@@ -1043,13 +1047,18 @@ const DL_LOAD = [
 function dSetX(i, bag, id, v){ if(bag === 'notes'){ const g = dEdit()[i]; g.notes = String(v); if(!g.notes.trim()) delete g.notes; save(); const c = document.getElementById('dn-' + i); if(c) c.textContent = dCount(g); return; } const f = dEdit()[i], o = f[bag] || (f[bag] = {}); v = String(v); if(v.trim()) o[id] = v; else delete o[id]; save(); const c = document.getElementById('dn-' + i); if(c) c.textContent = dCount(f); }
 function dEvAdd(i, k){ if(!k) return; const f = dEdit()[i]; f.evs = [...new Set([...(f.evs || []), k])]; save(); render(); }
 function dEvDel(i, k){ const f = dEdit()[i], e = dEvAll().find(x => x.k === k); f.evs = (f.evs || []).filter(x => x !== k); if(e && f.tm) e.f.forEach(([id]) => delete f.tm[id]); save(); render(); }
+// v3.47.1 (Hugo) : champs Load selon la compagnie (FR/RK ou autres) et, pour FR/RK, eLID ou Paper LID
+const DL_FRRK = ['PreviPAX_MAIN','PreviPAX_INF','PreviBAGS','FinalADULT'], DL_OTHER = ['PreviMALE','PreviFEMALE','PreviCHILD','PreviINFANT','PreviBAGS_OTHER','PreviPOIDS_OTHER','FinalMALE','FinalFEMALE'];
+function dLoadShow(id, frrk, lid){ if(frrk){ if(DL_OTHER.includes(id)) return false; if(lid === 'ELID' && (id === 'FinalCHILD' || /^FinalO[A-D]$/.test(id))) return false; return true; } return !DL_FRRK.includes(id); }
+function dLid(i, k){ const f = dEdit()[i]; if(k === 'LID') f.lid = 'LID'; else delete f.lid; save(); render(); }
 function dCount(f){ const n = Object.keys(f.tm || {}).length + Object.keys(f.val || {}).length + (String(f.notes || '').trim() ? 1 : 0); return n ? n + ' saisie' + (n > 1 ? 's' : '') : ''; }
 const TIME_OK = v => { v = String(v || '').trim().replace(/[−–]/g, '-'); return !v || /^vide$/i.test(v) || /^(\d{1,2})[:h](\d{2})$/.test(v) || /^(SIBT|AIBT|SOBT|EOBT|CTOT|AOBT)?\s*[+-]?\s*\d+$/i.test(v); };
 function dDetails(f, i, part){
   part = part || dTab;
   const auto = f.fill !== 'none', c = dCalc(f, i), cie = String(f.cie || '').toUpperCase();
   // Ce que l'app remplira d'office (même plan que la démo : demo-auto.js) → affiché en gris dans chaque case
-  const plan = auto && !c.bad && typeof demoAutoPlan === 'function' ? demoAutoPlan(i, cie, c) : { tm:[], val:[], notes:[] };
+  const frrk = cie === 'FR' || cie === 'RK', lid = f.lid === 'LID' ? 'LID' : 'ELID';
+  const plan = auto && !c.bad && typeof demoAutoPlan === 'function' ? demoAutoPlan(i, cie, c, frrk ? lid : null) : { tm:[], val:[], notes:[] };
   const pT = Object.fromEntries(plan.tm), pV = Object.fromEntries(plan.val.map(([id, v, w]) => [id, [v, w]]));
   const tin = (id, lb) => { const v = (f.tm || {})[id] || '', r = pT[id];
     const ph = r == null ? '' : r <= 0 ? dHM(r) : dHM(r) + ' à venir';
@@ -1067,7 +1076,8 @@ function dDetails(f, i, part){
     arr: help + '<h3>Arrivée</h3><div class="dgrid dt">' + DT_ARR.map(([id, lb]) => tin(id, lb)).join('') + '</div>',
     dep: help + '<h3>Départ</h3><div class="dgrid dt">' + DT_DEP.map(([id, lb]) => tin(id, lb)).join('') + '</div>',
     ev: help + '<h3>Événements affichés sur ce vol</h3>' + (evs || '<p class="hint" style="padding:0 0 8px">Aucun pour l\'instant.</p>') + pick,
-    load: DL_LOAD.map(([h, fl]) => '<h3>' + h + '</h3><div class="dgrid">' + fl.map(([id, lb, w]) => vin(id, lb, w)).join('') + '</div>').join(''),
+    load: (frrk ? '<div class="dexp" style="display:flex;align-items:center;gap:12px;flex-wrap:wrap"><b>Load final ' + esc(cie) + '</b><span class="seg">' + [['ELID','eLID'],['LID','Paper LID']].map(([k, t]) => '<button type="button" class="' + (lid === k ? 'on' : '') + '" onclick="dLid(' + i + ',\'' + k + '\')">' + t + '</button>').join('') + '</span><span>' + (lid === 'ELID' ? 'Adultes et enfants dans une seule case, pas de zones.' : 'Adultes, enfants et zones séparés, avec le guide LID.') + '</span></div>' : '')
+      + DL_LOAD.map(([h, fl]) => { const ok = fl.filter(x => dLoadShow(x[0], frrk, lid)); return ok.length ? '<h3>' + h + '</h3><div class="dgrid">' + ok.map(([id, lb, w]) => vin(id, frrk && lid === 'ELID' && id === 'FinalADULT' ? 'Adultes + enfants' : lb.replace(' (FR/RK)', ''), w)).join('') + '</div>' : ''; }).join(''),
     notes: '<h3>Notes du journal</h3><textarea class="txt" rows="6" style="width:100%;min-height:140px;font:inherit" placeholder="' + esc(notesPh || 'Une ligne par note, ex. AIBT+3 · SNY · DERUHU') + '" oninput="dSetX(' + i + ',\'notes\',null,this.value)">' + esc(f.notes || '') + '</textarea>'
   };
   return '<div class="ddet" id="dd-' + i + '">' + (parts[part] || '') + '</div>';
@@ -1104,7 +1114,7 @@ function vDemo(){
   const i = dSel, f = fl[i];
   const cc = c => { const h = m => c.bad ? '' : m == null ? 'aucun' : dHM(m); return { A:h(c.A), D:h(c.D), ctot:h(c.ctot), off:h(c.off) }; };
   const inp = (k, lbl, ph) => '<div class="f"><label>' + lbl + '</label><input id="dm-' + i + '-' + k + '" class="txt" style="min-width:0" value="' + esc(f[k] ?? '') + '" placeholder="' + (ph || '') + '" oninput="dSet(' + i + ',\'' + k + '\',this.value)"></div>';
-  const head = '<div class="hd"><div><h1>Vols de démo</h1><p>Le scénario que la démo rejoue à son lancement et quand on touche « Réinitialiser ». Heures : <b>10:35</b> = heure exacte, <b>-20</b> = 20 min avant le lancement, <b>+15</b> = 15 min après, <b>non</b> = pas encore (AIBT ou AOBT).</p></div><span class="sp"></span>'
+  const head = '<div class="hd"><div><h1>Vols de démo</h1><p>Le scénario que la démo rejoue à son lancement et quand on touche « Réinitialiser ». Heures : <b>10:35</b> = heure exacte (les heures prévues SIBT et SOBT tombent toujours sur 0 ou 5, et la SOBT respecte la rotation mini), <b>-20</b> = 20 min avant le lancement, <b>+15</b> = 15 min après, <b>non</b> = pas encore (AIBT ou AOBT).</p></div><span class="sp"></span>'
    + '<div class="seg" title="Même réglage que dans l\'app"><button type="button" class="' + (dUTC() ? '' : 'on') + '" onclick="dTz(false)">LT</button><button type="button" class="' + (dUTC() ? 'on' : '') + '" onclick="dTz(true)">UTC</button></div>'
    + (own ? '<button class="btn" type="button" onclick="dReset()">Scénario par défaut</button>' : '') + '<button class="btn p" type="button" onclick="dAdd();dSel=dfl().length-1;render()">+ Ajouter un vol</button></div>';
   if(!f) return head;
