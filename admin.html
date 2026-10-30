@@ -199,23 +199,91 @@ a.nav,a.btn{text-decoration:none}a.btn{display:inline-block}.btn:disabled{opacit
 :root:not([data-theme="light"]) .btn.p{background:#EDEEF0;color:#141516;border-color:#EDEEF0}:root:not([data-theme="light"]) .gb{background:#9DB2FF}
 :root:not([data-theme="light"]) .tc.on{border-color:#9DB2FF;box-shadow:0 0 0 1px #9DB2FF inset;background:#25272B}
 }
+
+/* v3.47 · nouvelle admin (option A) : menu marine rangé par usage, aperçu de l'app toujours à droite, mode jour / nuit (nuit marine comme l'app) */
+.app{grid-template-columns:240px minmax(0,1fr) 400px;min-height:100vh}
+.side{background:#0B1E4F;color:#fff;border-right:0;position:sticky;top:0;height:100vh;overflow:auto}
+.brand i{background:#fff;color:#0B1E4F}.brand small,.grp{color:#9FB0DA}
+.nav{color:#D5DEF5}.nav:hover{background:rgba(255,255,255,.07)}.nav.on{background:rgba(255,255,255,.13);color:#fff;box-shadow:none}
+.nav span{flex:1}.nav em{font-style:normal;font-size:11px;font-weight:800;color:#9FB0DA}.nav em.w{background:#F5B400;color:#14213D;border-radius:9px;padding:0 7px}
+.me{border-top-color:rgba(255,255,255,.12);display:flex;flex-direction:column;gap:10px}.me .back{color:#9FB0DA}
+.seg.thm{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.15);align-self:flex-start}.seg.thm button{color:#C9D3F0;display:inline-flex;gap:6px;align-items:center}.seg.thm button.on{background:rgba(255,255,255,.2);color:#fff;box-shadow:none}
+.seg.thm svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2}
+.wrap{max-width:none}
+.pub .mock.ok{background:var(--ok-soft);color:var(--ok)}
+.btn.g{background:transparent;border-color:transparent;color:var(--muted)}.btn.g:hover{background:var(--surf2)}
+.btn svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;vertical-align:-3px}
+/* aperçu */
+.pv{position:sticky;top:0;height:100vh;background:var(--surf);border-left:1px solid var(--line);padding:14px 16px;display:flex;flex-direction:column;gap:10px;align-items:center;overflow:hidden}
+.pvh{display:flex;align-items:center;gap:8px;width:100%}.pvh b{flex:1;font-size:14px}
+.pvs{width:100%;font-size:12.5px;font-weight:700;color:var(--muted);min-height:20px}.pvs .tag{margin-right:4px}
+.pvphone{position:relative;width:332px;height:min(694px,calc(100vh - 150px));border-radius:40px;background:#05091A;padding:11px;box-shadow:0 18px 40px rgba(11,30,79,.22);flex:none}
+.pvphone iframe{width:390px;height:calc((100% ) / .797);border:0;border-radius:30px;transform:scale(.797);transform-origin:0 0;background:#EEF1F7}
+.pvload{position:absolute;inset:11px;border-radius:30px;background:rgba(5,9,26,.55);color:#fff;display:grid;place-items:center;font-weight:800;font-size:13px}
+.pvf{display:flex;align-items:center;gap:8px;width:100%;font-size:12px;color:var(--muted)}
+/* vérifier */
+.rvt td{padding:12px 14px}
+/* événements */
+.evbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.evbar .sp{flex:1}.legend{display:flex;gap:6px;margin-right:6px}
+.rl{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:800;border-radius:20px;padding:2px 8px;white-space:nowrap;background:var(--surf2);border:1px solid var(--line);color:var(--fg)}
+.rl.d,.rl.f{background:var(--accent-soft);border-color:transparent;color:var(--accent)}
+.evt td{vertical-align:middle}.evt tr.off td{opacity:.55}.evt tr.off td:last-child{opacity:1}
+.evn{display:inline-flex;align-items:center;gap:8px;margin-right:6px}.evn i{width:10px;height:10px;border-radius:50%;flex:none}
+.evacts{display:flex;flex-wrap:wrap;gap:6px 14px}.evacts span{display:inline-flex;align-items:center;gap:6px;white-space:nowrap}.evacts small{color:var(--muted);font-weight:700}
+tr.evxr td{background:var(--surf2);cursor:default}tr.evxr:hover td{background:var(--surf2)}
+.evx{padding:6px 2px}.evxg{display:grid;grid-template-columns:1.2fr 1fr auto auto;gap:14px;align-items:start}
+.evx .evr{display:flex;gap:8px;align-items:center;margin-top:6px}.evx .evr .it{max-width:300px}.evx small.mut{color:var(--muted);font-size:11px}
+.evxf{display:flex;align-items:center;gap:10px;margin-top:12px;font-size:12.5px}.evxf .sp{flex:1}
+.mut{color:var(--muted)}
+/* vols de démo : frise */
+.frise{padding:14px 16px}.frh{display:flex;align-items:center;gap:10px;margin-bottom:8px}.frh .sp{flex:1}
+.lg{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--muted);font-weight:700}.lg i{width:14px;height:8px;border-radius:3px;background:#7C93D6;display:inline-block}
+.lg i.ok{background:var(--ok)}.lg i.nv{background:#0B1E4F}.lg i.m{background:var(--line)}.lg i.cx{background:repeating-linear-gradient(135deg,var(--bad) 0 3px,transparent 3px 6px)}
+.fx,.fr{display:flex;align-items:center}.fn{width:150px;flex:none;display:flex;align-items:center;gap:7px;font-size:13px;white-space:nowrap;overflow:hidden}.fn .code{min-width:28px;height:20px;font-size:10.5px;border-radius:5px}
+.fn small{color:var(--muted);font-weight:700}.fn i{width:6px;height:6px;border-radius:50%;background:var(--accent);flex:none}
+.ft{position:relative;flex:1;height:100%}
+.fx{height:20px}.fx .ft span{position:absolute;transform:translateX(-50%);font-size:10.5px;font-weight:700;color:var(--muted);top:2px}.fx .ft .f0{color:var(--bad);font-weight:900}
+.fbody{position:relative}.fnow{position:absolute;top:0;bottom:0;width:2px;background:var(--bad);opacity:.55}
+.fr{height:30px;border-radius:8px;cursor:pointer}.fr:hover{background:var(--surf2)}.fr.on{background:var(--accent-soft)}
+.fb{position:absolute;top:8px;height:14px;border-radius:5px;background:#7C93D6}.fb.ok{background:var(--ok-soft);border:1px solid var(--ok)}.fb.nv{background:#0B1E4F}.fb.m{background:var(--line)}
+.fb.cx{background:repeating-linear-gradient(135deg,var(--bad-soft) 0 6px,transparent 6px 12px);border:1px dashed var(--bad)}.fb.bad{background:var(--bad)}
+.fl{position:absolute;top:7px;font-size:11.5px;font-weight:700;color:var(--muted);white-space:nowrap}
+.dcard .tabs{margin-top:4px}.dgrid{grid-template-columns:repeat(auto-fill,minmax(120px,1fr))}.dgrid.dtt{grid-template-columns:repeat(5,minmax(90px,1fr)) minmax(150px,1.4fr);background:var(--surf2);border-radius:10px;padding:10px;margin-top:6px}
+/* nuit marine */
+:root[data-theme="dark"]{--bg:#0A1230;--surf:#111B40;--surf2:#0E1738;--line:#24336A;--fg:#E7ECF8;--muted:#9AA7C9;--accent:#7EA0FF;--accent-soft:#1B2B63;--ok:#5FD18A;--ok-soft:#123528;--warn:#F2C14E;--warn-soft:#3A2C10;--bad:#FF7A88;--bad-soft:#3B1519;color-scheme:dark}
+:root[data-theme="dark"] .side{background:#070D24;color:#fff;border-right:0}
+:root[data-theme="dark"] .nav{color:#D5DEF5}:root[data-theme="dark"] .nav.on{background:rgba(126,160,255,.16);color:#fff;box-shadow:none}
+:root[data-theme="dark"] .brand i{background:#fff;color:#0B1E4F}:root[data-theme="dark"] .me b{color:#fff}
+:root[data-theme="dark"] .btn.p{background:var(--accent);border-color:var(--accent);color:#0A1230}:root[data-theme="dark"] .code{background:#24336A}
+:root[data-theme="dark"] .chip.on{background:var(--accent);color:#0A1230;border-color:var(--accent)}:root[data-theme="dark"] .gb,:root[data-theme="dark"] .fb.nv,:root[data-theme="dark"] .lg i.nv{background:var(--accent)}
+:root[data-theme="dark"] .tc.on{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset;background:var(--accent-soft)}
+:root[data-theme="dark"] .pv{background:#0E1738}
 </style></head><body>
 <div class="app">
   <nav class="side" id="side" aria-label="Sections de l'admin"></nav>
   <div class="main">
-    <div class="pub" role="status"><span class="mock">DÉMO</span><span id="pubtxt"></span><span class="sp"></span><button class="btn" id="undoBtn" type="button" onclick="undo()" hidden>Annuler</button><button class="btn p" id="pubBtn" type="button" onclick="publish()">Publier</button></div>
+    <div class="pub" role="status"><span class="mock" id="pubchip">À JOUR</span><span id="pubtxt"></span><span class="sp"></span><button class="btn g" id="undoBtn" type="button" onclick="undo()" hidden>Annuler les modifs</button><button class="btn p" id="pubBtn" type="button" onclick="go('review')">Vérifier et publier</button></div>
     <div class="wrap view" id="view"></div>
   </div>
+  <aside class="pv" id="pv" aria-label="Aperçu dans l'app">
+    <div class="pvh"><b>Aperçu dans l'app</b><div class="seg" id="pvSeg"><button type="button" data-m="before" onclick="pvSetMode('before')">Avant</button><button type="button" data-m="after" class="on" onclick="pvSetMode('after')">Après</button></div></div>
+    <div class="pvs" id="pvScene">Chargement…</div>
+    <div class="pvphone"><iframe id="pvFrame" title="Aperçu de l'app" tabindex="-1"></iframe><div class="pvload" id="pvLoad">Mise à jour de l'aperçu…</div></div>
+    <div class="pvf"><button class="btn g" type="button" onclick="pvReload()">Recharger</button><span id="pvNote"></span></div>
+  </aside>
 </div>
-<script src="./demo-auto.js"></script><script>
+<script src="./demo-auto.js"></script><script src="./cfg.js"></script><script>
 /* Admin compagnies (démo) : brouillon dans localStorage 'adminCfgDraft', publication dans 'adminCfg' que lit l'app (cfg.js). */
 const ICONS = {
   plane:'<path d="M2 16l20-6-20-6 4 6-4 6z"/>', clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
   plus:'<circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/>', phone:'<rect x="7" y="2.5" width="10" height="19" rx="2.5"/><path d="M11 18h2"/>',
-  back:'<path d="M15 5l-7 7 7 7"/>', flag:'<path d="M5 21V4h11l-2 4 2 4H5"/>', text:'<path d="M4 7V5h16v2M12 5v14M9 19h6"/>', send:'<path d="M3 11l18-8-8 18-2-8-8-2z"/>'
+  back:'<path d="M15 5l-7 7 7 7"/>', alert:'<path d="M12 3l10 18H2z"/><path d="M12 10v4M12 17v.5"/>', play:'<path d="M7 4l13 8-13 8z"/>',
+  eye:'<path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>', hist:'<path d="M3 12a9 9 0 103-6.7L3 8"/><path d="M3 3v5h5M12 7v5l3 2"/>',
+  sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5L19 19M5 19l1.5-1.5M17.5 6.5L19 5"/>', moon:'<path d="M20 14.5A8 8 0 019.5 4 8 8 0 1020 14.5z"/>', flag:'<path d="M5 21V4h11l-2 4 2 4H5"/>', text:'<path d="M4 7V5h16v2M12 5v14M9 19h6"/>', send:'<path d="M3 11l18-8-8 18-2-8-8-2z"/>'
 };
-const NAV = [['Compagnies'],['compagnies','Compagnies','plane'],['cibles','Temps d\'escale cibles','clock'],['ajout','Ajouter une compagnie','plus'],
-  ['Pour toutes les compagnies'],['events','Événements','flag'],['words','Mots rapides','text'],['Démo'],['demo','Vols de démo','plane'],['Contrôle'],['apercu','Aperçu dans l\'app','phone'],['publication','Publication','send']];
+// v3.47 : menu rangé par usage ; l'aperçu de l'app est toujours affiché à droite
+const NAV = [['Opérations'],['compagnies','Compagnies','plane'],['cibles','Temps d\'escale cibles','clock'],['dl','Codes retard','alert'],
+  ['Pendant le vol'],['events','Événements','flag'],['words','Mots rapides','text'],['Démo'],['demo','Vols de démo','play'],['Publier'],['review','Vérifier et publier','eye'],['publication','Historique et code','hist']];
 // Étapes que la timeline de l'app sait afficher (clé = action de renderTimeline)
 const STEPS = {
   'Débarquement':'Débarquement', 'Cabin release':'Cabin tidy / cleaning', 'Avitair':'Avitaillement', 'Lift (Dep)':'Lift départ',
@@ -262,12 +330,15 @@ const AL = c => C.al[c];
 const stepsOf = (a,t) => { const x = a.types[t]; if(!x) return null; return x.steps || (x.like && a.types[x.like] && a.types[x.like].steps) || null; };
 const sgn = v => (v > 0 ? '+' : '') + v;
 
-function save(){ LS.set('adminCfgDraft', C); pubBar(); }
+function save(){ LS.set('adminCfgDraft', C); pubBar(); pvSoon(); }
 function dirty(){ return bare(C) !== bare(pubCfg()); }
 function pubBar(){
   const d = dirty();
-  $('#pubtxt').textContent = busy ? 'Envoi en cours…' : d ? 'Modifications pas encore publiées' : flash || (pubCfg() !== DEFAULTS ? 'Réglages publiés sur la démo' : 'Réglages d\'origine de l\'app');
-  $('#pubBtn').disabled = !d || busy; $('#undoBtn').hidden = !d || busy;
+  const n = d ? nChanges() : 0;
+  $('#pubtxt').textContent = busy ? 'Envoi en cours…' : d ? (n > 1 ? n + ' modifications pas encore publiées' : '1 modification pas encore publiée') : flash || (pubCfg() !== DEFAULTS ? 'Réglages publiés sur la démo' : 'Réglages d\'origine de l\'app');
+  $('#pubchip').textContent = d ? 'BROUILLON' : 'À JOUR'; $('#pubchip').classList.toggle('ok', !d);
+  $('#pubBtn').disabled = !d || busy || cur === 'review'; $('#undoBtn').hidden = !d || busy;
+  const nv = document.querySelector('.nav[onclick*="review"] em'); if(nv) nv.textContent = n || '';
 }
 let busy = false;
 // v3.46 : publication sur Cloudflare (functions/api/config.js du projet Pages timing-demo relié à testapp, KV), code admin gardé dans ce navigateur
@@ -322,25 +393,175 @@ function resetAll(){
 function icon(k){ return '<svg viewBox="0 0 24 24" aria-hidden="true">' + ICONS[k] + '</svg>'; }
 function side(){
   let h = '<div class="brand"><i>T</i><div><b>Timing · Admin</b><small>Démo · Escale BVA</small></div></div>';
+  const cnt = { compagnies: Object.keys(C.al).length, events: Object.keys(EV_BUILTIN).length + (C.events || []).length, words: (C.words || WORDS0).length, demo: (dfl() || demoDefault()).length, review: nChanges() || '' };
   NAV.forEach(n => { h += n.length === 1 ? '<div class="grp">' + n[0] + '</div>'
-    : '<button type="button" class="nav' + (navOn(n[0]) ? ' on' : '') + '" onclick="go(\'' + n[0] + '\')">' + icon(n[2]) + n[1] + '</button>'; });
-  h += '<a class="nav" href="./">' + icon('back') + 'Retour à l\'app</a>';
-  h += '<div class="me"><button type="button" class="back" onclick="resetAll()">Revenir aux réglages d\'origine</button></div>';
+    : '<button type="button" class="nav' + (navOn(n[0]) ? ' on' : '') + '" onclick="go(\'' + n[0] + '\')">' + icon(n[2]) + '<span>' + n[1] + '</span>' + (cnt[n[0]] ? '<em class="' + (n[0] === 'review' ? 'w' : '') + '">' + cnt[n[0]] + '</em>' : '') + '</button>'; });
+  h += '<a class="nav" href="./">' + icon('back') + '<span>Retour à l\'app</span></a>';
+  const dk = theme() === 'dark';
+  h += '<div class="me"><div class="seg thm" role="group" aria-label="Mode jour ou nuit"><button type="button" class="' + (dk ? '' : 'on') + '" onclick="setTheme(\'light\')" aria-label="Mode jour">' + icon('sun') + ' Jour</button><button type="button" class="' + (dk ? 'on' : '') + '" onclick="setTheme(\'dark\')" aria-label="Mode nuit">' + icon('moon') + ' Nuit</button></div>'
+    + '<button type="button" class="back" onclick="resetAll()">Revenir aux réglages d\'origine</button></div>';
   $('#side').innerHTML = h;
 }
-function navOn(k){ return k === 'cibles' ? (cur === 'fiche' && tab === 'cibles') : k === 'compagnies' ? (cur === 'compagnies' || (cur === 'fiche' && tab !== 'cibles')) : cur === k; }
+// v3.47 : mode jour / nuit de l'admin (gardé dans ce navigateur)
+const theme = () => { try{ return localStorage.getItem('adminTheme') === 'dark' ? 'dark' : 'light'; }catch(e){ return 'light'; } };
+function setTheme(t){ try{ localStorage.setItem('adminTheme', t); }catch(e){} document.documentElement.dataset.theme = t; side(); }
+document.documentElement.dataset.theme = theme();
+function navOn(k){ return k === 'cibles' ? (cur === 'fiche' && tab === 'cibles') : k === 'dl' ? (cur === 'fiche' && tab === 'dl') : k === 'compagnies' ? (cur === 'compagnies' || cur === 'ajout' || (cur === 'fiche' && !['cibles','dl'].includes(tab))) : cur === k; }
 function go(v, c, t){
   cur = v; if(c) sel = c; if(t) tab = t;
   if(v === 'cibles'){ cur = 'fiche'; tab = 'cibles'; }
+  if(v === 'dl'){ cur = 'fiche'; tab = 'dl'; }
+  if(v === 'apercu') cur = 'review';
   if(!AL(sel)) sel = Object.keys(C.al)[0];
   if(cur === 'fiche' && !AL(sel).types[ty]) ty = Object.keys(AL(sel).types)[0] || '';
-  side(); render(); pubBar();
+  side(); render(); pubBar(); pvSoon(true);
 }
 function render(){
-  const v = $('#view'); v.innerHTML = ({compagnies:vList, fiche:vFiche, ajout:vAjout, apercu:vApercu, events:vEvents, words:vWords, demo:vDemo, publication:vPub})[cur]();
+  const v = $('#view'); v.innerHTML = ({compagnies:vList, fiche:vFiche, ajout:vAjout, events:vEvents, words:vWords, demo:vDemo, review:vReview, publication:vPub})[cur]();
   const key = cur + ':' + sel + ':' + tab;   // animation seulement quand on change d'écran
   if(key !== render.k){ render.k = key; v.classList.remove('view'); void v.offsetWidth; v.classList.add('view'); }
   if(cur === 'fiche' && tab === 'cibles') drawGantt();
+}
+
+/* v3.47 · Vérifier avant de publier : chaque modification du brouillon, l'écran de l'app où elle se voit, et de quoi l'annuler seule */
+function changes(){
+  const P = pubCfg(), out = [], J = x => JSON.stringify(x ?? null), pa = P.al || {}, ca = C.al || {};
+  const put = (o, b, keys) => keys.forEach(k => { if(b && k in b) o[k] = clone(b[k]); else delete o[k]; });
+  Object.keys(ca).forEach(c => {
+    const a = ca[c], b = pa[c];
+    if(!b){ out.push({ sec:'Compagnies', t:'Nouvelle compagnie ' + c + (a.n ? ' (' + a.n + ')' : ''), go:['fiche', c, 'general'], undo:() => { delete C.al[c]; } }); return; }
+    const w = [];
+    if(J(a.n) !== J(b.n)) w.push('nom « ' + (b.n || '') + ' » → « ' + (a.n || '') + ' »');
+    if(J(a.icao) !== J(b.icao)) w.push('callsign ' + (b.icao || '—') + ' → ' + (a.icao || '—'));
+    if(J(a.hle) !== J(b.hle)) w.push('HLE SOBT −' + b.hle + ' → −' + a.hle);
+    if(w.length) out.push({ sec:'Compagnies', t:c + ' : ' + w.join(', '), go:['fiche', c, 'general'], undo:() => put(a, b, ['n','icao','hle']) });
+    const ts = [...new Set([...Object.keys(a.types || {}), ...Object.keys(b.types || {})])];
+    ts.forEach(t => {
+      const x = (a.types || {})[t], y = (b.types || {})[t]; if(J(x) === J(y)) return;
+      if(!x || !y){ out.push({ sec:'Compagnies', t:c + ' : type ' + t + (x ? ' ajouté' : ' retiré'), go:['fiche', c, 'types'], undo:() => { const T = a.types || (a.types = {}); if(y) T[t] = clone(y); else delete T[t]; } }); return; }
+      const r = [];
+      if(J(x.mtt) !== J(y.mtt)) r.push('rotation mini ' + (y.mtt ?? 'programme') + ' → ' + (x.mtt ?? 'programme') + ' min');
+      if(J(x.crew) !== J(y.crew)) r.push('avec changement d\'équipage ' + (y.crew ?? '—') + ' → ' + (x.crew ?? '—') + ' min');
+      if(r.length) out.push({ sec:'Compagnies', t:c + ' ' + t + ' : ' + r.join(', '), go:['fiche', c, 'types', t], undo:() => put(x, y, ['mtt','crew']) });
+      if(J(x.steps) !== J(y.steps) || J(x.like) !== J(y.like)) out.push({ sec:'Temps d\'escale cibles', t:c + ' ' + t + ' : ' + stepDiff(stepsOf(b, t), stepsOf(a, t)), go:['fiche', c, 'cibles', t], undo:() => put(x, y, ['steps','like']) });
+    });
+    if(J(a.dl) !== J(b.dl) || J(a.dlLike) !== J(b.dlLike)) out.push({ sec:'Codes retard', t:c + ' : liste des codes retard', go:['fiche', c, 'dl'], undo:() => put(a, b, ['dl','dlLike']) });
+  });
+  Object.keys(pa).forEach(c => { if(!ca[c]) out.push({ sec:'Compagnies', t:'Compagnie ' + c + ' supprimée', go:['compagnies'], undo:() => { C.al[c] = clone(pa[c]); } }); });
+  const top = (k, sec, t, g) => { if(J(C[k]) !== J(P[k])) out.push({ sec, t, go:g, undo:() => put(C, P, [k]) }); };
+  const evN = k => (EV_BUILTIN[k] || {}).t || k;
+  const edK = [...new Set([...Object.keys(C.evEdit || {}), ...Object.keys(P.evEdit || {})])].filter(k => J((C.evEdit || {})[k]) !== J((P.evEdit || {})[k]));
+  top('events', 'Événements', 'Événements ajoutés : ' + ((C.events || []).map(e => e.t).join(', ') || 'aucun'), ['events']);
+  top('evHide', 'Événements', 'Masqués dans la liste : ' + ((C.evHide || []).map(evN).join(', ') || 'aucun'), ['events']);
+  const evD = k => { const n = (C.evEdit || {})[k] || {}, o = (P.evEdit || {})[k] || {}, r = [];
+    if(J(n.t) !== J(o.t)) r.push('nom ' + (o.t || evN(k)) + ' → ' + (n.t || evN(k)));
+    if(J(n.c) !== J(o.c)) r.push('couleur');
+    if(J(n.cies) !== J(o.cies)) r.push((n.cies || []).length ? 'seulement ' + n.cies.join(', ') : 'toutes les compagnies');
+    return evN(k) + ' (' + r.join(', ') + ')'; };
+  top('evEdit', 'Événements', edK.map(evD).join(' · '), ['events', null, null, 'b:' + edK[0]]);
+  const lbF = Object.keys(Object.assign({}, C.lbl, P.lbl)).filter(f => J((C.lbl || {})[f]) !== J((P.lbl || {})[f]));
+  const lbK = Object.keys(EV_BUILTIN).find(k => EV_BUILTIN[k].it.some(x => x[0] === lbF[0]));
+  top('lbl', 'Événements', 'Noms des actions : ' + lbF.map(f => { const d = Object.values(EV_BUILTIN).flatMap(e => e.it).find(x => x[0] === f); return (d ? d[1] : f) + ' → ' + ((C.lbl || {})[f] || (d ? d[1] : f)); }).join(', '), ['events', null, null, lbK ? 'b:' + lbK : null]);
+  top('words', 'Mots rapides', 'Mots rapides : ' + (C.words || WORDS0).join(', '), ['words']);
+  if(J(C.demo) !== J(P.demo)){
+    const A = (C.demo && C.demo.flights) || demoDefault(), B = (P.demo && P.demo.flights) || demoDefault();
+    const n = A.filter((f, i) => J(f) !== J(B[i])).length + Math.max(0, B.length - A.length);
+    out.push({ sec:'Vols de démo', t:'Scénario de la démo : ' + n + ' vol' + (n > 1 ? 's' : '') + ' modifié' + (n > 1 ? 's' : '') + (A.length !== B.length ? ' (' + B.length + ' → ' + A.length + ' vols)' : ''), go:['demo'], undo:() => put(C, P, ['demo']) });
+  }
+  return out;
+}
+function stepDiff(a, b){
+  a = a || []; b = b || []; const f = s => s ? (s.a[0] === 'AIBT' ? 'AIBT' : 'EOBT') + sgn(s.a[1]) + (s.b ? ' → ' + s.b[0] + sgn(s.b[1]) : '') : '';
+  const out = [];
+  b.forEach(s => { const o = a.find(x => x.k === s.k); if(!o) out.push('+ ' + (STEPS[s.k] || s.k)); else if(f(o) !== f(s)) out.push((STEPS[s.k] || s.k) + ' ' + f(o) + ' devient ' + f(s)); });
+  a.forEach(s => { if(!b.find(x => x.k === s.k)) out.push('− ' + (STEPS[s.k] || s.k)); });
+  return out.join(' · ') || 'cibles de la timeline';
+}
+const nChanges = () => { try{ return dirty() ? (changes().length || 1) : 0; }catch(e){ return dirty() ? 1 : 0; } };
+let rvSeen = new Set();
+function rvShow(i){ const c = changes()[i]; if(!c) return; pvFocus = c.go; rvSeen.add(c.t); render(); pvSoon(true); }
+function rvUndo(i){ const c = changes()[i]; if(!c) return; c.undo(); pvFocus = null; save(); side(); render(); }
+function vReview(){
+  const ch = dirty() ? changes() : [], code = !!adminCode();
+  if(!ch.length) return '<div class="hd"><div><h1>Vérifier et publier</h1><p>Rien à publier : le brouillon est identique à la version en ligne.</p></div></div>'
+    + '<div class="card"><div class="rule" style="border:0">' + (flash ? esc(flash) : 'Modifiez un réglage, il apparaîtra ici avec l\'écran de l\'app où il se voit.') + '</div></div>';
+  return '<div class="hd"><div><h1>Vérifier avant de publier</h1><p>' + ch.length + ' modification' + (ch.length > 1 ? 's' : '') + '. Touchez « Voir dans l\'app » : l\'aperçu à droite ouvre l\'écran concerné. Passez de « Après » à « Avant » pour comparer.</p></div>'
+   + '<span class="sp"></span><div class="steps" style="padding:0"><span class="dn">1 · Modifs</span><span class="on">2 · Vérifier</span><span>3 · Publier</span></div></div>'
+   + '<div class="card tw"><table class="rvt"><tbody>' + ch.map((c, i) => '<tr class="' + (pvFocus && J2(pvFocus) === J2(c.go) ? 'sel' : '') + '" style="cursor:default"><td style="width:1%;white-space:nowrap"><span class="tag">' + esc(c.sec) + '</span></td><td><b>' + esc(c.t) + '</b></td>'
+     + '<td style="white-space:nowrap;text-align:right"><button class="btn" type="button" onclick="rvShow(' + i + ')">' + icon('eye') + ' Voir dans l\'app' + (rvSeen.has(c.t) ? ' ✓' : '') + '</button> <button class="btn g" type="button" onclick="rvUndo(' + i + ')">Annuler cette modif</button></td></tr>').join('') + '</tbody></table></div>'
+   + '<div class="card"><div class="rule" style="border:0;align-items:center;flex-wrap:wrap"><div style="flex:1;min-width:260px">' + (code ? '<b>Prêt à publier.</b> Toute personne qui ouvre la démo reçoit ces réglages en moins d\'une minute. La version actuelle reste dans l\'historique.' : '<b>Code admin manquant :</b> sans lui, la publication ne s\'applique que sur cet ordinateur. <a href="#" onclick="go(\'publication\');return false">Enregistrer le code</a>') + '</div>'
+   + '<button class="btn" type="button" onclick="undo()">Tout annuler</button><button class="btn p" id="pubGo" type="button" onclick="publish()"' + (busy ? ' disabled' : '') + '>Publier pour tout le monde</button></div></div>';
+}
+const J2 = x => JSON.stringify(x);
+
+/* v3.47 · Aperçu : la vraie app (index.html?preview=1) dans un téléphone, avec le brouillon (« Après ») ou la version en ligne (« Avant »).
+   L'app lit la copie posée dans localStorage 'adminCfgPreview' (cfg.js). Elle partage les données de la démo de ce navigateur. */
+let pvMode = 'after', pvFocus = null, pvT = 0, pvLoaded = '', pvRunId = 0;
+function pvSetMode(m){ pvMode = m; document.querySelectorAll('#pvSeg button').forEach(b => b.classList.toggle('on', b.dataset.m === m)); pvSoon(true); }
+function pvCfg(){ const c = clone(pvMode === 'after' ? C : pubCfg()); c.at = Date.now(); return c; }
+function pvSoon(now){
+  clearTimeout(pvT);
+  pvT = setTimeout(() => {
+    const txt = JSON.stringify(Object.assign(pvCfg(), { at:0 }));
+    if(txt !== pvLoaded){ pvLoaded = txt; try{ localStorage.setItem('adminCfgPreview', JSON.stringify(pvCfg())); }catch(e){} pvReload(); }
+    else pvRun();
+  }, now ? 30 : 900);
+}
+function pvReload(){ const f = $('#pvFrame'); if(!f) return; $('#pvLoad').hidden = false; f.onload = () => pvRun(); f.src = './?preview=1&t=' + Date.now(); }
+const pvSleep = ms => new Promise(r => setTimeout(r, ms));
+// Écran de l'app qui montre la page en cours de l'admin
+function pvWhat(){
+  const g = (cur === 'review' && pvFocus) ? pvFocus : [cur, sel, tab, cur === 'events' ? evSel : ty];
+  const [pg, c, tb, x] = g;
+  if(pg === 'fiche'){
+    if(tb === 'cibles') return { tab:'timing', sub:'tl', cie:c, label:'Timing › Timeline · ' + c + ' ' + (x || '') };
+    if(tb === 'dl') return { tab:'retard', cie:c, label:'Retard · ' + c };
+    return { tab:'vol', cie:c, label:'Vol · ' + c };
+  }
+  if(pg === 'events'){
+    const k = x && String(x).replace(/^b:/, ''), b = k && EV_BUILTIN[k], ce = x && /^c:/.test(x) ? (C.events || [])[+String(x).slice(2)] : null;
+    const side = b ? (b.side === 'arr' ? 'arr' : 'dep') : ce ? (ce.side === 'arr' ? 'arr' : 'dep') : 'dep';
+    return { tab:'timing', sub:side, ev: b ? k : ce ? 'cx-' + String(ce.id || '').toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 20) : null, sheet: !b && !ce, label:'Timing › ' + (side === 'arr' ? 'Arrivée' : 'Départ') + ' › ' + (b ? (((C.evEdit || {})[k] || {}).t || b.t) : ce ? ce.t : 'Ajouter un événement') };
+  }
+  if(pg === 'words') return { tab:'notes', words:true, label:'Notes › Clavier › Ajout rapide' };
+  if(pg === 'demo'){ const f = (dfl() || demoDefault())[dSel]; return f && f.open ? { tab:'vol', flight:f, label:'Vol · ' + f.cie + f.dep } : { tab:'vols', label:'Récap' + (f ? ' (' + f.cie + f.dep + ' est dans « Ouvrir un vol »)' : '') }; }
+  return { tab:'vols', label:'Récap' };
+}
+function pvFind(w, sc){
+  let ids = []; try{ ids = JSON.parse(w.localStorage.getItem('flightTabs') || '[]').map(String); }catch(e){}
+  const rd = id => { try{ return JSON.parse(w.localStorage.getItem('tab-' + id) || '{}'); }catch(e){ return {}; } };
+  const up = v => String(v || '').toUpperCase().trim();
+  if(sc.flight){ const f = sc.flight; return ids.find(id => { const d = rd(id); return up(d.Cie) === up(f.cie) && [f.dep, f.arr].map(String).some(n => n && JSON.stringify(d).includes(up(f.cie) + n)); }) || ids.find(id => up(rd(id).Cie) === up(f.cie)); }
+  return ids.find(id => up(rd(id).Cie) === up(sc.cie));
+}
+async function pvRun(){
+  const run = ++pvRunId, f = $('#pvFrame'), w = f && f.contentWindow; if(!w) return;
+  for(let k = 0; k < 100; k++){ if(run !== pvRunId) return; try{ if(typeof w.uiTab === 'function' && w.document.getElementById('PremierDebarque') && w.localStorage.getItem('demoT0') && w.document.body.classList.contains('pv-authed')) break; }catch(e){} await pvSleep(100); }
+  await pvSleep(250); if(run !== pvRunId) return;
+  const sc = pvWhat(); let note = '';
+  try{
+    w.document.querySelectorAll('.sheet-modal,#wnModal').forEach(m => { if(m.style) m.style.display = 'none'; });
+    if(!w.document.getElementById('pvHlCss')){ const st = w.document.createElement('style'); st.id = 'pvHlCss'; st.textContent = '.pv-hl{outline:3px solid #F5B400!important;outline-offset:3px;border-radius:12px}'; w.document.head.appendChild(st); }
+    w.document.querySelectorAll('.pv-hl').forEach(x => x.classList.remove('pv-hl'));
+    if(sc.cie || sc.flight){ const id = pvFind(w, sc); if(id) w.uiOpenFlight(id); else note = 'Aucun vol ' + (sc.cie || sc.flight.cie) + ' ouvert dans la démo : aperçu sur un autre vol.'; }
+    else if(sc.tab !== 'vols'){ const ids = JSON.parse(w.localStorage.getItem('flightTabs') || '[]'); if(ids[0] && !w.currentTabId) w.uiOpenFlight(ids[0]); }
+    w.uiTab(sc.tab);
+    if(sc.sub && typeof w.switchTimingPanel === 'function') w.switchTimingPanel(sc.sub);
+    await pvSleep(120);
+    if(sc.ev){
+      const pnl = w.document.getElementById('panel-' + sc.ev);
+      if(pnl && pnl.style.display === 'none' && typeof w.toggleDepExtra === 'function') w.toggleDepExtra(sc.ev);
+      const el = w.document.getElementById('panel-' + sc.ev); if(el){ el.scrollIntoView({ block:'center' }); el.classList.add('pv-hl'); }
+      else note = 'Événement masqué ou réservé à d\'autres compagnies sur ce vol.';
+    }
+    if(sc.sheet && typeof w.uiEvOpen === 'function') w.uiEvOpen(sc.sub || 'dep');
+    if(sc.words){ const b = w.document.getElementById('bnModeTextBtn'); if(b) b.click(); const q = w.document.querySelector('#bnTextMode .nj-quick'); if(q){ q.scrollIntoView({ block:'center' }); q.classList.add('pv-hl'); } }
+    if(sc.tab === 'timing' && sc.sub === 'tl'){ const t = w.document.getElementById('timelineCard'); if(t) t.scrollIntoView({ block:'start' }); }
+  }catch(e){ note = 'Aperçu incomplet : ' + e.message; }
+  if(run !== pvRunId) return;
+  $('#pvLoad').hidden = true;
+  $('#pvScene').innerHTML = '<span class="tag">' + (pvMode === 'after' ? 'Après' : 'Avant') + '</span> ' + esc(sc.label);
+  $('#pvNote').textContent = note;
 }
 
 /* Compagnies */
@@ -529,23 +750,6 @@ function addAl(){
   save(); const c = W.c; Object.assign(W, {c:'', icao:'', n:'', from:'W6', types:[]}); wiz = 1; ty = Object.keys(types)[0]; go('fiche', c, 'types');
 }
 
-/* Aperçu côté app */
-let pv = {c:'W6', t:'A321'};
-function vApercu(){
-  if(!AL(pv.c)) pv.c = Object.keys(C.al)[0];
-  const a = AL(pv.c); if(!a.types[pv.t]) pv.t = Object.keys(a.types)[0];
-  const x = a.types[pv.t] || {}, st = stepsOf(a, pv.t) || [], mtt = x.mtt || 30;
-  const {abs, Wd, pc} = ganttHTML(st, mtt);
-  const eobt = 630, hm = m => { m = (m + 1440) % 1440; return String(Math.floor(m / 60)).padStart(2,'0') + ':' + String(m % 60).padStart(2,'0'); };
-  const at = p => hm(eobt + abs(p));
-  const rows = st.map(s => { const s0 = abs(s.a), s1 = s.b ? abs(s.b) : s0; return '<div class="r"><i>' + esc(STEPS[s.k] || s.k) + '</i><em><b class="' + (s.b ? '' : 'pt') + '" style="left:' + pc(Math.min(s0,s1)) + ';width:' + (Math.abs(s1 - s0) / Wd * 100).toFixed(1) + '%"></b><span class="now" style="left:' + pc(-12) + '"></span></em></div>'; }).join('') || '<div style="font-size:11px;color:#6B7799;padding:8px 0">Pas de cibles : heures réelles seulement.</div>';
-  const tbl = st.map(s => '<tr style="cursor:default"><td>' + esc(STEPS[s.k] || s.k) + '</td><td class="num">' + at(s.a) + (s.b ? ' → ' + at(s.b) : '') + '</td></tr>').join('');
-  return '<div class="hd"><div><h1>Aperçu dans l\'app</h1><p>Vol à l\'heure, EOBT 10:30 : les cibles que l\'agent verra dans la timeline une fois publié.</p></div></div>'
-   + '<div class="split"><div class="card"><h2>Vol d\'exemple</h2><div class="form"><div class="f"><label>Compagnie</label><div class="chips">' + Object.keys(C.al).map(c => '<button type="button" class="chip' + (c === pv.c ? ' on' : '') + '" onclick="pv.c=\'' + c + '\';render()">' + c + '</button>').join('') + '</div></div><div class="f"><label>Type avion</label><div class="chips">' + Object.keys(a.types).map(t => '<button type="button" class="chip' + (t === pv.t ? ' on' : '') + '" onclick="pv.t=\'' + t + '\';render()">' + t + '</button>').join('') + '</div></div>'
-   + '<table><tbody><tr style="cursor:default"><td>AIBT</td><td class="num">' + hm(eobt - mtt) + '</td></tr><tr style="cursor:default"><td>EOBT</td><td class="num">' + hm(eobt) + (x.mtt ? ' <span class="u">AIBT + ' + mtt + ' min</span>' : '') + '</td></tr><tr style="cursor:default"><td>HLE</td><td class="num">' + hm(eobt - a.hle) + '</td></tr>' + tbl + '</tbody></table></div></div>'
-   + '<div class="card" style="padding:16px"><div class="phone"><div class="ph-top"><span>' + pv.c + ' 1234 · ' + esc(pv.t) + '</span><span>' + hm(eobt - 12) + '</span></div><div class="ph-item"><small>Timeline · Départ</small><b>EOBT ' + hm(eobt) + '</b></div><div class="ph-tl">' + rows + '</div></div><p class="hint" style="padding:12px 0 0;text-align:center">Après « Publier », rouvrez la démo pour voir ces cibles sur un vol ' + pv.c + '.</p></div></div>';
-}
-
 /* Accès : connexion faite dans la démo aujourd'hui (même clé que l'app) */
 function authed(){ try{ const o = JSON.parse(localStorage.getItem('pv_auth') || 'null'); return sessionStorage.getItem('pv_auth') === '1' || (o && o.h && new Date(o.t - 3*36e5).toDateString() === new Date(Date.now() - 3*36e5).toDateString()); }catch(e){ return false; } }
 if(!authed()){
@@ -559,7 +763,7 @@ if(!authed()){
     go(cur);
   }).catch(() => {});
   fetch('./dlcodes.js').then(r => r.text()).then(t => { const m = /window\.DL_CODES = (\{.*\});/.exec(t); if(m) DLC = JSON.parse(m[1]); }).catch(() => {}).then(() => { if(cur === 'fiche' && tab === 'dl') render(); });
-  go('compagnies');
+  setTimeout(() => go('compagnies'));   // v3.47 : après la lecture de tout le script (le menu compte les mots, les vols…)
 }
 
 /* Codes retard par compagnie (v3.37) : liste du manuel (dlcodes.js), « comme » une autre compagnie, ou liste propre */
@@ -647,14 +851,56 @@ function evSum(i){ const el = document.getElementById('evs-' + i); if(el) el.inn
 function evAdd(){
   C.events = C.events || [];
   C.events.push({ id:'e' + Date.now().toString(36), t:'Nouvel événement', side:'dep', c:EV_COLORS[C.events.length % EV_COLORS.length], cies:[], items:[{id:'a', t:'Début', r:'d'}, {id:'b', t:'Fin', r:'f'}] });
-  save(); render(); const f = document.querySelector('.evc:last-of-type input.txt'); if(f){ f.focus(); f.select(); }
+  save(); evSel = 'c:' + (C.events.length - 1); render(); const f = document.querySelector('.evc input.txt'); if(f){ f.focus(); f.select(); }
 }
-function evDel(i){ if(!confirm('Retirer « ' + C.events[i].t + ' » ? Les heures déjà saisies sur les vols ne seront plus affichées.')) return; C.events.splice(i, 1); save(); render(); }
-function vEvents(){
-  const hid = new Set(C.evHide || []), evs = C.events || [];
-  const base = ['arr','dep','both'].map(sd => EV_BASE.filter(e => e[2] === sd).map(([k, t]) =>
-    '<tr style="cursor:default"><td><b>' + t + '</b></td><td>' + SIDE[sd] + '</td><td><div class="seg"><button type="button" class="' + (hid.has(k) ? '' : 'on') + '" onclick="evHide(\'' + k + '\',false)">Proposé</button><button type="button" class="' + (hid.has(k) ? 'on' : '') + '" onclick="evHide(\'' + k + '\',true)">Masqué</button></div></td></tr>').join('')).join('');
-  const own = evs.map((e, i) => { const it = evItems(i); return '<div class="evc" id="ev-' + i + '">'
+function evDel(i){ if(!confirm('Retirer « ' + C.events[i].t + ' » ? Les heures déjà saisies sur les vols ne seront plus affichées.')) return; C.events.splice(i, 1); evSel = null; save(); render(); }
+// v3.47 : un seul tableau, événements de l'app et ajoutés ; chaque ligne détaille ses actions (une heure, début, fin) et s'ouvre pour être réglée
+let evF = 'all', evSel = null;
+const ROLE_CH = r => '<span class="rl ' + r + '">' + ({ h:'● Une heure', d:'▶ Début', f:'■ Fin' })[r] + '</span>';
+function evTl(items){
+  const used = new Set(), pairs = [];
+  items.forEach((x, j) => { if(x[2] !== 'd') return; const k = items.findIndex((y, n) => n > j && y[2] === 'f' && !used.has(n)); if(k > 0){ used.add(j); used.add(k); pairs.push(1); } });
+  const pts = items.length - used.size;
+  return [pairs.length ? (pairs.length > 1 ? pairs.length + ' barres' : 'barre') + ' + durée' : '', pts ? pts + ' repère' + (pts > 1 ? 's' : '') : ''].filter(Boolean).join(' + ');
+}
+function evB(k){
+  const b = EV_BUILTIN[k], e = (C.evEdit || {})[k] || {}, L = C.lbl || {};
+  return { k, own:false, t:e.t || b.t, t0:b.t, c:e.c || b.c, c0:b.c, side:b.side, cies:e.cies || [], it:b.it.map(([f, l, r]) => [f, L[f] || l, r, l]) };
+}
+function evList(){
+  const hid = new Set(C.evHide || []);
+  const bi = Object.keys(EV_BUILTIN).map(k => Object.assign(evB(k), { id:'b:' + k, hidden:hid.has(k) }));
+  const cu = (C.events || []).map((e, i) => ({ id:'c:' + i, i, own:true, t:e.t, c:e.c, side:e.side || 'dep', cies:e.cies || [], it:evItems(i).map(x => [x.f || '', x.t, x.r]) }));
+  return bi.concat(cu).filter(e => evF === 'all' || (evF === 'own' ? e.own : e.side === evF));
+}
+function evPick(id){ evSel = evSel === id ? null : id; render(); pvSoon(true); }
+function evEditSet(k, prop, v){
+  const m = C.evEdit || (C.evEdit = {}), o = m[k] || (m[k] = {}), b = EV_BUILTIN[k];
+  if(prop === 'cies') v = String(v).toUpperCase().split(/[^A-Z0-9]+/).filter(Boolean);
+  const def = prop === 't' ? b.t : prop === 'c' ? b.c : [];
+  if(v == null || (Array.isArray(v) ? !v.length : String(v).trim() === '' || v === def)) delete o[prop]; else o[prop] = typeof v === 'string' ? v.trim() : v;
+  if(!Object.keys(o).length) delete m[k]; if(!Object.keys(m).length) delete C.evEdit;
+  save(); if(prop === 'c') render(); else { const h = document.querySelector('tr.sel .evname'); if(h && prop === 't') h.textContent = v || b.t; }
+}
+function lblSet(f, v, def){
+  const m = C.lbl || (C.lbl = {}); v = String(v).trim();
+  if(!v || v === def) delete m[f]; else m[f] = v; if(!Object.keys(m).length) delete C.lbl; save();
+}
+function evBReset(k){ const b = EV_BUILTIN[k]; if(C.evEdit){ delete C.evEdit[k]; if(!Object.keys(C.evEdit).length) delete C.evEdit; } if(C.lbl){ b.it.forEach(x => delete C.lbl[x[0]]); if(!Object.keys(C.lbl).length) delete C.lbl; } save(); render(); }
+function evBuiltinEditor(e){
+  const hidden = (C.evHide || []).includes(e.k), cols = [...new Set([e.c0].concat(EV_COLORS))];
+  return '<div class="evx"><div class="evxg">'
+   + '<div class="f"><label>Nom affiché dans l\'app</label><input class="txt" value="' + esc(e.t) + '" placeholder="' + esc(e.t0) + '" oninput="evEditSet(\'' + e.k + '\',\'t\',this.value)"></div>'
+   + '<div class="f"><label>Compagnies</label><input class="txt" value="' + esc(e.cies.join(' ')) + '" placeholder="Toutes" oninput="evEditSet(\'' + e.k + '\',\'cies\',this.value)"><small>Vide : proposé à toutes. Sinon par exemple « FR RK ».</small></div>'
+   + '<div class="f"><label>Couleur</label><div class="sw">' + cols.map(c => '<button type="button" aria-label="Couleur" class="' + (e.c === c ? 'on' : '') + '" style="background:' + c + '" onclick="evEditSet(\'' + e.k + '\',\'c\',\'' + c + '\')"></button>').join('') + '</div></div>'
+   + '<div class="f"><label>Dans « + Ajouter un événement »</label><div class="seg"><button type="button" class="' + (hidden ? '' : 'on') + '" onclick="evHide(\'' + e.k + '\',false)">Proposé</button><button type="button" class="' + (hidden ? 'on' : '') + '" onclick="evHide(\'' + e.k + '\',true)">Masqué</button></div></div></div>'
+   + '<div class="f" style="margin-top:12px"><label>Actions (le type ne change pas : il est lié aux calculs et au rapport)</label>'
+   + e.it.map(([f, l, r, l0], j) => '<div class="evr"><span class="tag">' + (j + 1) + '</span><input class="txt it" value="' + esc(l) + '" placeholder="' + esc(l0) + '" oninput="lblSet(\'' + f + '\',this.value,\'' + esc(l0).replace(/'/g, "\\'") + '\')">' + ROLE_CH(r) + '<small class="mut">champ ' + f + '</small></div>').join('') + '</div>'
+   + '<div class="evxf"><span class="mut">Côté : ' + SIDE[e.side] + '. Timeline : ' + evTl(e.it) + '. Les heures déjà saisies et le rapport gardent leurs champs.</span><span class="sp"></span><button class="btn g" type="button" onclick="evBReset(\'' + e.k + '\')">Rétablir l\'origine</button></div></div>';
+}
+function evCustomEditor(i){
+  const e = C.events[i], it = evItems(i);
+  return '<div class="evc" id="ev-' + i + '">'
     + '<div class="evh"><i style="background:' + esc(e.c) + '"></i><input class="txt" style="font-weight:700;max-width:240px" value="' + esc(e.t) + '" oninput="evSet(' + i + ',\'t\',this.value)" aria-label="Nom de l\'événement">'
     + '<select class="refsel" onchange="evSet(' + i + ',\'side\',this.value)">' + Object.keys(SIDE).map(k => '<option value="' + k + '"' + (e.side === k ? ' selected' : '') + '>' + SIDE[k] + '</option>').join('') + '</select>'
     + '<input class="txt" style="width:110px" value="' + esc((e.cies || []).join(' ')) + '" placeholder="Toutes cies" oninput="evSet(' + i + ',\'cies\',this.value.toUpperCase().split(/[^A-Z0-9]+/).filter(Boolean))" aria-label="Compagnies">'
@@ -665,12 +911,25 @@ function vEvents(){
       + '<button class="btn" type="button" aria-label="Monter" onclick="evIMove(' + i + ',' + j + ',-1)"' + (j ? '' : ' disabled') + '>↑</button><button class="btn" type="button" aria-label="Descendre" onclick="evIMove(' + i + ',' + j + ',1)"' + (j < it.length - 1 ? '' : ' disabled') + '>↓</button>'
       + '<button class="btn d" type="button" aria-label="Retirer l\'action" onclick="evIDel(' + i + ',' + j + ')"' + (it.length > 1 ? '' : ' disabled') + '>×</button></div>').join('')
     + (it.length < 4 ? '<button class="chip add" type="button" onclick="evIAdd(' + i + ')">+ Ajouter une action</button>' : '') + '</div>'
-    + '<div class="hint" id="evs-' + i + '" style="padding:8px 0 0">' + evSumTxt(e) + '</div></div>'; }).join('');
-  return '<div class="hd"><div><h1>Événements</h1><p>Ce que l\'agent trouve dans « + Ajouter un événement », côté Arrivée ou Départ. Un événement regroupe jusqu\'à 4 actions, chacune avec son nom : une heure seule, un début ou une fin. Par exemple Nayak : Appel Nayak (une heure), Arrivée Nayak (début), Départ Nayak (fin).</p></div></div>'
-   + '<div class="card tw"><h2>Événements ajoutés</h2><div style="padding:4px 16px 2px">' + (own || '<div class="hint" style="padding:0 0 10px">Aucun pour l\'instant.</div>') + '</div>'
-   + '<div class="rule"><button class="chip add" type="button" onclick="evAdd()">+ Ajouter un événement</button><span style="color:var(--muted)">Compagnies vide : proposé à toutes. Sinon, par exemple « FR RK ».</span></div></div>'
-   + '<div class="card tw"><h2>Événements de l\'app</h2><table><thead><tr><th>Nom</th><th>Côté</th><th>Dans la liste</th></tr></thead><tbody>' + base + '</tbody></table>'
-   + '<div class="hint" style="padding-top:10px">Un événement masqué reste visible sur un vol où une heure est déjà saisie.</div></div>';
+    + '<div class="hint" id="evs-' + i + '" style="padding:8px 0 0">' + evSumTxt(e) + '</div></div>'; ;
+}
+function vEvents(){
+  const all = evList(), n = k => all.length;
+  const sides = [['all','Tous'],['dep','Départ'],['arr','Arrivée'],['both','Les deux'],['own','Ajoutés']];
+  const rows = all.map(e => {
+    const on = evSel === e.id;
+    return '<tr class="' + (on ? 'sel' : '') + (e.hidden ? ' off' : '') + '" onclick="if(!event.target.closest(\'button,input,select\'))evPick(\'' + e.id + '\')">'
+      + '<td><b class="evn"><i style="background:' + esc(e.c) + '"></i><span class="evname">' + esc(e.t) + '</span></b>' + (e.own ? '<span class="tag">Ajouté</span>' : '') + (e.hidden ? '<span class="tag">Masqué</span>' : '') + '</td>'
+      + '<td>' + SIDE[e.side] + '</td>'
+      + '<td><div class="evacts">' + e.it.map((x, j) => '<span><small>' + (j + 1) + '</small>' + esc(x[1]) + ' ' + ROLE_CH(x[2]) + '</span>').join('') + '</div></td>'
+      + '<td class="mut">' + evTl(e.it) + '</td><td>' + (e.cies.length ? esc(e.cies.join(' ')) : '<span class="mut">Toutes</span>') + '</td>'
+      + '<td style="text-align:right"><button class="btn g" type="button" onclick="evPick(\'' + e.id + '\')">' + (on ? 'Fermer' : 'Régler') + '</button></td></tr>'
+      + (on ? '<tr class="evxr"><td colspan="6">' + (e.own ? evCustomEditor(e.i) : evBuiltinEditor(e)) + '</td></tr>' : '');
+  }).join('');
+  return '<div class="hd"><div><h1>Événements</h1><p>Ce que l\'agent ajoute sur un vol avec « + Ajouter un événement ». Chaque événement regroupe 1 à 4 actions : <b>une heure</b> (un bouton Now, un repère sur la timeline) ou un <b>début</b> et une <b>fin</b> (une barre avec sa durée). Touchez une ligne pour la régler : l\'aperçu montre la carte dans l\'app.</p></div></div>'
+   + '<div class="evbar"><div class="seg">' + sides.map(([k, t]) => '<button type="button" class="' + (evF === k ? 'on' : '') + '" onclick="evF=\'' + k + '\';render()">' + t + '</button>').join('') + '</div><span class="sp"></span><span class="legend">' + ROLE_CH('h') + ROLE_CH('d') + ROLE_CH('f') + '</span><button class="btn p" type="button" onclick="evAdd();evF=\'all\';evSel=\'c:\'+(C.events.length-1);render()">+ Nouvel événement</button></div>'
+   + '<div class="card tw"><table class="evt"><thead><tr><th>Événement</th><th>Côté</th><th>Actions dans l\'app</th><th>Timeline</th><th>Compagnies</th><th></th></tr></thead><tbody>' + (rows || '<tr><td colspan="6" class="mut">Aucun événement ici.</td></tr>') + '</tbody></table></div>'
+   + '<p class="hint" style="padding:0">Un événement masqué reste visible sur un vol où une heure est déjà saisie.</p>';
 }
 
 /* Mots rapides du journal (onglet Notes, mode clavier) */
@@ -745,6 +1004,7 @@ function dSync(i){
   const c = dCalc(f, i); if(c.bad) return;
   [['aibt', c.A], ['sobt', c.D], ['aobt', c.off], ['ctot', c.ctot]].forEach(([k, m]) => { const x = document.getElementById('dm-' + i + '-' + k); if(x) x.placeholder = m == null ? 'aucun' : dHM(m); });
   const dd = document.getElementById('dd-' + i); if(dd) dd.outerHTML = dDetails(f, i);   // les heures grises suivent SIBT / AIBT / AOBT
+  const fr = document.querySelector('.frise'); if(fr) fr.outerHTML = dFrise(dfl());   // v3.47 : la frise suit la saisie
 }
 // Heure saisie dans les détails → heure réelle : -20, 10:35, AIBT+3, AOBT-5…
 function dTm(v, c){
@@ -780,14 +1040,13 @@ const DL_LOAD = [
   ['Load prévi', [['PreviPAX_MAIN','Pax (FR/RK)'],['PreviPAX_INF','Bébés (FR/RK)'],['PreviBAGS','Bags (FR/RK)'],['PreviMALE','Hommes'],['PreviFEMALE','Femmes'],['PreviCHILD','Enfants'],['PreviINFANT','Bébés'],['PreviBAGS_OTHER','Bags'],['PreviPOIDS_OTHER','Poids bags'],['PreviPoussettesPorte','Poussettes porte'],['PreviPoussettesCBS','Poussettes CBS'],['PreviSI','SI',1]]],
   ['Load final', [['FinalADULT','Adultes (FR/RK)'],['FinalMALE','Hommes'],['FinalFEMALE','Femmes'],['FinalCHILD','Enfants'],['FinalINFANT','Bébés'],['FinalOA','Zone OA'],['FinalOB','Zone OB'],['FinalOC','Zone OC'],['FinalOD','Zone OD'],['FinalBAGS','Bags'],['FinalPOIDS','Poids bags'],['FinalGB','GB'],['FinalH1','Soute 1'],['FinalH2','Soute 2'],['FinalH3','Soute 3'],['FinalH4','Soute 4'],['FinalSI','SI',1]]],
   ['Fuel', [['BlockFuel','Block fuel'],['TaxiFuel','Taxi fuel'],['TripFuel','Trip fuel'],['FuelUplift','Uplift'],['FuelUplift2','Uplift 2'],['FuelUplift3','Uplift 3'],['FuelUplift4','Uplift 4']]]];
-const dOpen = new Set();
-function dTog(i){ dOpen.has(i) ? dOpen.delete(i) : dOpen.add(i); render(); }
 function dSetX(i, bag, id, v){ if(bag === 'notes'){ const g = dEdit()[i]; g.notes = String(v); if(!g.notes.trim()) delete g.notes; save(); const c = document.getElementById('dn-' + i); if(c) c.textContent = dCount(g); return; } const f = dEdit()[i], o = f[bag] || (f[bag] = {}); v = String(v); if(v.trim()) o[id] = v; else delete o[id]; save(); const c = document.getElementById('dn-' + i); if(c) c.textContent = dCount(f); }
 function dEvAdd(i, k){ if(!k) return; const f = dEdit()[i]; f.evs = [...new Set([...(f.evs || []), k])]; save(); render(); }
 function dEvDel(i, k){ const f = dEdit()[i], e = dEvAll().find(x => x.k === k); f.evs = (f.evs || []).filter(x => x !== k); if(e && f.tm) e.f.forEach(([id]) => delete f.tm[id]); save(); render(); }
 function dCount(f){ const n = Object.keys(f.tm || {}).length + Object.keys(f.val || {}).length + (String(f.notes || '').trim() ? 1 : 0); return n ? n + ' saisie' + (n > 1 ? 's' : '') : ''; }
 const TIME_OK = v => { v = String(v || '').trim().replace(/[−–]/g, '-'); return !v || /^vide$/i.test(v) || /^(\d{1,2})[:h](\d{2})$/.test(v) || /^(SIBT|AIBT|SOBT|EOBT|CTOT|AOBT)?\s*[+-]?\s*\d+$/i.test(v); };
-function dDetails(f, i){
+function dDetails(f, i, part){
+  part = part || dTab;
   const auto = f.fill !== 'none', c = dCalc(f, i), cie = String(f.cie || '').toUpperCase();
   // Ce que l'app remplira d'office (même plan que la démo : demo-auto.js) → affiché en gris dans chaque case
   const plan = auto && !c.bad && typeof demoAutoPlan === 'function' ? demoAutoPlan(i, cie, c) : { tm:[], val:[], notes:[] };
@@ -802,39 +1061,78 @@ function dDetails(f, i){
   const all = dEvAll(), on = (f.evs || []).filter(k => all.some(e => e.k === k));
   const evs = on.map(k => { const e = all.find(x => x.k === k); return '<div class="dev"><div class="devh"><b>' + esc(e.t) + '</b><button class="btn d" type="button" aria-label="Retirer" onclick="dEvDel(' + i + ',\'' + k + '\')">×</button></div><div class="dgrid dt">' + e.f.map(([id, lb]) => tin(id, lb)).join('') + '</div></div>'; }).join('');
   const pick = '<select class="refsel" onchange="dEvAdd(' + i + ',this.value)"><option value="">+ Ajouter un événement</option>' + all.filter(e => !on.includes(e.k)).map(e => '<option value="' + e.k + '">' + esc(e.t) + '</option>').join('') + '</select>';
-  return '<div class="ddet" id="dd-' + i + '">'
-    + '<div class="dexp">' + (auto ? '<b>En gris : ce que l\'app mettra</b> si la démo est lancée maintenant, en ' + dTzName() + '. « à venir » = pas encore arrivé au lancement : la case reste vide dans l\'app. Tapez une valeur pour la remplacer.' : '<b>Je saisis moi-même</b> : seules les cases remplies ici apparaîtront dans l\'app.')
-    + '<br>Heure : <b>10:35</b> (' + dTzName() + '), <b>-20</b> = 20 min avant le lancement, ou calée sur le vol : <b>AIBT+3</b>, <b>AOBT-5</b>. <b>vide</b> = laisser la case vide.</div>'
-    + '<h3>Arrivée</h3><div class="dgrid dt">' + DT_ARR.map(([id, lb]) => tin(id, lb)).join('') + '</div>'
-    + '<h3>Départ</h3><div class="dgrid dt">' + DT_DEP.map(([id, lb]) => tin(id, lb)).join('') + '</div>'
-    + '<h3>Événements</h3>' + evs + pick
-    + DL_LOAD.map(([h, fl]) => '<h3>' + h + '</h3><div class="dgrid">' + fl.map(([id, lb, w]) => vin(id, lb, w)).join('') + '</div>').join('')
-    + '<h3>Notes du journal</h3><textarea class="txt" rows="4" style="width:100%;min-height:90px;font:inherit" placeholder="' + esc(notesPh || 'Une ligne par note, ex. AIBT+3 · SNY · DERUHU') + '" oninput="dSetX(' + i + ',\'notes\',null,this.value)">' + esc(f.notes || '') + '</textarea>'
-    + '</div>';
+  const help = '<div class="dexp">' + (auto ? '<b>En gris : ce que l\'app mettra</b> si la démo est lancée maintenant, en ' + dTzName() + '. « à venir » = pas encore arrivé au lancement : la case reste vide dans l\'app. Tapez une valeur pour la remplacer.' : '<b>Je saisis moi-même</b> : seules les cases remplies ici apparaîtront dans l\'app.')
+    + '<br>Heure : <b>10:35</b> (' + dTzName() + '), <b>-20</b> = 20 min avant le lancement, ou calée sur le vol : <b>AIBT+3</b>, <b>AOBT-5</b>. <b>vide</b> = laisser la case vide.</div>';
+  const parts = {
+    arr: help + '<h3>Arrivée</h3><div class="dgrid dt">' + DT_ARR.map(([id, lb]) => tin(id, lb)).join('') + '</div>',
+    dep: help + '<h3>Départ</h3><div class="dgrid dt">' + DT_DEP.map(([id, lb]) => tin(id, lb)).join('') + '</div>',
+    ev: help + '<h3>Événements affichés sur ce vol</h3>' + (evs || '<p class="hint" style="padding:0 0 8px">Aucun pour l\'instant.</p>') + pick,
+    load: DL_LOAD.map(([h, fl]) => '<h3>' + h + '</h3><div class="dgrid">' + fl.map(([id, lb, w]) => vin(id, lb, w)).join('') + '</div>').join(''),
+    notes: '<h3>Notes du journal</h3><textarea class="txt" rows="6" style="width:100%;min-height:140px;font:inherit" placeholder="' + esc(notesPh || 'Une ligne par note, ex. AIBT+3 · SNY · DERUHU') + '" oninput="dSetX(' + i + ',\'notes\',null,this.value)">' + esc(f.notes || '') + '</textarea>'
+  };
+  return '<div class="ddet" id="dd-' + i + '">' + (parts[part] || '') + '</div>';
+}
+/* v3.47 : le scénario sur une frise (une barre par vol, de l'arrivée au départ, autour du lancement), puis la fiche du vol choisi par onglets */
+let dSel = 0, dTab = 'vol';
+function dPick(i){ dSel = i; render(); pvSoon(true); }
+function dDup(i){ const f = dEdit(), c = clone(f[i]); c.open = false; f.splice(i + 1, 0, c); dSel = i + 1; save(); render(); }
+function dState(f, i){
+  const c = dCalc(f, i);
+  if(f.cx) return ['Annulé', 'bad'];
+  if(c.bad) return ['Heure à corriger', 'bad'];
+  return c.off <= 0 ? ['Parti', 'ok'] : c.A <= 0 ? ['Au sol', 'nv'] : c.sibt - 60 <= 0 ? ['En approche', ''] : ['Prévu', 'm'];
+}
+function dFrise(fl){
+  const cs = fl.map((f, i) => dCalc(f, i)).map(c => c.bad ? null : c);
+  const lo = Math.min(-90, ...cs.filter(Boolean).map(c => Math.min(c.sibt, c.A))) - 10, hi = Math.max(120, ...cs.filter(Boolean).map(c => Math.max(c.D, c.off))) + 40;
+  const X = m => ((m - lo) / (hi - lo) * 100).toFixed(2) + '%';
+  let ax = ''; for(let m = Math.ceil(lo / 30) * 30; m <= hi; m += 30) if(m) ax += '<span style="left:' + X(m) + '">' + (m > 0 ? '+' : '') + m + '</span>';
+  const rows = fl.map((f, i) => {
+    const c = cs[i], st = dState(f, i), lab = [f.paf ? 'PAF ' + f.paf : '', c && c.ctot != null ? 'CTOT ' + dHM(c.ctot) : '', f.dl ? 'Retard ' + f.dl : ''].filter(Boolean).join(' · ');
+    const bar = !c ? '' : '<span class="fb ' + (f.cx ? 'cx' : st[1]) + '" style="left:' + X(Math.min(c.sibt, c.A)) + ';width:calc(' + X(Math.max(c.D, c.off)) + ' - ' + X(Math.min(c.sibt, c.A)) + ')"></span>'
+      + '<span class="fl" style="left:calc(' + X(Math.max(c.D, c.off)) + ' + 6px)">' + esc(st[0]) + (lab ? ' · ' + esc(lab) : '') + '</span>';
+    return '<div class="fr' + (i === dSel ? ' on' : '') + '" role="button" tabindex="0" onclick="dPick(' + i + ')"><div class="fn"><span class="code">' + esc(f.cie || '?') + '</span><b>' + esc((f.cie || '') + (f.dep || f.arr || '')) + '</b><small>' + esc(f.ap || '') + '</small>' + (f.open ? '<i title="Onglet ouvert au lancement"></i>' : '') + '</div><div class="ft">' + bar + '</div></div>';
+  }).join('');
+  return '<div class="card frise"><div class="frh"><h2 style="padding:0">Scénario · ce que l\'agent voit au lancement</h2><span class="sp"></span><span class="lg"><i class="ok"></i>Parti <i class="nv"></i>Au sol <i></i>En approche <i class="m"></i>Prévu <i class="cx"></i>Annulé <b>•</b> onglet ouvert</span></div>'
+   + '<div class="fx"><div class="fn"></div><div class="ft">' + ax + '<span class="f0" style="left:' + X(0) + '">LANCEMENT</span></div></div>'
+   + '<div class="fbody"><span class="fnow" style="left:calc(150px + (100% - 150px) * ' + ((0 - lo) / (hi - lo)).toFixed(4) + ')"></span>' + rows + '</div>'
+   + '<div class="hint" style="padding:8px 0 0">Chaque barre va de l\'arrivée au départ (minutes par rapport au lancement de la démo). Touchez un vol pour le régler.</div></div>';
 }
 function vDemo(){
   const fl = dfl() || demoDefault(), own = !!dfl();
-  const cc = i => { const c = dCalc(fl[i], i), h = m => c.bad ? '' : m == null ? 'aucun' : dHM(m); return { A:h(c.A), D:h(c.D), ctot:h(c.ctot), off:h(c.off) }; };
-  const inp = (i, k, lbl, w, ph) => '<div class="f"><label>' + lbl + '</label><input id="dm-' + i + '-' + k + '" class="txt" style="min-width:0' + (w ? ';max-width:' + w + 'px' : '') + '" value="' + esc(fl[i][k] ?? '') + '" placeholder="' + (ph || '') + '" oninput="dSet(' + i + ',\'' + k + '\',this.value)"></div>';
-  const cards = fl.map((f, i) => '<div class="card dcard"><div class="dhd"><span class="code">' + esc(f.cie || '?') + '</span><b>' + esc((f.cie || '') + (f.arr || '') + ' → ' + (f.cie || '') + (f.dep || '')) + '</b><span class="tag">' + esc(f.ap || '---') + '</span>'
-    + (f.cx ? '<span class="st w">Annulé</span>' : '') + '<span class="sp" style="flex:1"></span>'
-    + '<div class="seg"><button type="button" class="' + (f.open ? 'on' : '') + '" onclick="dSet(' + i + ',\'open\',true)">Onglet ouvert</button><button type="button" class="' + (f.open ? '' : 'on') + '" onclick="dSet(' + i + ',\'open\',false)">Dans la liste</button></div>'
-    + '<button class="btn" type="button" aria-label="Monter" onclick="dMove(' + i + ',-1)"' + (i ? '' : ' disabled') + '>↑</button><button class="btn" type="button" aria-label="Descendre" onclick="dMove(' + i + ',1)"' + (i < fl.length - 1 ? '' : ' disabled') + '>↓</button><button class="btn d" type="button" aria-label="Retirer" onclick="dDel(' + i + ')">×</button></div>'
-    + '<div class="dgrid">' + inp(i,'cie','Cie',70) + inp(i,'arr','N° arrivée',100) + inp(i,'dep','N° départ',100) + inp(i,'ap','Prov. / dest.',90) + inp(i,'reg','Immat',110) + inp(i,'type','Type',90) + inp(i,'park','Parking',80) + inp(i,'paf','PAF',70) + inp(i,'tat','Escale (min)',90) + '</div>'
-    + '<div class="dgrid dt">' + inp(i,'sibt','SIBT',90,'-60') + inp(i,'aibt','AIBT',90,cc(i).A) + inp(i,'sobt','SOBT',90,cc(i).D) + inp(i,'ctot','CTOT',90,cc(i).ctot) + inp(i,'aobt','AOBT',90,cc(i).off) + inp(i,'dl','Codes retard',140,'ex. 32 4, 77 4') + '</div>'
-    + '<div class="dft"><div class="seg"><button type="button" class="' + (f.fill !== 'none' ? 'on' : '') + '" onclick="dSet(' + i + ',\'fill\',\'auto\')">Rempli comme un vrai vol</button><button type="button" class="' + (f.fill === 'none' ? 'on' : '') + '" onclick="dSet(' + i + ',\'fill\',\'none\')">Je saisis moi-même</button></div>'
-    + '<label class="dcx"><input type="checkbox"' + (f.cx ? ' checked' : '') + ' onchange="dSet(' + i + ',\'cx\',this.checked)"> Annulé</label></div>'
-    + '<div class="hint" id="dl-' + i + '" style="padding:8px 0 0">' + dLine(f, i) + '</div>'
-    + '<button class="btn dmore" type="button" onclick="dTog(' + i + ')" aria-expanded="' + dOpen.has(i) + '">' + (dOpen.has(i) ? 'Masquer les détails' : 'Heures, événements, loads, fuel, notes') + ' <span class="tag" id="dn-' + i + '">' + dCount(f) + '</span></button>'
-    + (dOpen.has(i) ? dDetails(f, i) : '') + '</div>').join('');
-  return '<div class="hd"><div><h1>Vols de démo</h1><p>Le scénario que la démo rejoue à son lancement et quand on touche « Réinitialiser ». Les heures grises sont celles que l\'app calcule. Pour en changer une : <b>10:35</b> = heure exacte, <b>-20</b> = 20 min avant le lancement, <b>+15</b> = 15 min après, <b>non</b> = pas encore (AIBT ou AOBT).</p></div><span class="sp"></span>'
-   + '<div class="seg" title="Même réglage que dans l\'app"><button type="button" class="' + (dUTC() ? '' : 'on') + '" onclick="dTz(false)">Heures en LT</button><button type="button" class="' + (dUTC() ? 'on' : '') + '" onclick="dTz(true)">UTC</button></div>'
-   + (own ? '<button class="btn" type="button" onclick="dReset()">Scénario par défaut</button>' : '') + '<button class="btn p" type="button" onclick="dAdd()">+ Ajouter un vol</button></div>'
-   + (own ? '' : '<div class="card"><div class="hint" style="padding:12px 16px">Voici le scénario par défaut. Modifiez n\'importe quel champ pour en faire le vôtre.</div></div>')
-   + cards
+  if(dSel >= fl.length) dSel = fl.length - 1; if(dSel < 0) dSel = 0;
+  const i = dSel, f = fl[i];
+  const cc = c => { const h = m => c.bad ? '' : m == null ? 'aucun' : dHM(m); return { A:h(c.A), D:h(c.D), ctot:h(c.ctot), off:h(c.off) }; };
+  const inp = (k, lbl, ph) => '<div class="f"><label>' + lbl + '</label><input id="dm-' + i + '-' + k + '" class="txt" style="min-width:0" value="' + esc(f[k] ?? '') + '" placeholder="' + (ph || '') + '" oninput="dSet(' + i + ',\'' + k + '\',this.value)"></div>';
+  const head = '<div class="hd"><div><h1>Vols de démo</h1><p>Le scénario que la démo rejoue à son lancement et quand on touche « Réinitialiser ». Heures : <b>10:35</b> = heure exacte, <b>-20</b> = 20 min avant le lancement, <b>+15</b> = 15 min après, <b>non</b> = pas encore (AIBT ou AOBT).</p></div><span class="sp"></span>'
+   + '<div class="seg" title="Même réglage que dans l\'app"><button type="button" class="' + (dUTC() ? '' : 'on') + '" onclick="dTz(false)">LT</button><button type="button" class="' + (dUTC() ? 'on' : '') + '" onclick="dTz(true)">UTC</button></div>'
+   + (own ? '<button class="btn" type="button" onclick="dReset()">Scénario par défaut</button>' : '') + '<button class="btn p" type="button" onclick="dAdd();dSel=dfl().length-1;render()">+ Ajouter un vol</button></div>';
+  if(!f) return head;
+  const st = dState(f, i), c = dCalc(f, i), tabs = [['vol','Vol & heures'],['arr','Arrivée'],['dep','Départ'],['ev','Événements'],['load','Load & fuel'],['notes','Notes']];
+  let body;
+  if(dTab === 'vol') body = '<div class="dgrid">' + inp('cie','Compagnie') + inp('arr','N° arrivée') + inp('dep','N° départ') + inp('ap','Prov. / dest.') + inp('reg','Immat') + inp('type','Type') + inp('park','Stand') + inp('paf','PAF') + inp('tat','Escale (min)') + '</div>'
+    + '<div class="dgrid dt dtt">' + inp('sibt','SIBT','-60') + inp('aibt','AIBT',cc(c).A) + inp('sobt','SOBT',cc(c).D) + inp('ctot','CTOT',cc(c).ctot) + inp('aobt','AOBT',cc(c).off) + inp('dl','Codes retard','ex. 32 4, 77 4') + '</div>'
+    + '<div class="dft"><span class="mut">Remplissage</span><div class="seg"><button type="button" class="' + (f.fill !== 'none' ? 'on' : '') + '" onclick="dSet(' + i + ',\'fill\',\'auto\')">Comme un vrai vol</button><button type="button" class="' + (f.fill === 'none' ? 'on' : '') + '" onclick="dSet(' + i + ',\'fill\',\'none\')">Je saisis moi-même</button></div>'
+    + '<label class="dcx"><input type="checkbox"' + (f.cx ? ' checked' : '') + ' onchange="dSet(' + i + ',\'cx\',this.checked)"> Vol annulé</label></div>'
+    + '<div class="hint" id="dl-' + i + '" style="padding:10px 0 0">' + dLine(f, i) + '</div>';
+  else body = dDetails(f, i, dTab);
+  return head + dFrise(fl)
+   + '<div class="card dcard"><div class="dhd"><span class="code">' + esc(f.cie || '?') + '</span><b style="font-size:16px">' + esc((f.cie || '') + (f.arr || '') + ' → ' + (f.cie || '') + (f.dep || '')) + '</b><span class="tag">' + esc(f.ap || '---') + '</span><span class="st ' + (st[1] === 'ok' ? 'ok' : st[1] === 'bad' ? 'w' : 'm') + '">' + st[0] + '</span><span class="sp" style="flex:1"></span>'
+   + '<div class="seg"><button type="button" class="' + (f.open ? 'on' : '') + '" onclick="dSet(' + i + ',\'open\',true)">Onglet ouvert</button><button type="button" class="' + (f.open ? '' : 'on') + '" onclick="dSet(' + i + ',\'open\',false)">Dans « Ouvrir un vol »</button></div>'
+   + '<button class="btn" type="button" aria-label="Monter" onclick="dMove(' + i + ',-1);dSel=Math.max(0,dSel-1);render()"' + (i ? '' : ' disabled') + '>↑</button><button class="btn" type="button" aria-label="Descendre" onclick="dMove(' + i + ',1);dSel=Math.min(dfl().length-1,dSel+1);render()"' + (i < fl.length - 1 ? '' : ' disabled') + '>↓</button>'
+   + '<button class="btn" type="button" onclick="dDup(' + i + ')">Dupliquer</button><button class="btn d" type="button" onclick="dDel(' + i + ')">Retirer</button></div>'
+   + '<div class="tabs" role="tablist">' + tabs.map(([k, t]) => '<button type="button" role="tab" class="' + (dTab === k ? 'on' : '') + '" onclick="dTab=\'' + k + '\';render()">' + t + (k !== 'vol' && dCountPart(f, k) ? ' <span class="tag">' + dCountPart(f, k) + '</span>' : '') + '</button>').join('') + '</div>'
+   + '<div style="padding-top:14px">' + body + '</div></div>'
    + '<p class="hint" style="padding:0">Après « Publier », rouvrez la démo : elle repart sur ce scénario. Entre deux réinitialisations, ce que vous saisissez dans l\'app reste en place.</p>';
 }
-
+function dCountPart(f, k){
+  const ids = { arr:DT_ARR, dep:DT_DEP }[k];
+  if(ids) return ids.filter(([id]) => (f.tm || {})[id]).length;
+  if(k === 'ev') return (f.evs || []).length;
+  if(k === 'load') return Object.keys(f.val || {}).length;
+  if(k === 'notes') return String(f.notes || '').trim() ? String(f.notes).trim().split('\n').length : 0;
+  return 0;
+}
 /* Publication (v3.46) : code admin + historique des publications gardé sur Cloudflare (30 dernières), retour à une version en un clic */
 let hist = null, histErr = '', codeMsg = '';
 function codeSave(){ const v = $('#admCode').value.trim(); try{ v ? localStorage.setItem('adminCode', v) : localStorage.removeItem('adminCode'); }catch(e){}
