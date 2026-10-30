@@ -270,35 +270,54 @@ function pubBar(){
   $('#pubBtn').disabled = !d || busy; $('#undoBtn').hidden = !d || busy;
 }
 let busy = false;
-// v3.40 : écrit config.json dans le repo de la démo (API GitHub, jeton gardé dans ce navigateur)
-const GH = (() => { const o = (location.hostname.match(/^([^.]+)\.github\.io$/) || [])[1] || 'hugoflying', r = location.pathname.split('/').filter(Boolean)[0] || 'testapp';
-  return { owner:o, repo: /\.html$/.test(r) ? 'testapp' : r, path:'config.json' }; })();
-const b64 = t => btoa(unescape(encodeURIComponent(t)));
-async function ghPut(obj, msg){
-  const tok = (localStorage.getItem('ghToken') || '').trim(); if(!tok) throw new Error('notoken');
-  const api = 'https://api.github.com/repos/' + GH.owner + '/' + GH.repo + '/contents/' + GH.path;
-  const h = { Authorization:'Bearer ' + tok, Accept:'application/vnd.github+json' };
-  let sha; const g = await fetch(api + '?ref=main&t=' + Date.now(), { headers:h, cache:'no-store' });
-  if(g.ok) sha = (await g.json()).sha; else if(g.status !== 404) throw new Error(String(g.status));
-  const text = JSON.stringify(obj, null, 1), body = { message:msg, content:b64(text), branch:'main' }; if(sha) body.sha = sha;
-  const r = await fetch(api, { method:'PUT', headers:Object.assign({ 'Content-Type':'application/json' }, h), body:JSON.stringify(body) });
-  if(!r.ok) throw new Error(String(r.status));
-  LS.set('adminCfgRemote', obj); try{ localStorage.setItem('adminCfgRemote', text); }catch(e){}
+// v3.46 : publication sur Cloudflare (functions/api/config.js du projet companionturnaroundapp, KV), code admin gardé dans ce navigateur
+const CF = 'https://companionturnaroundapp.pages.dev/api/config';
+const adminCode = () => (localStorage.getItem('adminCode') || '').trim();
+const devName = () => { const u = navigator.userAgent; return /iPhone/.test(u) ? 'iPhone' : /iPad/.test(u) ? 'iPad' : /Android/.test(u) ? 'Android' : /Windows/.test(u) ? 'PC Windows' : /Mac/.test(u) ? 'Mac' : 'Ordinateur'; };
+async function cfCall(method, body){
+  const code = adminCode(); if(!code) throw new Error('nocode');
+  const r = await fetch(CF + (method === 'GET' ? '?history=1&t=' + Date.now() : ''), { method, cache:'no-store',
+    headers:Object.assign({ 'X-Admin-Code':code }, body ? { 'Content-Type':'application/json' } : {}), body: body ? JSON.stringify(body) : undefined });
+  let j = null; try{ j = await r.json(); }catch(e){}
+  if(!r.ok) throw new Error((j && j.error) || String(r.status));
+  return j;
 }
-const ghWhy = e => e.message === 'notoken' ? 'aucun jeton GitHub enregistré (menu Publication)' : e.message === '401' ? 'jeton GitHub refusé ou expiré' : /^(403|404)$/.test(e.message) ? 'le jeton n\'a pas le droit d\'écrire dans ' + GH.repo : 'GitHub injoignable (' + e.message + ')';
+const cfWhy = e => ({ nocode:'aucun code admin enregistré (menu Publication)', badcode:'code admin refusé', nokv:'stockage Cloudflare pas encore branché' })[e.message]
+  || 'Cloudflare injoignable (' + e.message + ')';
+// Ce qui a changé entre deux versions, en quelques mots pour l'historique
+function sumDiff(a, b){
+  const out = [], A = (a && a.al) || {}, B = (b && b.al) || {};
+  if(b && b.reset) return 'Réglages d\'origine';
+  Object.keys(B).forEach(c => {
+    if(!A[c]){ out.push('+ ' + c); return; }
+    if(JSON.stringify(A[c]) === JSON.stringify(B[c])) return;
+    const k = new Set(); Object.keys(Object.assign({}, A[c], B[c])).forEach(x => { if(JSON.stringify(A[c][x]) !== JSON.stringify(B[c][x])) k.add(({ types:'types avion et cibles', hle:'HLE', dl:'codes retard', dlLike:'codes retard', n:'nom', icao:'nom' })[x] || x); });
+    out.push(c + ' : ' + [...k].join(', '));
+  });
+  Object.keys(A).forEach(c => { if(!B[c]) out.push('− ' + c); });
+  const top = new Set(); Object.keys(Object.assign({}, a, b)).forEach(x => { if(['al','at','v','reset'].includes(x)) return; if(JSON.stringify((a || {})[x]) !== JSON.stringify((b || {})[x])) top.add(({ events:'Événements', evHide:'Événements', words:'Mots rapides', demo:'Vols de démo' })[x] || x); });
+  return out.concat([...top]).join(' · ') || 'Aucun changement';
+}
+async function cfPut(obj){
+  const j = await cfCall('POST', { cfg:obj, dev:devName(), sum:sumDiff(pubCfg(), obj) });
+  try{ localStorage.setItem('adminCfgRemote', JSON.stringify(j.cfg)); }catch(e){}
+  hist = j.hist;
+}
 async function publish(){
-  C.at = Date.now(); LS.set('adminCfg', C); LS.set('adminCfgDraft', null);
+  C.at = Date.now(); const out = clone(C);
   busy = true; pubBar();
-  try{ await ghPut(C, 'Admin démo : réglages publiés'); flash = 'Publié pour tout le monde : visible dans la démo d\'ici 1 à 2 min.'; }
-  catch(e){ flash = 'Publié sur cet appareil seulement : ' + ghWhy(e) + '.'; }
+  try{ await cfPut(out); flash = 'Publié pour tout le monde : visible dans l\'app en moins d\'une minute.'; }
+  catch(e){ flash = 'Publié sur cet appareil seulement : ' + cfWhy(e) + '.'; }
+  LS.set('adminCfg', out); LS.set('adminCfgDraft', null);
   busy = false; pubBar(); if(cur === 'publication') render();
 }
 function undo(){ C = clone(pubCfg()); LS.set('adminCfgDraft', null); flash = ''; go(cur); }
 function resetAll(){
   if(!confirm('Revenir aux réglages d\'origine de l\'app ? Les compagnies ajoutées et les cibles modifiées seront perdues.')) return;
   const r = {v:1, reset:true, at:Date.now()};
-  LS.set('adminCfg', r); LS.set('adminCfgDraft', null); C = clone(DEFAULTS); busy = true; go('compagnies');
-  ghPut(r, 'Admin démo : retour aux réglages d\'origine').then(() => { flash = 'Réglages d\'origine rétablis pour tout le monde.'; }, e => { flash = 'Réglages d\'origine rétablis sur cet appareil seulement : ' + ghWhy(e) + '.'; }).then(() => { busy = false; pubBar(); });
+  busy = true; go('compagnies');
+  cfPut(r).then(() => { flash = 'Réglages d\'origine rétablis pour tout le monde.'; }, e => { flash = 'Réglages d\'origine rétablis sur cet appareil seulement : ' + cfWhy(e) + '.'; })
+    .then(() => { LS.set('adminCfg', r); LS.set('adminCfgDraft', null); C = clone(DEFAULTS); busy = false; go(cur); });
 }
 function icon(k){ return '<svg viewBox="0 0 24 24" aria-hidden="true">' + ICONS[k] + '</svg>'; }
 function side(){
@@ -532,7 +551,8 @@ function authed(){ try{ const o = JSON.parse(localStorage.getItem('pv_auth') || 
 if(!authed()){
   document.body.innerHTML = '<div style="min-height:100vh;display:grid;place-items:center;padding:16px"><div class="card" style="padding:24px;max-width:400px;text-align:center"><h1 style="margin:0 0 8px;font-size:20px">Admin compagnies</h1><p class="hint" style="padding:0 0 16px">Connectez-vous d\'abord dans la démo, puis revenez par le menu « Admin compagnies ».</p><a class="btn p" href="./">Ouvrir la démo</a></div></div>';
 } else {
-  fetch('./config.json?t=' + Date.now(), { cache:'no-store' }).then(r => r.ok ? r.text() : null).then(t => {
+  const oldCfg = () => fetch('./config.json?t=' + Date.now(), { cache:'no-store' }).then(r => r.ok ? r.text() : null);
+  fetch(CF + '?t=' + Date.now(), { cache:'no-store' }).then(r => r.ok ? r.json() : null).then(j => j && j.cfg ? JSON.stringify(j.cfg) : oldCfg(), oldCfg).then(t => {
     if(t == null) return; let o; try{ o = JSON.parse(t); }catch(e){ return; }
     try{ localStorage.setItem('adminCfgRemote', t); }catch(e){}
     if(!LS.get('adminCfgDraft')){ C = clone(pubCfg()); }
@@ -815,30 +835,42 @@ function vDemo(){
    + '<p class="hint" style="padding:0">Après « Publier », rouvrez la démo : elle repart sur ce scénario. Entre deux réinitialisations, ce que vous saisissez dans l\'app reste en place.</p>';
 }
 
-/* Publication (v3.40) : jeton GitHub pour écrire config.json dans le repo de la démo */
-function tokSave(){ const v = $('#ghTok').value.trim(); try{ v ? localStorage.setItem('ghToken', v) : localStorage.removeItem('ghToken'); }catch(e){} tokMsg = v ? 'Jeton enregistré dans ce navigateur.' : 'Jeton retiré.'; render(); }
-let tokMsg = '';
-async function tokTest(){
-  tokMsg = 'Vérification…'; render();
-  try{
-    const tok = (localStorage.getItem('ghToken') || '').trim(); if(!tok) throw new Error('notoken');
-    const r = await fetch('https://api.github.com/repos/' + GH.owner + '/' + GH.repo, { headers:{ Authorization:'Bearer ' + tok, Accept:'application/vnd.github+json' }, cache:'no-store' });
-    if(!r.ok) throw new Error(String(r.status));
-    const j = await r.json(); tokMsg = j.permissions && j.permissions.push === false ? 'Le jeton lit ' + GH.repo + ' mais ne peut pas y écrire : ajoutez le droit Contents en écriture.' : 'Jeton valide : la publication pour tout le monde est prête.';
-  }catch(e){ tokMsg = 'Problème : ' + ghWhy(e) + '.'; }
-  render();
+/* Publication (v3.46) : code admin + historique des publications gardé sur Cloudflare (30 dernières), retour à une version en un clic */
+let hist = null, histErr = '', codeMsg = '';
+function codeSave(){ const v = $('#admCode').value.trim(); try{ v ? localStorage.setItem('adminCode', v) : localStorage.removeItem('adminCode'); }catch(e){}
+  codeMsg = v ? '' : 'Code oublié sur cet appareil.'; hist = null; histErr = ''; if(v) histLoad(); else render(); }
+async function histLoad(){
+  histErr = ''; codeMsg = 'Vérification…'; render();
+  try{ hist = (await cfCall('GET')).hist; codeMsg = '✓ Code accepté sur cet appareil. Les 30 dernières versions sont gardées.'; }
+  catch(e){ hist = null; codeMsg = ''; histErr = cfWhy(e); }
+  if(cur === 'publication') render();
+}
+const dhm = t => { const d = new Date(+t); return String(d.getDate()).padStart(2,'0') + '/' + String(d.getMonth()+1).padStart(2,'0') + ' ' + String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0'); };
+async function rollback(id){
+  const h = (hist || []).find(x => x.id === id); if(!h) return;
+  if(!confirm('Remettre en ligne la version du ' + dhm(h.at) + ' (' + h.sum + ') ? Elle remplace les réglages actuels pour tout le monde.')) return;
+  busy = true; pubBar();
+  try{ const j = await cfCall('POST', { rollback:id, label:dhm(h.at), dev:devName() }); hist = j.hist;
+    try{ localStorage.setItem('adminCfgRemote', JSON.stringify(j.cfg)); }catch(e){}
+    LS.set('adminCfg', null); LS.set('adminCfgDraft', null); C = clone(pubCfg()); flash = 'Version du ' + dhm(h.at) + ' remise en ligne pour tout le monde.'; }
+  catch(e){ flash = 'Retour impossible : ' + cfWhy(e) + '.'; }
+  busy = false; pubBar(); render();
 }
 function vPub(){
-  const has = !!(localStorage.getItem('ghToken') || '').trim();
-  return '<div class="hd"><div><h1>Publication</h1><p>« Publier » écrit vos réglages dans le fichier config.json du repo ' + esc(GH.owner + '/' + GH.repo) + '. Toute personne qui ouvre la démo les reçoit, en général 1 à 2 minutes après. Sans jeton, ils ne s\'appliquent que sur cet appareil.</p></div></div>'
-   + '<div class="split"><div class="card"><h2>Jeton GitHub</h2><div class="form">'
-   + '<div class="f"><label>Jeton (gardé seulement dans ce navigateur)</label><input id="ghTok" type="password" autocomplete="off" class="txt" value="' + (has ? '••••••••••••' : '') + '" onfocus="if(this.value.startsWith(\'•\'))this.value=\'\'" placeholder="github_pat_…"></div>'
-   + '<div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn p" type="button" onclick="tokSave()">Enregistrer</button><button class="btn" type="button" onclick="tokTest()"' + (has ? '' : ' disabled') + '>Vérifier</button>' + (has ? '<button class="btn d" type="button" onclick="$(\'#ghTok\').value=\'\';tokSave()">Retirer</button>' : '') + '</div>'
-   + (tokMsg ? '<div class="hint" style="padding:0">' + esc(tokMsg) + '</div>' : '') + '</div></div>'
-   + '<div class="card"><h2>Créer le jeton (une seule fois)</h2><ol class="hint" style="padding:8px 16px 14px 34px;line-height:1.6;margin:0">'
-   + '<li>Ouvrez <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">github.com › Fine-grained token</a>.</li>'
-   + '<li>Repository access : <b>Only select repositories</b> → <b>' + esc(GH.repo) + '</b>.</li>'
-   + '<li>Permissions › Repository › <b>Contents : Read and write</b>. Rien d\'autre.</li>'
-   + '<li>Choisissez une expiration, générez, copiez le jeton et collez-le ici.</li></ol></div></div>';
+  const has = !!adminCode();
+  if(has && hist == null && !histErr && !codeMsg) setTimeout(histLoad);
+  const rows = (hist || []).map((h, i) => '<tr style="cursor:default"><td class="num">' + dhm(h.at) + '</td><td>' + esc(h.dev || '—') + '</td><td>' + esc(h.sum || '—') + '</td><td style="text-align:right">'
+    + (i === 0 ? '<span class="tag" style="background:#E7F6EC;border-color:#BFE5CB;color:#1E7B3C">En ligne</span>' : '<button class="btn" type="button" onclick="rollback(\'' + esc(h.id) + '\')"' + (busy ? ' disabled' : '') + '>Revenir à cette version</button>') + '</td></tr>').join('');
+  const body = !has ? '<p class="hint">Enregistrez le code admin pour voir l\'historique.</p>'
+    : histErr ? '<p class="hint">Historique indisponible : ' + esc(histErr) + '.</p>'
+    : hist == null ? '<p class="hint">Chargement…</p>'
+    : !hist.length ? '<p class="hint">Aucune publication sur Cloudflare pour l\'instant. La prochaine apparaîtra ici.</p>'
+    : '<table><thead><tr><th>Date</th><th>Appareil</th><th>Changements</th><th></th></tr></thead><tbody>' + rows + '</tbody></table>';
+  return '<div class="hd"><div><h1>Publication</h1><p>Chaque « Publier » garde une version sur Cloudflare. L\'app reçoit la dernière en moins d\'une minute, et vous pouvez revenir à une version précédente en un clic.</p></div></div>'
+   + '<div class="split"><div class="card tw"><h2>Historique des publications</h2>' + body + '</div>'
+   + '<div class="card"><h2>Code admin</h2><div class="form">'
+   + '<div class="f"><label>Code admin (gardé seulement dans ce navigateur)</label><input id="admCode" type="password" autocomplete="off" class="txt" value="' + (has ? '••••••' : '') + '" onfocus="if(this.value.startsWith(\'•\'))this.value=\'\'" onkeydown="if(event.key===\'Enter\')codeSave()"></div>'
+   + '<div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn p" type="button" onclick="codeSave()">Enregistrer</button>' + (has ? '<button class="btn d" type="button" onclick="$(\'#admCode\').value=\'\';codeSave()">Oublier sur cet appareil</button>' : '') + '</div>'
+   + (codeMsg ? '<div class="hint" style="padding:0">' + esc(codeMsg) + '</div>' : '') + '</div></div></div>';
 }
 </script></body></html>
