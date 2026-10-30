@@ -440,9 +440,10 @@ function changes(){
       const x = (a.types || {})[t], y = (b.types || {})[t]; if(J(x) === J(y)) return;
       if(!x || !y){ out.push({ sec:'Compagnies', t:c + ' : type ' + t + (x ? ' ajouté' : ' retiré'), go:['fiche', c, 'types'], undo:() => { const T = a.types || (a.types = {}); if(y) T[t] = clone(y); else delete T[t]; } }); return; }
       const r = [];
+      if(J(x.sny) !== J(y.sny)) r.push('zones sièges SNY ' + (x.sny ? x.sny.join(' / ') : 'par défaut'));
       if(J(x.mtt) !== J(y.mtt)) r.push('rotation mini ' + (y.mtt ?? 'programme') + ' → ' + (x.mtt ?? 'programme') + ' min');
       if(J(x.crew) !== J(y.crew)) r.push('avec changement d\'équipage ' + (y.crew ?? '—') + ' → ' + (x.crew ?? '—') + ' min');
-      if(r.length) out.push({ sec:'Compagnies', t:c + ' ' + t + ' : ' + r.join(', '), go:['fiche', c, 'types', t], undo:() => put(x, y, ['mtt','crew']) });
+      if(r.length) out.push({ sec:'Compagnies', t:c + ' ' + t + ' : ' + r.join(', '), go:['fiche', c, 'types', t], undo:() => put(x, y, ['mtt','crew','sny']) });
       if(J(x.steps) !== J(y.steps) || J(x.like) !== J(y.like)) out.push({ sec:'Temps d\'escale cibles', t:c + ' ' + t + ' : ' + stepDiff(stepsOf(b, t), stepsOf(a, t)), go:['fiche', c, 'cibles', t], undo:() => put(x, y, ['steps','like']) });
     });
     if(J(a.dl) !== J(b.dl) || J(a.dlLike) !== J(b.dlLike)) out.push({ sec:'Codes retard', t:c + ' : liste des codes retard', go:['fiche', c, 'dl'], undo:() => put(a, b, ['dl','dlLike']) });
@@ -599,6 +600,17 @@ function tGen(a){
    + '</div></div>';
 }
 function delAl(){ if(!confirm('Supprimer ' + sel + ' ?')) return; delete C.al[sel]; save(); go('compagnies'); }
+// v3.48 : zones FWD/MID/AFT par type (FR/RK) pour le siège des SNY ; vide = valeurs de l'app (cfg.js SNY_ZONES0)
+function snySet(t, x){
+  const d = (typeof SNY_ZONES0 === 'object' && SNY_ZONES0[t]) || [], v = Array.isArray(x.sny) ? x.sny : [];
+  return '<span style="white-space:nowrap">' + ['FWD','MID','AFT'].map((z, k) => '<small style="color:var(--muted);font-weight:700;margin:0 3px 0 ' + (k ? 6 : 0) + 'px">' + z + '</small><input class="mini" style="width:42px" title="Dernier rang ' + z + '" inputmode="numeric" value="' + (v[k] ?? '') + '" placeholder="' + (d[k] ?? '—') + '" oninput="setSny(\'' + t + '\',' + k + ',this)">').join('') + '</span>';
+}
+function setSny(t, k, el){
+  const x = AL(sel).types[t], d = (typeof SNY_ZONES0 === 'object' && SNY_ZONES0[t]) || [null, null, null];
+  const v = Array.isArray(x.sny) ? x.sny.slice() : d.slice(); v[k] = parseInt(el.value, 10) || d[k] || null;
+  if(JSON.stringify(v) === JSON.stringify(d) || v.some(n => !n)) delete x.sny; else x.sny = v;
+  el.classList.add('ch'); save();
+}
 function setT(t, k, el){
   const x = AL(sel).types[t], v = el.value.trim();
   x[k] = v === '' ? null : Math.max(0, parseInt(v, 10) || 0); el.classList.add('ch'); save();
@@ -626,7 +638,7 @@ function delType(t){
   save(); render();
 }
 function tTypes(a){
-  const ts = Object.keys(a.types); let r = '';
+  const ts = Object.keys(a.types), snyOn = ['FR','RK'].includes(sel); let r = '';
   ts.forEach(t => {
     const x = a.types[t];
     const opts = '<option value="__own"' + (x.steps ? ' selected' : '') + '>Cibles propres</option>'
@@ -636,11 +648,12 @@ function tTypes(a){
       + '<td><input class="mini" inputmode="numeric" value="' + (x.mtt ?? '') + '" placeholder="—" oninput="setT(\'' + t + '\',\'mtt\',this)"><span class="u">min</span></td>'
       + '<td><input class="mini" inputmode="numeric" value="' + (x.crew ?? '') + '" placeholder="—" oninput="setT(\'' + t + '\',\'crew\',this)"><span class="u">min</span></td>'
       + '<td><select class="refsel" onchange="setLike(\'' + t + '\',this.value)">' + opts + '</select></td>'
+      + (snyOn ? '<td>' + snySet(t, x) + '</td>' : '')
       + '<td style="white-space:nowrap"><button class="btn" type="button" onclick="ty=\'' + t + '\';go(\'fiche\',null,\'cibles\')">Cibles</button> ' + (ts.length > 1 ? '<button class="btn d" type="button" aria-label="Retirer ' + t + '" onclick="delType(\'' + t + '\')">×</button>' : '') + '</td></tr>';
   });
-  return '<div class="card tw"><table><thead><tr><th>Type</th><th>Rotation mini</th><th>Avec changement d\'équipage</th><th>Timeline cible</th><th></th></tr></thead><tbody>' + r + '</tbody></table>'
+  return '<div class="card tw"><table><thead><tr><th>Type</th><th>Rotation mini</th><th>Avec changement d\'équipage</th><th>Timeline cible</th>' + (snyOn ? '<th>Zones sièges SNY (dernier rang)</th>' : '') + '<th></th></tr></thead><tbody>' + r + '</tbody></table>'
    + '<div class="rule" style="flex-wrap:wrap;align-items:center"><input id="newType" class="mini" style="width:96px;text-transform:uppercase" maxlength="6" placeholder="A21N" onkeydown="if(event.key===\'Enter\')addType()"><button class="chip add" type="button" onclick="addType()">+ Ajouter un type</button>'
-   + '<span style="color:var(--muted);flex-basis:100%">EOBT = max(SOBT, AIBT + rotation mini). Rotation vide : rotation prévue au programme. Changement d\'équipage vide : même rotation. Un type absent de la liste prend les réglages du type par défaut.</span></div></div>';
+   + '<span style="color:var(--muted);flex-basis:100%">' + (snyOn ? 'Zones sièges : dernier rang de FWD, MID et AFT. L\'app s\'en sert pour donner la zone du siège d\'un SNY (notes et LOAD FINAL). Vide : valeurs Ryanair de l\'app. ' : '') + 'EOBT = max(SOBT, AIBT + rotation mini). Rotation vide : rotation prévue au programme. Changement d\'équipage vide : même rotation. Un type absent de la liste prend les réglages du type par défaut.</span></div></div>';
 }
 function tCibles(a){
   const ts = Object.keys(a.types);
