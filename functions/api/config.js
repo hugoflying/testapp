@@ -1,4 +1,5 @@
 // v3.46 : réglages de l'admin compagnies gardés sur Cloudflare KV, avec l'historique des publications.
+// v3.46.1 : hébergé par le projet Pages timing-demo (relié à testapp), plus par la prod.
 // Liaisons du projet Pages : KV « CFG_KV » (namespace timing-config) et secret « ADMIN_CODE ».
 //   GET                         → dernière version publiée { at, cfg } (lecture libre, c'est ce que lit l'app)
 //   GET  ?history=1  + X-Admin-Code → { hist:[{ id, at, dev, sum }] }, la plus récente d'abord = celle en ligne

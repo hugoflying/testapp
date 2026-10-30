@@ -270,8 +270,8 @@ function pubBar(){
   $('#pubBtn').disabled = !d || busy; $('#undoBtn').hidden = !d || busy;
 }
 let busy = false;
-// v3.46 : publication sur Cloudflare (functions/api/config.js du projet companionturnaroundapp, KV), code admin gardé dans ce navigateur
-const CF = 'https://companionturnaroundapp.pages.dev/api/config';
+// v3.46 : publication sur Cloudflare (functions/api/config.js du projet Pages timing-demo relié à testapp, KV), code admin gardé dans ce navigateur
+const CF = 'https://timing-demo.pages.dev/api/config';
 const adminCode = () => (localStorage.getItem('adminCode') || '').trim();
 const devName = () => { const u = navigator.userAgent; return /iPhone/.test(u) ? 'iPhone' : /iPad/.test(u) ? 'iPad' : /Android/.test(u) ? 'Android' : /Windows/.test(u) ? 'PC Windows' : /Mac/.test(u) ? 'Mac' : 'Ordinateur'; };
 async function cfCall(method, body){

@@ -7,7 +7,7 @@ const { onRequest } = await import(fn); fs.unlinkSync(fn);
 const store = new Map(), env = { ADMIN_CODE:'secret42', CFG_KV:{ get: async (k, t) => { const v = store.get(k); return v == null ? null : t === 'json' ? JSON.parse(v) : v; }, put: async (k, v) => store.set(k, v), delete: async k => store.delete(k) } };
 const b = await chromium.launch(), errs = [], o = {};
 const ctx = await b.newContext({ viewport:{ width:1280, height:860 } });
-await ctx.route('https://companionturnaroundapp.pages.dev/api/config**', async r => { const q = r.request();
+await ctx.route('https://timing-demo.pages.dev/api/config**', async r => { const q = r.request();
   const res = await onRequest({ env, request: new Request(q.url(), { method:q.method(), headers:q.headers(), body: ['GET','OPTIONS'].includes(q.method()) ? undefined : q.postData() }) });
   r.fulfill({ status:res.status, headers:Object.fromEntries(res.headers), body:await res.text() }); });
 await ctx.addInitScript(() => { sessionStorage.setItem('pv_auth', '1'); localStorage.setItem('whatsNewSeen', 'maj-2026-10-18c'); });
@@ -25,7 +25,7 @@ const hle0 = JSON.parse(store.get('v:' + JSON.parse(store.get('hist'))[1].id)).a
 await p.locator('button:has-text("Revenir à cette version")').first().click(); await p.waitForTimeout(500);
 o.after = await p.evaluate(() => hist.map(h => h.sum)); o.rolledBack = JSON.stringify(JSON.parse(store.get('latest')).cfg.al) === JSON.stringify(hle0);
 // visiteur de la démo : rien en local, reçoit la dernière version
-const q = await ctx.browser().newContext({ viewport:{ width:390, height:844 } }); await q.route('https://companionturnaroundapp.pages.dev/api/config**', r => r.fulfill({ status:200, contentType:'application/json', body:store.get('latest') }));
+const q = await ctx.browser().newContext({ viewport:{ width:390, height:844 } }); await q.route('https://timing-demo.pages.dev/api/config**', r => r.fulfill({ status:200, contentType:'application/json', body:store.get('latest') }));
 await q.addInitScript(() => { sessionStorage.setItem('pv_auth', '1'); localStorage.setItem('whatsNewSeen', 'maj-2026-10-18c'); });
 const v = await q.newPage(); v.on('pageerror', e => errs.push(e.message)); await v.goto('http://localhost:8803/'); await v.waitForTimeout(4000);
 o.visitor = await v.evaluate(() => ({ cfg: !!window.CFG, words: (window.CFG && window.CFG.words || []).slice(-1) }));
