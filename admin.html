@@ -996,8 +996,14 @@ function dTz(u){ try{ localStorage.setItem('modeUTC', u ? '1' : '0'); }catch(e){
 const dTzName = () => dUTC() ? 'UTC' : 'LT';
 const dN0 = () => Math.floor(Date.now() / 60000) * 60000;   // v3.47.1 : à la minute pile, comme l'app
 const dR5 = (rel, up) => { const m = dN0() / 60000 + rel; return (up ? Math.ceil(m / 5) : Math.round(m / 5)) * 5 - dN0() / 60000; };
-function dHM(m){ const d = new Date(dN0() + m*60000), u = dUTC(); return String(u ? d.getUTCHours() : d.getHours()).padStart(2,'0') + ':' + String(u ? d.getUTCMinutes() : d.getMinutes()).padStart(2,'0'); }
+// v3.52 (Hugo) : heures de la démo affichées par rapport à T0 (ouverture ou réinitialisation de la démo), ou en heure
+const dT0 = () => { try{ return localStorage.getItem('adminDemoT0') !== '0'; }catch(e){ return true; } };
+function dT0Set(on){ try{ localStorage.setItem('adminDemoT0', on ? '1' : '0'); }catch(e){} render(); }
+const dT = m => m === 0 ? 'T0' : 'T' + (m > 0 ? '+' : '-') + Math.abs(m);
+function dHM(m){ if(dT0()) return dT(m); return dHMa(m); }
+function dHMa(m){ const d = new Date(dN0() + m*60000), u = dUTC(); return String(u ? d.getUTCHours() : d.getHours()).padStart(2,'0') + ':' + String(u ? d.getUTCMinutes() : d.getMinutes()).padStart(2,'0'); }
 function dRel(v){ v = String(v ?? '').trim().replace(/[−–]/g, '-'); if(!v) return null; if(/^(non|x|pas encore)$/i.test(v)) return 'non';
+  if(/^T0?\s*([+-]\s*\d+)?$/i.test(v)){ const t = v.replace(/^T0?\s*/i, '').replace(/\s/g, ''); return t ? parseInt(t, 10) : 0; }   // v3.52 : T-60, T+15, T0
   const m = /^(\d{1,2})[:h](\d{2})$/.exec(v); if(m){ const t = new Date(); if(dUTC()) t.setUTCHours(+m[1], +m[2], 0, 0); else t.setHours(+m[1], +m[2], 0, 0); let r = Math.round((t - dN0()) / 60000); if(r > 720) r -= 1440; if(r < -720) r += 1440; return r; }
   const n = parseInt(v, 10); return isNaN(n) ? NaN : n; }
 function dCalc(f, i){
@@ -1012,8 +1018,9 @@ function dCalc(f, i){
 }
 function dLine(f, i){
   const c = dCalc(f, i), hm = dHM;
-  if(c.bad) return '<span style="color:var(--bad)">Une heure n\'est pas comprise : utilisez -20, +15, 10:35 ou non.</span>';
+  if(c.bad) return '<span style="color:var(--bad)">Une heure n\'est pas comprise : utilisez T-20, T+15, 10:35 ou non.</span>';
   const st = c.off <= 0 ? 'parti' : c.A <= 0 ? 'au sol' : 'pas encore arrivé';
+  if(dT0()) return 'Par rapport à <b>T0</b> (ouverture de la démo ou « Réinitialiser ») : SIBT ' + hm(c.sibt) + ' · AIBT ' + hm(c.A) + ' · SOBT ' + hm(c.D) + (c.ctot != null ? ' · CTOT ' + hm(c.ctot) : '') + ' · AOBT ' + hm(c.off) + ' → <b>' + st + '</b> à T0 <span class="mut">(si T0 = maintenant : SIBT ' + dHMa(c.sibt) + ', SOBT ' + dHMa(c.D) + ' ' + dTzName() + ')</span>';
   return 'Si la démo est lancée maintenant (' + dTzName() + ') : SIBT ' + hm(c.sibt) + ' · AIBT ' + hm(c.A) + ' · SOBT ' + hm(c.D) + (c.ctot != null ? ' · CTOT ' + hm(c.ctot) : '') + ' · AOBT ' + hm(c.off) + ' → <b>' + st + '</b>';
 }
 function dSync(i){
@@ -1083,8 +1090,8 @@ function dDetails(f, i, part){
   const all = dEvAll(), on = (f.evs || []).filter(k => all.some(e => e.k === k));
   const evs = on.map(k => { const e = all.find(x => x.k === k); return '<div class="dev"><div class="devh"><b>' + esc(e.t) + '</b><button class="btn d" type="button" aria-label="Retirer" onclick="dEvDel(' + i + ',\'' + k + '\')">×</button></div><div class="dgrid dt">' + e.f.map(([id, lb]) => tin(id, lb)).join('') + '</div></div>'; }).join('');
   const pick = '<select class="refsel" onchange="dEvAdd(' + i + ',this.value)"><option value="">+ Ajouter un événement</option>' + all.filter(e => !on.includes(e.k)).map(e => '<option value="' + e.k + '">' + esc(e.t) + '</option>').join('') + '</select>';
-  const help = '<div class="dexp">' + (auto ? '<b>En gris : ce que l\'app mettra</b> si la démo est lancée maintenant, en ' + dTzName() + '. « à venir » = pas encore arrivé au lancement : la case reste vide dans l\'app. Tapez une valeur pour la remplacer.' : '<b>Je saisis moi-même</b> : seules les cases remplies ici apparaîtront dans l\'app.')
-    + '<br>Heure : <b>10:35</b> (' + dTzName() + '), <b>-20</b> = 20 min avant le lancement, ou calée sur le vol : <b>AIBT+3</b>, <b>AOBT-5</b>. <b>vide</b> = laisser la case vide.</div>';
+  const help = '<div class="dexp">' + (auto ? '<b>En gris : ce que l\'app mettra</b>, ' + (dT0() ? 'par rapport à T0 (ouverture ou réinitialisation de la démo)' : 'si la démo est lancée maintenant, en ' + dTzName()) + '. « à venir » = pas encore arrivé à T0 : la case reste vide dans l\'app. Tapez une valeur pour la remplacer.' : '<b>Je saisis moi-même</b> : seules les cases remplies ici apparaîtront dans l\'app.')
+    + '<br>Heure : <b>T-20</b> = 20 min avant T0 (ouverture ou réinitialisation de la démo), <b>10:35</b> (' + dTzName() + '), ou calée sur le vol : <b>AIBT+3</b>, <b>AOBT-5</b>. <b>vide</b> = laisser la case vide.</div>';
   const parts = {
     arr: help + '<h3>Arrivée</h3><div class="dgrid dt">' + DT_ARR.map(([id, lb]) => tin(id, lb)).join('') + '</div>',
     dep: help + '<h3>Départ</h3><div class="dgrid dt">' + DT_DEP.map(([id, lb]) => tin(id, lb)).join('') + '</div>',
@@ -1109,7 +1116,7 @@ function dFrise(fl){
   const cs = fl.map((f, i) => dCalc(f, i)).map(c => c.bad ? null : c);
   const lo = Math.min(-90, ...cs.filter(Boolean).map(c => Math.min(c.sibt, c.A))) - 10, hi = Math.max(120, ...cs.filter(Boolean).map(c => Math.max(c.D, c.off))) + 40;
   const X = m => ((m - lo) / (hi - lo) * 100).toFixed(2) + '%';
-  let ax = ''; for(let m = Math.ceil(lo / 30) * 30; m <= hi; m += 30) if(m) ax += '<span style="left:' + X(m) + '">' + (m > 0 ? '+' : '') + m + '</span>';
+  let ax = ''; for(let m = Math.ceil(lo / 30) * 30; m <= hi; m += 30) if(m) ax += '<span style="left:' + X(m) + '">T' + (m > 0 ? '+' : '') + m + '</span>';
   const rows = fl.map((f, i) => {
     const c = cs[i], st = dState(f, i), lab = [f.paf ? 'PAF ' + f.paf : '', c && c.ctot != null ? 'CTOT ' + dHM(c.ctot) : '', f.dl ? 'Retard ' + f.dl : ''].filter(Boolean).join(' · ');
     const bar = !c ? '' : '<span class="fb ' + (f.cx ? 'cx' : st[1]) + '" style="left:' + X(Math.min(c.sibt, c.A)) + ';width:calc(' + X(Math.max(c.D, c.off)) + ' - ' + X(Math.min(c.sibt, c.A)) + ')"></span>'
@@ -1117,9 +1124,9 @@ function dFrise(fl){
     return '<div class="fr' + (i === dSel ? ' on' : '') + '" role="button" tabindex="0" onclick="dPick(' + i + ')"><div class="fn"><span class="code">' + esc(f.cie || '?') + '</span><b>' + esc((f.cie || '') + (f.dep || f.arr || '')) + '</b><small>' + esc(f.ap || '') + '</small>' + (f.open ? '<i title="Onglet ouvert au lancement"></i>' : '') + '</div><div class="ft">' + bar + '</div></div>';
   }).join('');
   return '<div class="card frise"><div class="frh"><h2 style="padding:0">Scénario · ce que l\'agent voit au lancement</h2><span class="sp"></span><span class="lg"><i class="ok"></i>Parti <i class="nv"></i>Au sol <i></i>En approche <i class="m"></i>Prévu <i class="cx"></i>Annulé <b>•</b> onglet ouvert</span></div>'
-   + '<div class="fx"><div class="fn"></div><div class="ft">' + ax + '<span class="f0" style="left:' + X(0) + '">LANCEMENT</span></div></div>'
+   + '<div class="fx"><div class="fn"></div><div class="ft">' + ax + '<span class="f0" style="left:' + X(0) + '">T0</span></div></div>'
    + '<div class="fbody"><span class="fnow" style="left:calc(150px + (100% - 150px) * ' + ((0 - lo) / (hi - lo)).toFixed(4) + ')"></span>' + rows + '</div>'
-   + '<div class="hint" style="padding:8px 0 0">Chaque barre va de l\'arrivée au départ (minutes par rapport au lancement de la démo). Touchez un vol pour le régler.</div></div>';
+   + '<div class="hint" style="padding:8px 0 0">Chaque barre va de l\'arrivée au départ (minutes par rapport à T0 = ouverture ou réinitialisation de la démo). Touchez un vol pour le régler.</div></div>';
 }
 function vDemo(){
   const fl = dfl() || demoDefault(), own = !!dfl();
@@ -1127,14 +1134,15 @@ function vDemo(){
   const i = dSel, f = fl[i];
   const cc = c => { const h = m => c.bad ? '' : m == null ? 'aucun' : dHM(m); return { A:h(c.A), D:h(c.D), ctot:h(c.ctot), off:h(c.off) }; };
   const inp = (k, lbl, ph) => '<div class="f"><label>' + lbl + '</label><input id="dm-' + i + '-' + k + '" class="txt" style="min-width:0" value="' + esc(f[k] ?? '') + '" placeholder="' + (ph || '') + '" oninput="dSet(' + i + ',\'' + k + '\',this.value)"></div>';
-  const head = '<div class="hd"><div><h1>Vols de démo</h1><p>Le scénario que la démo rejoue à son lancement et quand on touche « Réinitialiser ». Heures : <b>10:35</b> = heure exacte (les heures prévues SIBT et SOBT tombent toujours sur 0 ou 5, et la SOBT respecte la rotation mini), <b>-20</b> = 20 min avant le lancement, <b>+15</b> = 15 min après, <b>non</b> = pas encore (AIBT ou AOBT).</p></div><span class="sp"></span>'
+  const head = '<div class="hd"><div><h1>Vols de démo</h1><p>Le scénario que la démo rejoue à son lancement et quand on touche « Réinitialiser ». <b>T0</b> = moment où la démo est ouverte la première fois ou réinitialisée (bouton « Réinitialiser » de la démo ou du Récap) : toutes les heures en <b>T</b> sont recalées dessus. <b>T-20</b> (ou -20) = 20 min avant T0, <b>T+15</b> = 15 min après, <b>10:35</b> = heure exacte, <b>non</b> = pas encore (AIBT ou AOBT). Les heures prévues SIBT et SOBT tombent toujours sur 0 ou 5 et la SOBT respecte la rotation mini.</p></div><span class="sp"></span>'
+   + '<div class="seg" title="Affichage des heures calculées (en gris)"><button type="button" class="' + (dT0() ? 'on' : '') + '" onclick="dT0Set(true)">T0</button><button type="button" class="' + (dT0() ? '' : 'on') + '" onclick="dT0Set(false)">Heure</button></div>'
    + '<div class="seg" title="Même réglage que dans l\'app"><button type="button" class="' + (dUTC() ? '' : 'on') + '" onclick="dTz(false)">LT</button><button type="button" class="' + (dUTC() ? 'on' : '') + '" onclick="dTz(true)">UTC</button></div>'
    + (own ? '<button class="btn" type="button" onclick="dReset()">Scénario par défaut</button>' : '') + '<button class="btn p" type="button" onclick="dAdd();dSel=dfl().length-1;render()">+ Ajouter un vol</button></div>';
   if(!f) return head;
   const st = dState(f, i), c = dCalc(f, i), tabs = [['vol','Vol & heures'],['arr','Arrivée'],['dep','Départ'],['ev','Événements'],['load','Load & fuel'],['notes','Notes']];
   let body;
   if(dTab === 'vol') body = '<div class="dgrid">' + inp('cie','Compagnie') + inp('arr','N° arrivée') + inp('dep','N° départ') + inp('ap','Prov. / dest.') + inp('reg','Immat') + inp('type','Type') + inp('park','Stand') + inp('paf','PAF') + inp('tat','Escale (min)') + '</div>'
-    + '<div class="dgrid dt dtt">' + inp('sibt','SIBT','-60') + inp('aibt','AIBT',cc(c).A) + inp('sobt','SOBT',cc(c).D) + inp('ctot','CTOT',cc(c).ctot) + inp('aobt','AOBT',cc(c).off) + inp('dl','Codes retard','ex. 32 4, 77 4') + '</div>'
+    + '<div class="dgrid dt dtt">' + inp('sibt','SIBT','T-60') + inp('aibt','AIBT',cc(c).A) + inp('sobt','SOBT',cc(c).D) + inp('ctot','CTOT',cc(c).ctot) + inp('aobt','AOBT',cc(c).off) + inp('dl','Codes retard','ex. 32 4, 77 4') + '</div>'
     + '<div class="dft"><span class="mut">Remplissage</span><div class="seg"><button type="button" class="' + (f.fill !== 'none' ? 'on' : '') + '" onclick="dSet(' + i + ',\'fill\',\'auto\')">Comme un vrai vol</button><button type="button" class="' + (f.fill === 'none' ? 'on' : '') + '" onclick="dSet(' + i + ',\'fill\',\'none\')">Je saisis moi-même</button></div>'
     + '<label class="dcx"><input type="checkbox"' + (f.cx ? ' checked' : '') + ' onchange="dSet(' + i + ',\'cx\',this.checked)"> Vol annulé</label></div>'
     + '<div class="hint" id="dl-' + i + '" style="padding:10px 0 0">' + dLine(f, i) + '</div>';
